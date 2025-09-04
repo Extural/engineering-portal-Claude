@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .home-screen {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .module-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 15px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .module-card h2 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .module-card p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.8em;
+        }
+
+        .qa-interface {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .qa-interface.active {
+            display: block;
+        }
+
+        .interface-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 20px;
+        }
+
+        .interface-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .interface-title h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin: 0;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .form-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #ecf0f1;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .form-container.show {
+            display: block;
+        }
+
+        .form-row {
+            display: flex !important;
+            gap: 20px !important;
+            margin-bottom: 20px !important;
+            align-items: flex-end !important;
+        }
+
+        .form-group {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .form-group.small {
+            flex: 0 0 120px !important;
+            max-width: 120px !important;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .required::after {
+            content: '*';
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .form-group.full-width {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            color: #1a1a1a !important;
+            font-weight: 500 !important;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            font-weight: 600 !important;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .edit-btn { background: #3498db; }
+        .delete-btn { background: #e74c3c; }
+        .print-btn { background: #27ae60; }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column !important;
+            }
+            
+            .form-group {
+                width: 100% !important;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Engineering Portal</h1>
+                <p>Comprehensive task management and quality assurance system</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">BR</div>
+                <div>
+                    <div style="font-weight: 600;">Brad Rumbold</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Quality Manager</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="homeScreen" class="home-screen">
+            <div class="module-card" onclick="showQualityAlerts()">
+                <div class="module-header">
+                    <div class="module-icon">📋</div>
+                    <h2>Quality Alerts</h2>
+                </div>
+                <p>Record, manage, and track quality issues and corrective actions</p>
+                <button class="btn">Access Quality Alerts</button>
+            </div>
+        </div>
+
+        <!-- Quality Alerts Interface -->
+        <div id="qualityAlertsInterface" class="qa-interface">
+            <div class="interface-header">
+                <div class="interface-title">
+                    <div class="module-icon">📋</div>
+                    <h2>Quality Alert Management</h2>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showHome()">← Back to Home</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <button class="btn" onclick="showNewQAForm()">+ New Quality Alert</button>
+                <button class="btn btn-success btn-small" onclick="exportData()">📊 Export</button>
+            </div>
+
+            <!-- Form Container -->
+            <div id="qaFormContainer" class="form-container">
+                <h3 id="formTitle">New Quality Alert</h3>
+                <form id="qualityAlertForm" onsubmit="saveQA(event)">
+                    <!-- Row 1: QA#, Complaint Type, Date of Complaint -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="qaNumber" class="required">Quality Alert Number</label>
+                            <input type="text" id="qaNumber" name="qaNumber" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="complaintType" class="required">Complaint Type</label>
+                            <select id="complaintType" name="complaintType" required>
+                                <option value="">Select Type</option>
+                                <option value="Customer Complaint">Customer Complaint</option>
+                                <option value="Internal Finding">Internal Finding</option>
+                                <option value="Supplier Issue">Supplier Issue</option>
+                                <option value="Audit Finding">Audit Finding</option>
+                                <option value="Process Issue">Process Issue</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateComplaint" class="required">Date of Complaint</label>
+                            <input type="date" id="dateComplaint" name="dateComplaint" required>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Part Number, Customer/Supplier, Facility, Revision Level -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partNumber">Part Number</label>
+                            <input type="text" id="partNumber" name="partNumber">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerSupplier">Customer/Supplier</label>
+                            <input type="text" id="customerSupplier" name="customerSupplier">
+                        </div>
+                        <div class="form-group">
+                            <label for="facility">Facility</label>
+                            <select id="facility" name="facility">
+                                <option value="">Select Facility</option>
+                                <option value="Plant 1">Plant 1</option>
+                                <option value="Plant 2">Plant 2</option>
+                                <option value="Warehouse A">Warehouse A</option>
+                                <option value="Remote Site">Remote Site</option>
+                            </select>
+                        </div>
+                        <div class="form-group small">
+                            <label for="revisionLevel">Revision Level</label>
+                            <input type="text" id="revisionLevel" name="revisionLevel" maxlength="2" style="text-align: center;">
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Department, Assigned To, Report By -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <select id="department" name="department">
+                                <option value="">Select Department</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Quality">Quality</option>
+                                <option value="Purchasing">Purchasing</option>
+                                <option value="Production">Production</option>
+                                <option value="R&D">R&D</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignedTo">Assigned To</label>
+                            <select id="assignedTo" name="assignedTo">
+                                <option value="">Select Person</option>
+                                <option value="Brad Rumbold">Brad Rumbold</option>
+                                <option value="Alex Duncan">Alex Duncan</option>
+                                <option value="Alex Braun">Alex Braun</option>
+                                <option value="Sean McCathy">Sean McCathy</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reportBy">Report By (Date)</label>
+                            <input type="date" id="reportBy" name="reportBy">
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Contact, Contact Phone, Contact Email -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact">Contact</label>
+                            <input type="text" id="contact" name="contact">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactPhone">Contact Phone #</label>
+                            <input type="tel" id="contactPhone" name="contactPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">Contact Email</label>
+                            <input type="email" id="contactEmail" name="contactEmail">
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Reject Category, Qty Rejected, Qty Returned, Qty Scrapped -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rejectCategory">Reject Category</label>
+                            <select id="rejectCategory" name="rejectCategory">
+                                <option value="">Select Category</option>
+                                <option value="Dimensional">Dimensional</option>
+                                <option value="Cosmetic">Cosmetic</option>
+                                <option value="Functional">Functional</option>
+                                <option value="Material">Material</option>
+                                <option value="Packaging">Packaging</option>
+                                <option value="Documentation">Documentation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="qtyRejected">Qty Rejected</label>
+                            <input type="number" id="qtyRejected" name="qtyRejected" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="qtyReturned">Qty Returned</label>
+                            <input type="number" id="qtyReturned" name="qtyReturned" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="qtyScrapped">Qty Scrapped</label>
+                            <input type="number" id="qtyScrapped" name="qtyScrapped" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Priority Row -->
+                    <div class="form-row">
+                        <div class="form-group small">
+                            <label for="priority">Priority</label>
+                            <select id="priority" name="priority">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group"></div>
+                        <div class="form-group"></div>
+                    </div>
+
+                    <!-- Text Areas -->
+                    <div class="form-group full-width">
+                        <label for="reasonRejection">Reason for Rejection</label>
+                        <textarea id="reasonRejection" name="reasonRejection" placeholder="Detailed description of the rejection reason..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="containmentActions">Containment Actions</label>
+                        <textarea id="containmentActions" name="containmentActions" placeholder="Immediate actions taken to contain the issue..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="rootCause">Root Cause</label>
+                        <textarea id="rootCause" name="rootCause" placeholder="Analysis of the root cause..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="correctiveAction">Corrective/Preventive Action</label>
+                        <textarea id="correctiveAction" name="correctiveAction" placeholder="Actions to prevent recurrence..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="disposition">Disposition</label>
+                        <textarea id="disposition" name="disposition" placeholder="Final disposition of the quality alert..."></textarea>
+                    </div>
+
+                    <div style="margin-top: 25px; display: flex; gap: 15px;">
+                        <button type="submit" class="btn">💾 Save Quality Alert</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Data Table -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>QA #</th>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Date</th>
+                        <th>Part #</th>
+                        <th>Customer/Supplier</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="qaTableBody">
+                    <!-- Sample data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Simple data storage
+        let qualityAlerts = [];
+        let nextQANumber = 1;
+
+        // Navigation functions
+        function showHome() {
+            document.getElementById('homeScreen').style.display = 'grid';
+            document.getElementById('qualityAlertsInterface').classList.remove('active');
+        }
+
+        function showQualityAlerts() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('qualityAlertsInterface').classList.add('active');
+            loadSampleData();
+            updateTable();
+        }
+
+        // Form functions
+        function showNewQAForm() {
+            console.log('showNewQAForm called');
+            const container = document.getElementById('qaFormContainer');
+            
+            if (container) {
+                container.classList.add('show');
+                
+                // Set defaults
+                document.getElementById('qaNumber').value = 'QA-' + String(nextQANumber).padStart(4, '0');
+                document.getElementById('dateComplaint').valueAsDate = new Date();
+                document.getElementById('priority').value = 'Medium';
+                
+                // Scroll to form
+                container.scrollIntoView({ behavior: 'smooth' });
+                
+                console.log('Form displayed successfully');
+                console.log('Form container classes:', container.className);
+            } else {
+                console.error('Form container not found');
+            }
+        }
+
+        function cancelForm() {
+            document.getElementById('qaFormContainer').classList.remove('show');
+            
+            // Reset all form fields
+            const fields = [
+                'qaNumber', 'complaintType', 'dateComplaint', 'partNumber', 'customerSupplier',
+                'facility', 'revisionLevel', 'department', 'assignedTo', 'reportBy',
+                'contact', 'contactPhone', 'contactEmail', 'rejectCategory', 'qtyRejected',
+                'qtyReturned', 'qtyScrapped', 'priority', 'reasonRejection', 'containmentActions',
+                'rootCause', 'correctiveAction', 'disposition'
+            ];
+            
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    if (field.type === 'select-one') {
+                        field.selectedIndex = 0;
+                    } else {
+                        field.value = '';
+                    }
+                }
+            });
+        }
+
+        function saveQA(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const qaData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                qaData[key] = value;
+            }
+            
+            qaData.id = nextQANumber++;
+            qaData.status = 'Open';
+            qaData.createdDate = new Date().toISOString();
+            
+            qualityAlerts.push(qaData);
+            
+            updateTable();
+            cancelForm();
+            
+            alert('Quality Alert saved successfully!');
+        }
+
+        function updateTable() {
+            console.log('updateTable called, records:', qualityAlerts.length);
+            const tbody = document.getElementById('qaTableBody');
+            
+            if (!tbody) {
+                console.error('Table body not found');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            qualityAlerts.forEach((qa, index) => {
+                console.log(`Adding row ${index}:`, qa);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${qa.qaNumber || 'N/A'}</td>
+                    <td>${qa.complaintType || '-'}</td>
+                    <td>${qa.priority || 'Medium'}</td>
+                    <td>${qa.dateComplaint || '-'}</td>
+                    <td>${qa.partNumber || '-'}</td>
+                    <td>${qa.customerSupplier || '-'}</td>
+                    <td>${qa.assignedTo || '-'}</td>
+                    <td><span class="status-badge status-open">${qa.status || 'Open'}</span></td>
+                    <td class="actions">
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn print-btn">Print</button>
+                        <button class="action-btn delete-btn" onclick="deleteQA(${qa.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            console.log('Table updated successfully');
+        }
+
+        function deleteQA(id) {
+            if (confirm('Are you sure you want to delete this Quality Alert?')) {
+                qualityAlerts = qualityAlerts.filter(qa => qa.id !== id);
+                updateTable();
+            }
+        }
+
+        function exportData() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "QA Number,Complaint Type,Priority,Date,Part Number,Customer/Supplier,Status\n" +
+                qualityAlerts.map(qa => 
+                    `"${qa.qaNumber}","${qa.complaintType}","${qa.priority}","${qa.dateComplaint}","${qa.partNumber || ''}","${qa.customerSupplier || ''}","${qa.status}"`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "quality_alerts.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function loadSampleData() {
+            if (qualityAlerts.length === 0) {
+                qualityAlerts = [
+                    {
+                        id: 1,
+                        qaNumber: 'QA-0001',
+                        complaintType: 'Customer Complaint',
+                        priority: 'High',
+                        dateComplaint: '2024-01-15',
+                        partNumber: 'ABC-123',
+                        customerSupplier: 'ABC Manufacturing',
+                        assignedTo: 'Brad Rumbold',
+                        status: 'Open'
+                    },
+                    {
+                        id: 2,
+                        qaNumber: 'QA-0002',
+                        complaintType: 'Internal Finding',
+                        priority: 'Medium',
+                        dateComplaint: '2024-01-20',
+                        partNumber: 'XYZ-456',
+                        customerSupplier: 'Internal',
+                        assignedTo: 'Alex Duncan',
+                        status: 'Open'
+                    }
+                ];
+                nextQANumber = 3;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded successfully');
+            // Start on home screen
+            showHome();
+        });
+    </script>
+</body>
+</html>
