@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineering Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -592,188 +593,308 @@
             </table>
         </div>
     </div>
+<script>
+// Supabase configuration
+const SUPABASE_URL = 'https://ocrslcciwdpkgtrehkfg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jcnNsY2Npd2Rwa2d0cmVoa2ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzNTQ2NjEsImV4cCI6MjA3MDkzMDY2MX0.TpX8okjsPiwtH3xCjkWMVLOkc3YNvLf6suzHKL4tuJU';
 
-    <script>
-        // Simple data storage
-        let qualityAlerts = [];
-        let nextQANumber = 1;
+// Initialize Supabase client
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Navigation functions
-        function showHome() {
-            document.getElementById('homeScreen').style.display = 'grid';
-            document.getElementById('qualityAlertsInterface').classList.remove('active');
+// Global variables
+let qualityAlerts = [];
+let nextQANumber = 1;
+let editingQAId = null;
+
+// Load data from Supabase
+async function loadQualityAlerts() {
+    try {
+        console.log('Loading quality alerts from Supabase...');
+        const { data, error } = await supabaseClient
+            .from('quality_alerts')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error loading data:', error);
+            return;
         }
 
-        function showQualityAlerts() {
-            document.getElementById('homeScreen').style.display = 'none';
-            document.getElementById('qualityAlertsInterface').classList.add('active');
-            loadSampleData();
-            updateTable();
+        qualityAlerts = data || [];
+        console.log('Loaded', qualityAlerts.length, 'quality alerts');
+        
+        if (qualityAlerts.length > 0) {
+            const lastQA = qualityAlerts[0];
+            const lastNumber = parseInt(lastQA.qa_number.replace('QA-', ''));
+            nextQANumber = lastNumber + 1;
         }
 
-        // Form functions
-        function showNewQAForm() {
-            console.log('showNewQAForm called');
-            const container = document.getElementById('qaFormContainer');
-            
-            if (container) {
-                container.classList.add('show');
-                
-                // Set defaults
-                document.getElementById('qaNumber').value = 'QA-' + String(nextQANumber).padStart(4, '0');
-                document.getElementById('dateComplaint').valueAsDate = new Date();
-                document.getElementById('priority').value = 'Medium';
-                
-                // Scroll to form
-                container.scrollIntoView({ behavior: 'smooth' });
-                
-                console.log('Form displayed successfully');
-                console.log('Form container classes:', container.className);
-            } else {
-                console.error('Form container not found');
-            }
+        updateTable();
+        
+    } catch (error) {
+        console.error('Error loading quality alerts:', error);
+        alert('Error loading data from database');
+    }
+}
+
+// Save QA to Supabase
+async function saveToSupabase(qaData) {
+    try {
+        console.log('Saving to Supabase:', qaData);
+        
+        const dbData = {
+            qa_number: qaData.qaNumber,
+            complaint_type: qaData.complaintType,
+            date_complaint: qaData.dateComplaint,
+            part_number: qaData.partNumber,
+            customer_supplier: qaData.customerSupplier,
+            facility: qaData.facility,
+            revision_level: qaData.revisionLevel,
+            department: qaData.department,
+            assigned_to: qaData.assignedTo,
+            report_by: qaData.reportBy,
+            contact: qaData.contact,
+            contact_phone: qaData.contactPhone,
+            contact_email: qaData.contactEmail,
+            reject_category: qaData.rejectCategory,
+            qty_rejected: qaData.qtyRejected ? parseInt(qaData.qtyRejected) : null,
+            qty_returned: qaData.qtyReturned ? parseInt(qaData.qtyReturned) : null,
+            qty_scrapped: qaData.qtyScrapped ? parseInt(qaData.qtyScrapped) : null,
+            priority: qaData.priority,
+            reason_rejection: qaData.reasonRejection,
+            containment_actions: qaData.containmentActions,
+            root_cause: qaData.rootCause,
+            corrective_action: qaData.correctiveAction,
+            disposition: qaData.disposition,
+            status: qaData.status || 'Open'
+        };
+
+        if (editingQAId) {
+            const { data, error } = await supabaseClient
+                .from('quality_alerts')
+                .update(dbData)
+                .eq('id', editingQAId)
+                .select();
+
+            if (error) throw error;
+            console.log('Updated QA in database');
+        } else {
+            const { data, error } = await supabaseClient
+                .from('quality_alerts')
+                .insert(dbData)
+                .select();
+
+            if (error) throw error;
+            console.log('Inserted new QA in database');
+            nextQANumber++;
         }
 
-        function cancelForm() {
-            document.getElementById('qaFormContainer').classList.remove('show');
-            
-            // Reset all form fields
-            const fields = [
-                'qaNumber', 'complaintType', 'dateComplaint', 'partNumber', 'customerSupplier',
-                'facility', 'revisionLevel', 'department', 'assignedTo', 'reportBy',
-                'contact', 'contactPhone', 'contactEmail', 'rejectCategory', 'qtyRejected',
-                'qtyReturned', 'qtyScrapped', 'priority', 'reasonRejection', 'containmentActions',
-                'rootCause', 'correctiveAction', 'disposition'
-            ];
-            
-            fields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    if (field.type === 'select-one') {
-                        field.selectedIndex = 0;
-                    } else {
-                        field.value = '';
-                    }
-                }
-            });
+        return true;
+    } catch (error) {
+        console.error('Error saving to Supabase:', error);
+        throw error;
+    }
+}
+
+// Global save function
+window.saveQA = async function() {
+    console.log('saveQA called!');
+    
+    try {
+        const formData = {
+            qaNumber: document.getElementById('qaNumber').value,
+            complaintType: document.getElementById('complaintType').value,
+            dateComplaint: document.getElementById('dateComplaint').value,
+            partNumber: document.getElementById('partNumber').value || '',
+            customerSupplier: document.getElementById('customerSupplier').value || '',
+            facility: document.getElementById('facility').value || '',
+            revisionLevel: document.getElementById('revisionLevel').value || '',
+            department: document.getElementById('department').value || '',
+            assignedTo: document.getElementById('assignedTo').value || '',
+            reportBy: document.getElementById('reportBy').value || '',
+            contact: document.getElementById('contact').value || '',
+            contactPhone: document.getElementById('contactPhone').value || '',
+            contactEmail: document.getElementById('contactEmail').value || '',
+            rejectCategory: document.getElementById('rejectCategory').value || '',
+            qtyRejected: document.getElementById('qtyRejected').value || '',
+            qtyReturned: document.getElementById('qtyReturned').value || '',
+            qtyScrapped: document.getElementById('qtyScrapped').value || '',
+            priority: document.getElementById('priority').value || 'Medium',
+            reasonRejection: document.getElementById('reasonRejection').value || '',
+            containmentActions: document.getElementById('containmentActions').value || '',
+            rootCause: document.getElementById('rootCause').value || '',
+            correctiveAction: document.getElementById('correctiveAction').value || '',
+            disposition: document.getElementById('disposition').value || ''
+        };
+        
+        if (!formData.complaintType || !formData.dateComplaint) {
+            alert('Please fill in Complaint Type and Date of Complaint');
+            return false;
         }
 
-        function saveQA(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const qaData = {};
-            
-            for (let [key, value] of formData.entries()) {
-                qaData[key] = value;
-            }
-            
-            qaData.id = nextQANumber++;
-            qaData.status = 'Open';
-            qaData.createdDate = new Date().toISOString();
-            
-            qualityAlerts.push(qaData);
-            
-            updateTable();
-            cancelForm();
-            
-            alert('Quality Alert saved successfully!');
-        }
+        await saveToSupabase(formData);
+        editingQAId = null;
+        await loadQualityAlerts();
+        document.getElementById('qaFormContainer').classList.remove('show');
+        
+        alert('Quality Alert saved successfully!');
+        return false;
+        
+    } catch (error) {
+        console.error('Save error:', error);
+        alert('Error saving Quality Alert: ' + error.message);
+        return false;
+    }
+};
 
-        function updateTable() {
-            console.log('updateTable called, records:', qualityAlerts.length);
-            const tbody = document.getElementById('qaTableBody');
-            
-            if (!tbody) {
-                console.error('Table body not found');
-                return;
-            }
-            
-            tbody.innerHTML = '';
-            
-            qualityAlerts.forEach((qa, index) => {
-                console.log(`Adding row ${index}:`, qa);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${qa.qaNumber || 'N/A'}</td>
-                    <td>${qa.complaintType || '-'}</td>
-                    <td>${qa.priority || 'Medium'}</td>
-                    <td>${qa.dateComplaint || '-'}</td>
-                    <td>${qa.partNumber || '-'}</td>
-                    <td>${qa.customerSupplier || '-'}</td>
-                    <td>${qa.assignedTo || '-'}</td>
-                    <td><span class="status-badge status-open">${qa.status || 'Open'}</span></td>
-                    <td class="actions">
-                        <button class="action-btn edit-btn" onclick="window.editQA(${qa.id}); return false;">Edit</button>
-                        <button class="action-btn print-btn">Print</button>
-                        <button class="action-btn delete-btn" onclick="deleteQA(${qa.id})">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            console.log('Table updated successfully');
-        }
+window.cancelQA = function() {
+    editingQAId = null;
+    document.getElementById('qaFormContainer').classList.remove('show');
+    return false;
+};
 
-        function deleteQA(id) {
-            if (confirm('Are you sure you want to delete this Quality Alert?')) {
-                qualityAlerts = qualityAlerts.filter(qa => qa.id !== id);
-                updateTable();
-            }
-        }
+function editQA(id) {
+    const qa = qualityAlerts.find(q => q.id === id);
+    if (!qa) {
+        alert('Quality Alert not found');
+        return;
+    }
+    
+    editingQAId = id;
+    const container = document.getElementById('qaFormContainer');
+    container.classList.add('show');
+    
+    document.getElementById('formTitle').textContent = 'Edit Quality Alert - ' + qa.qa_number;
+    document.getElementById('qaNumber').value = qa.qa_number || '';
+    document.getElementById('complaintType').value = qa.complaint_type || '';
+    document.getElementById('dateComplaint').value = qa.date_complaint || '';
+    document.getElementById('partNumber').value = qa.part_number || '';
+    document.getElementById('customerSupplier').value = qa.customer_supplier || '';
+    document.getElementById('facility').value = qa.facility || '';
+    document.getElementById('revisionLevel').value = qa.revision_level || '';
+    document.getElementById('department').value = qa.department || '';
+    document.getElementById('assignedTo').value = qa.assigned_to || '';
+    document.getElementById('reportBy').value = qa.report_by || '';
+    document.getElementById('contact').value = qa.contact || '';
+    document.getElementById('contactPhone').value = qa.contact_phone || '';
+    document.getElementById('contactEmail').value = qa.contact_email || '';
+    document.getElementById('rejectCategory').value = qa.reject_category || '';
+    document.getElementById('qtyRejected').value = qa.qty_rejected || '';
+    document.getElementById('qtyReturned').value = qa.qty_returned || '';
+    document.getElementById('qtyScrapped').value = qa.qty_scrapped || '';
+    document.getElementById('priority').value = qa.priority || 'Medium';
+    document.getElementById('reasonRejection').value = qa.reason_rejection || '';
+    document.getElementById('containmentActions').value = qa.containment_actions || '';
+    document.getElementById('rootCause').value = qa.root_cause || '';
+    document.getElementById('correctiveAction').value = qa.corrective_action || '';
+    document.getElementById('disposition').value = qa.disposition || '';
+    
+    container.scrollIntoView({ behavior: 'smooth' });
+}
 
-        function exportData() {
-            const csvContent = "data:text/csv;charset=utf-8," + 
-                "QA Number,Complaint Type,Priority,Date,Part Number,Customer/Supplier,Status\n" +
-                qualityAlerts.map(qa => 
-                    `"${qa.qaNumber}","${qa.complaintType}","${qa.priority}","${qa.dateComplaint}","${qa.partNumber || ''}","${qa.customerSupplier || ''}","${qa.status}"`
-                ).join("\n");
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "quality_alerts.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function loadSampleData() {
-            if (qualityAlerts.length === 0) {
-                qualityAlerts = [
-                    {
-                        id: 1,
-                        qaNumber: 'QA-0001',
-                        complaintType: 'Customer Complaint',
-                        priority: 'High',
-                        dateComplaint: '2024-01-15',
-                        partNumber: 'ABC-123',
-                        customerSupplier: 'ABC Manufacturing',
-                        assignedTo: 'Brad Rumbold',
-                        status: 'Open'
-                    },
-                    {
-                        id: 2,
-                        qaNumber: 'QA-0002',
-                        complaintType: 'Internal Finding',
-                        priority: 'Medium',
-                        dateComplaint: '2024-01-20',
-                        partNumber: 'XYZ-456',
-                        customerSupplier: 'Internal',
-                        assignedTo: 'Alex Duncan',
-                        status: 'Open'
-                    }
-                ];
-                nextQANumber = 3;
-            }
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded successfully');
-            // Start on home screen
-            showHome();
+function deleteQA(id) {
+    if (confirm('Are you sure you want to delete this Quality Alert?')) {
+        supabaseClient.from('quality_alerts').delete().eq('id', id).then(() => {
+            loadQualityAlerts();
+            alert('Quality Alert deleted successfully');
+        }).catch(error => {
+            alert('Error deleting Quality Alert: ' + error.message);
         });
-    </script>
+    }
+}
+
+function updateTable() {
+    console.log('updateTable called, records:', qualityAlerts.length);
+    const tbody = document.getElementById('qaTableBody');
+    
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    qualityAlerts.forEach((qa, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${qa.qa_number || 'N/A'}</td>
+            <td>${qa.complaint_type || '-'}</td>
+            <td>${qa.priority || 'Medium'}</td>
+            <td>${qa.date_complaint || '-'}</td>
+            <td>${qa.part_number || '-'}</td>
+            <td>${qa.customer_supplier || '-'}</td>
+            <td>${qa.assigned_to || '-'}</td>
+            <td><span class="status-badge status-open">${qa.status || 'Open'}</span></td>
+            <td class="actions">
+                <input type="button" class="action-btn edit-btn" value="Edit" onclick="editQA(${qa.id}); return false;">
+                <button class="action-btn print-btn">Print</button>
+                <button class="action-btn delete-btn" onclick="deleteQA(${qa.id})">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function showHome() {
+    document.getElementById('homeScreen').style.display = 'grid';
+    document.getElementById('qualityAlertsInterface').classList.remove('active');
+}
+
+function showQualityAlerts() {
+    document.getElementById('homeScreen').style.display = 'none';
+    document.getElementById('qualityAlertsInterface').classList.add('active');
+    loadQualityAlerts();
+}
+
+function showNewQAForm() {
+    editingQAId = null;
+    const container = document.getElementById('qaFormContainer');
+    container.classList.add('show');
+    
+    document.getElementById('formTitle').textContent = 'New Quality Alert';
+    
+    // Clear all fields
+    const fields = ['qaNumber', 'complaintType', 'dateComplaint', 'partNumber', 'customerSupplier', 'facility', 'revisionLevel', 'department', 'assignedTo', 'reportBy', 'contact', 'contactPhone', 'contactEmail', 'rejectCategory', 'qtyRejected', 'qtyReturned', 'qtyScrapped', 'priority', 'reasonRejection', 'containmentActions', 'rootCause', 'correctiveAction', 'disposition'];
+    
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            if (field.type === 'select-one') {
+                field.selectedIndex = 0;
+            } else {
+                field.value = '';
+            }
+        }
+    });
+    
+    document.getElementById('qaNumber').value = 'QA-' + String(nextQANumber).padStart(4, '0');
+    document.getElementById('dateComplaint').valueAsDate = new Date();
+    document.getElementById('priority').value = 'Medium';
+    
+    container.scrollIntoView({ behavior: 'smooth' });
+}
+
+function exportData() {
+    const csvContent = "data:text/csv;charset=utf-8," + 
+        "QA Number,Complaint Type,Priority,Date,Part Number,Customer/Supplier,Status\n" +
+        qualityAlerts.map(qa => 
+            `"${qa.qa_number}","${qa.complaint_type}","${qa.priority}","${qa.date_complaint}","${qa.part_number || ''}","${qa.customer_supplier || ''}","${qa.status}"`
+        ).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "quality_alerts.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded successfully');
+    window.editQA = editQA;
+    window.deleteQA = deleteQA;
+    showHome();
+});
+</script>
 </body>
 </html>
