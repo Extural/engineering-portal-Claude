@@ -704,7 +704,7 @@
                     <td>${qa.assignedTo || '-'}</td>
                     <td><span class="status-badge status-open">${qa.status || 'Open'}</span></td>
                     <td class="actions">
-                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn edit-btn" onclick="editQA(${qa.id}); return false;">Edit</button>
                         <button class="action-btn print-btn">Print</button>
                         <button class="action-btn delete-btn" onclick="deleteQA(${qa.id})">Delete</button>
                     </td>
@@ -767,6 +767,39 @@
                 nextQANumber = 3;
             }
         }
+
+// Edit function definition
+function editQA(id) {
+    alert('Edit function called for ID: ' + id);
+    console.log('Edit QA called for ID:', id);
+    
+    var qa = qualityAlerts.find(function(q) { return q.id === id; });
+    if (!qa) {
+        alert('Quality Alert not found');
+        return;
+    }
+    
+    editingQAId = id;
+    
+    // Show the form
+    var container = document.getElementById('qaFormContainer');
+    container.classList.add('show');
+    
+    // Update form title
+    document.getElementById('formTitle').textContent = 'Edit Quality Alert - ' + qa.qaNumber;
+    
+    // Populate basic fields
+    document.getElementById('qaNumber').value = qa.qaNumber || '';
+    document.getElementById('complaintType').value = qa.complaintType || '';
+    document.getElementById('dateComplaint').value = qa.dateComplaint || '';
+    document.getElementById('partNumber').value = qa.partNumber || '';
+    document.getElementById('priority').value = qa.priority || 'Medium';
+    
+    // Scroll to form
+    container.scrollIntoView({ behavior: 'smooth' });
+    
+    alert('Form should now be populated with data');
+}
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
