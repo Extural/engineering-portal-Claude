@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Engineering Portal</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Engineering Portal - Home</title>
     <style>
         * {
             margin: 0;
@@ -28,107 +27,124 @@
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 20px 30px;
             border-radius: 15px;
+            padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
 
         .header h1 {
             color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 5px;
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .header p {
             color: #7f8c8d;
-            font-size: 1.1em;
+            font-size: 1.3em;
+            margin-bottom: 10px;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
 
-        .home-screen {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            margin-top: 20px;
+        .breadcrumb a:hover {
+            color: #764ba2;
         }
 
-        .module-card {
+        .breadcrumb span {
+            color: #7f8c8d;
+            margin: 0 10px;
+        }
+
+        .nav-section {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .nav-card {
+            background: white;
+            border-radius: 12px;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            border: 2px solid transparent;
         }
 
-        .module-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .module-card:hover {
+        .nav-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
         }
 
-        .module-header {
-            display: flex;
-            align-items: center;
+        .nav-card .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-card h3 {
+            color: #2c3e50;
+            font-size: 1.5em;
             margin-bottom: 15px;
         }
 
-        .module-icon {
-            width: 48px;
-            height: 48px;
-            margin-right: 15px;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .module-card h2 {
-            color: #2c3e50;
-            font-size: 1.5em;
-            margin: 0;
-        }
-
-        .module-card p {
+        .nav-card p {
             color: #7f8c8d;
+            line-height: 1.6;
             margin-bottom: 20px;
-            line-height: 1.5;
+        }
+
+        .nav-card .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-coming-soon {
+            background-color: #fff3cd;
+            color: #856404;
         }
 
         .btn {
@@ -136,127 +152,109 @@
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 1em;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 5px;
+            display: inline-block;
+            text-decoration: none;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .btn-secondary {
-            background: #95a5a6;
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
         }
 
-        .btn-success {
-            background: #27ae60;
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 0.8em;
-        }
-
-        .qa-interface {
-            display: none;
+        .welcome-section {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .qa-interface.active {
-            display: block;
-        }
-
-        .interface-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 20px;
-        }
-
-        .interface-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .interface-title h2 {
-            color: #2c3e50;
-            font-size: 2em;
-            margin: 0;
-        }
-
-        .toolbar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .form-container {
-            background: #f8f9fa;
-            padding: 30px;
             border-radius: 15px;
+            padding: 40px;
             margin-bottom: 30px;
-            border: 2px solid #ecf0f1;
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .stat-card h4 {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .hidden {
             display: none;
         }
 
-        .form-container.show {
-            display: block;
+        /* Quality Alerts Page Styles */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
         }
 
-        .form-row {
-            display: flex !important;
-            gap: 20px !important;
-            margin-bottom: 20px !important;
-            align-items: flex-end !important;
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+        }
+
+        .main-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .form-group {
-            flex: 1 !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-
-        .form-group.small {
-            flex: 0 0 120px !important;
-            max-width: 120px !important;
+            margin-bottom: 20px;
         }
 
         .form-group label {
-            font-weight: 600;
+            display: block;
             margin-bottom: 8px;
+            font-weight: 600;
             color: #2c3e50;
-        }
-
-        .required::after {
-            content: '*';
-            color: #e74c3c;
-            margin-left: 4px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
-            padding: 12px 15px;
+            width: 100%;
+            padding: 12px;
             border: 2px solid #ecf0f1;
             border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: white;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
         }
 
         .form-group input:focus,
@@ -264,94 +262,142 @@
         .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .form-group textarea {
             resize: vertical;
             min-height: 100px;
-            font-family: inherit;
         }
 
-        .form-group.full-width {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .data-table {
+        .alert-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .data-table th,
-        .data-table td {
-            padding: 15px 12px;
+        .alert-table th,
+        .alert-table td {
+            padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
-            color: #1a1a1a !important;
-            font-weight: 500 !important;
         }
 
-        .data-table th {
+        .alert-table th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white !important;
-            font-weight: 600 !important;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
             color: white;
+            font-weight: 600;
         }
 
-        .edit-btn { background: #3498db; }
-        .delete-btn { background: #e74c3c; }
-        .print-btn { background: #27ae60; }
+        .alert-table tr:hover {
+            background-color: #f8f9fa;
+        }
 
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
+        .priority-high {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .priority-medium {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: #27ae60;
+            font-weight: bold;
         }
 
         .status-open {
-            background: #e8f5e8;
-            color: #2e7d32;
+            background-color: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .status-in-progress {
+            background-color: #f39c12;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .status-resolved {
+            background-color: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .print-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+            .btn {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column !important;
+            .nav-grid {
+                grid-template-columns: 1fr;
             }
             
-            .form-group {
-                width: 100% !important;
+            .main-content {
+                grid-template-columns: 1fr;
             }
             
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats-preview {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -359,542 +405,591 @@
 <body>
     <div class="container">
         <div class="header">
-            <div>
-                <h1>Engineering Portal</h1>
-                <p>Comprehensive task management and quality assurance system</p>
+            <h1>🔧 Engineering Portal</h1>
+            <p>Streamlined Operations Management System</p>
+        </div>
+
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb" id="breadcrumb" style="display: none;">
+            <a href="#" onclick="showHomePage()">🏠 Home</a>
+            <span>></span>
+            <span id="currentPage">Quality Alerts</span>
+        </div>
+
+        <!-- Home Page -->
+        <div id="homePage">
+            <div class="welcome-section">
+                <h2>Welcome to the Engineering Portal</h2>
+                <p>Your centralized hub for engineering operations, quality management, and task coordination. Access all essential tools and systems from this unified dashboard.</p>
+                
+                <div class="stats-preview">
+                    <div class="stat-card">
+                        <h4 id="homeOpenAlerts">3</h4>
+                        <p>Open Quality Alerts</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>24</h4>
+                        <p>Active Projects</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>12</h4>
+                        <p>Pending Tasks</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>98%</h4>
+                        <p>System Uptime</p>
+                    </div>
+                </div>
             </div>
-            <div class="user-info">
-                <div class="user-avatar">BR</div>
-                <div>
-                    <div style="font-weight: 600;">Brad Rumbold</div>
-                    <div style="font-size: 0.9em; color: #7f8c8d;">Quality Manager</div>
+
+            <div class="nav-section">
+                <h2>System Modules</h2>
+                <p>Select a module below to access its features and functionality.</p>
+                
+                <div class="nav-grid">
+                    <div class="nav-card" onclick="showQualityAlerts()">
+                        <div class="icon">🛡️</div>
+                        <div class="status status-active">Active</div>
+                        <h3>Quality Alert System</h3>
+                        <p>Create, track, and manage quality alerts. Record issues, assign responsibilities, monitor progress, and generate reports for quality control processes.</p>
+                        <button class="btn">Access Module →</button>
+                    </div>
+
+                    <div class="nav-card">
+                        <div class="icon">📋</div>
+                        <div class="status status-coming-soon">Coming Soon</div>
+                        <h3>Task Management</h3>
+                        <p>Assign, track, and manage engineering tasks. Set priorities, deadlines, and monitor completion status across your team.</p>
+                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                    </div>
+
+                    <div class="nav-card">
+                        <div class="icon">📊</div>
+                        <div class="status status-coming-soon">Coming Soon</div>
+                        <h3>Project Dashboard</h3>
+                        <p>Comprehensive project tracking with timelines, milestones, resource allocation, and progress monitoring tools.</p>
+                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                    </div>
+
+                    <div class="nav-card">
+                        <div class="icon">🔧</div>
+                        <div class="status status-coming-soon">Coming Soon</div>
+                        <h3>Equipment Management</h3>
+                        <p>Track equipment status, maintenance schedules, calibrations, and operational history for all engineering assets.</p>
+                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                    </div>
+
+                    <div class="nav-card">
+                        <div class="icon">📁</div>
+                        <div class="status status-coming-soon">Coming Soon</div>
+                        <h3>Document Control</h3>
+                        <p>Centralized document management with version control, approval workflows, and secure access controls.</p>
+                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                    </div>
+
+                    <div class="nav-card">
+                        <div class="icon">📈</div>
+                        <div class="status status-coming-soon">Coming Soon</div>
+                        <h3>Analytics & Reporting</h3>
+                        <p>Generate comprehensive reports and analytics across all engineering operations and quality metrics.</p>
+                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Home Screen -->
-        <div id="homeScreen" class="home-screen">
-            <div class="module-card" onclick="showQualityAlerts()">
-                <div class="module-header">
-                    <div class="module-icon">📋</div>
-                    <h2>Quality Alerts</h2>
+        <!-- Quality Alerts Page -->
+        <div id="qualityAlertsPage" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalAlerts">0</h3>
+                    <p>Total Alerts</p>
                 </div>
-                <p>Record, manage, and track quality issues and corrective actions</p>
-                <button class="btn">Access Quality Alerts</button>
-            </div>
-        </div>
-
-        <!-- Quality Alerts Interface -->
-        <div id="qualityAlertsInterface" class="qa-interface">
-            <div class="interface-header">
-                <div class="interface-title">
-                    <div class="module-icon">📋</div>
-                    <h2>Quality Alert Management</h2>
+                <div class="stat-card">
+                    <h3 id="openAlerts">0</h3>
+                    <p>Open Alerts</p>
                 </div>
-                <div>
-                    <button class="btn btn-secondary" onclick="showHome()">← Back to Home</button>
+                <div class="stat-card">
+                    <h3 id="inProgressAlerts">0</h3>
+                    <p>In Progress</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="resolvedAlerts">0</h3>
+                    <p>Resolved</p>
                 </div>
             </div>
 
-            <div class="toolbar">
-                <button class="btn" onclick="showNewQAForm()">+ New Quality Alert</button>
-                <button class="btn btn-success btn-small" onclick="exportData()">📊 Export</button>
+            <div class="main-content">
+                <div class="sidebar">
+                    <h2>Quick Actions</h2>
+                    <button class="btn" onclick="showCreateForm()">➕ Create New Alert</button>
+                    <button class="btn btn-secondary" onclick="showAllAlerts()">📋 View All Alerts</button>
+                    <button class="btn btn-secondary" onclick="exportData()">💾 Export Data</button>
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Priority</h3>
+                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterByPriority('High')">High Priority</button>
+                    <button class="btn" onclick="filterByPriority('Medium')">Medium Priority</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterByPriority('Low')">Low Priority</button>
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Status</h3>
+                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterByStatus('Open')">Open</button>
+                    <button class="btn" onclick="filterByStatus('In Progress')">In Progress</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterByStatus('Resolved')">Resolved</button>
+                    
+                    <button class="btn btn-secondary" onclick="clearFilters()" style="margin-top: 20px; width: 100%;">Clear All Filters</button>
+                </div>
+
+                <div class="main-panel">
+                    <div id="createForm" class="hidden">
+                        <h2>Create New Quality Alert</h2>
+                        <form id="alertForm">
+                            <div class="form-group">
+                                <label for="alertId">Alert ID</label>
+                                <input type="text" id="alertId" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="title">Title *</label>
+                                <input type="text" id="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description *</label>
+                                <textarea id="description" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority *</label>
+                                <select id="priority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="assignedTo">Assigned To</label>
+                                <input type="text" id="assignedTo">
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <select id="department">
+                                    <option value="">Select Department</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Quality Control">Quality Control</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Safety">Safety</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Status</label>
+                                <select id="status">
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Resolved">Resolved</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="dueDate">Due Date</label>
+                                <input type="date" id="dueDate">
+                            </div>
+                            
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">💾 Save Alert</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">❌ Cancel</button>
+                        </form>
+                    </div>
+
+                    <div id="alertsList">
+                        <h2>Quality Alerts Dashboard</h2>
+                        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search alerts..." onkeyup="searchAlerts()">
+                        
+                        <table class="alert-table" id="alertsTable">
+                            <thead>
+                                <tr>
+                                    <th>Alert ID</th>
+                                    <th>Title</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Assigned To</th>
+                                    <th>Department</th>
+                                    <th>Created</th>
+                                    <th>Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alertsTableBody">
+                                <!-- Alerts will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="printView" class="print-section hidden">
+                        <!-- Print content will be populated here -->
+                    </div>
+                </div>
             </div>
-
-            <!-- Form Container -->
-            <div id="qaFormContainer" class="form-container">
-                <h3 id="formTitle">New Quality Alert</h3>
-                <form id="qualityAlertForm" onsubmit="saveQA(event)">
-                    <!-- Row 1: QA#, Complaint Type, Date of Complaint -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="qaNumber" class="required">Quality Alert Number</label>
-                            <input type="text" id="qaNumber" name="qaNumber" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="complaintType" class="required">Complaint Type</label>
-                            <select id="complaintType" name="complaintType" required>
-                                <option value="">Select Type</option>
-                                <option value="Customer Complaint">Customer Complaint</option>
-                                <option value="Internal Finding">Internal Finding</option>
-                                <option value="Supplier Issue">Supplier Issue</option>
-                                <option value="Audit Finding">Audit Finding</option>
-                                <option value="Process Issue">Process Issue</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="dateComplaint" class="required">Date of Complaint</label>
-                            <input type="date" id="dateComplaint" name="dateComplaint" required>
-                        </div>
-                    </div>
-
-                    <!-- Row 2: Part Number, Customer/Supplier, Facility, Revision Level -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="partNumber">Part Number</label>
-                            <input type="text" id="partNumber" name="partNumber">
-                        </div>
-                        <div class="form-group">
-                            <label for="customerSupplier">Customer/Supplier</label>
-                            <input type="text" id="customerSupplier" name="customerSupplier">
-                        </div>
-                        <div class="form-group">
-                            <label for="facility">Facility</label>
-                            <select id="facility" name="facility">
-                                <option value="">Select Facility</option>
-                                <option value="Plant 1">Plant 1</option>
-                                <option value="Plant 2">Plant 2</option>
-                                <option value="Warehouse A">Warehouse A</option>
-                                <option value="Remote Site">Remote Site</option>
-                            </select>
-                        </div>
-                        <div class="form-group small">
-                            <label for="revisionLevel">Revision Level</label>
-                            <input type="text" id="revisionLevel" name="revisionLevel" maxlength="2" style="text-align: center;">
-                        </div>
-                    </div>
-
-                    <!-- Row 3: Department, Assigned To, Report By -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="department">Department</label>
-                            <select id="department" name="department">
-                                <option value="">Select Department</option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="Manufacturing">Manufacturing</option>
-                                <option value="Quality">Quality</option>
-                                <option value="Purchasing">Purchasing</option>
-                                <option value="Production">Production</option>
-                                <option value="R&D">R&D</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="assignedTo">Assigned To</label>
-                            <select id="assignedTo" name="assignedTo">
-                                <option value="">Select Person</option>
-                                <option value="Brad Rumbold">Brad Rumbold</option>
-                                <option value="Alex Duncan">Alex Duncan</option>
-                                <option value="Alex Braun">Alex Braun</option>
-                                <option value="Sean McCathy">Sean McCathy</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="reportBy">Report By (Date)</label>
-                            <input type="date" id="reportBy" name="reportBy">
-                        </div>
-                    </div>
-
-                    <!-- Row 4: Contact, Contact Phone, Contact Email -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contact">Contact</label>
-                            <input type="text" id="contact" name="contact">
-                        </div>
-                        <div class="form-group">
-                            <label for="contactPhone">Contact Phone #</label>
-                            <input type="tel" id="contactPhone" name="contactPhone">
-                        </div>
-                        <div class="form-group">
-                            <label for="contactEmail">Contact Email</label>
-                            <input type="email" id="contactEmail" name="contactEmail">
-                        </div>
-                    </div>
-
-                    <!-- Row 5: Reject Category, Qty Rejected, Qty Returned, Qty Scrapped -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="rejectCategory">Reject Category</label>
-                            <select id="rejectCategory" name="rejectCategory">
-                                <option value="">Select Category</option>
-                                <option value="Dimensional">Dimensional</option>
-                                <option value="Cosmetic">Cosmetic</option>
-                                <option value="Functional">Functional</option>
-                                <option value="Material">Material</option>
-                                <option value="Packaging">Packaging</option>
-                                <option value="Documentation">Documentation</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="qtyRejected">Qty Rejected</label>
-                            <input type="number" id="qtyRejected" name="qtyRejected" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="qtyReturned">Qty Returned</label>
-                            <input type="number" id="qtyReturned" name="qtyReturned" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="qtyScrapped">Qty Scrapped</label>
-                            <input type="number" id="qtyScrapped" name="qtyScrapped" min="0">
-                        </div>
-                    </div>
-
-                    <!-- Priority Row -->
-                    <div class="form-row">
-                        <div class="form-group small">
-                            <label for="priority">Priority</label>
-                            <select id="priority" name="priority">
-                                <option value="Low">Low</option>
-                                <option value="Medium" selected>Medium</option>
-                                <option value="High">High</option>
-                                <option value="Critical">Critical</option>
-                            </select>
-                        </div>
-                        <div class="form-group"></div>
-                        <div class="form-group"></div>
-                    </div>
-
-                    <!-- Text Areas -->
-                    <div class="form-group full-width">
-                        <label for="reasonRejection">Reason for Rejection</label>
-                        <textarea id="reasonRejection" name="reasonRejection" placeholder="Detailed description of the rejection reason..."></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="containmentActions">Containment Actions</label>
-                        <textarea id="containmentActions" name="containmentActions" placeholder="Immediate actions taken to contain the issue..."></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="rootCause">Root Cause</label>
-                        <textarea id="rootCause" name="rootCause" placeholder="Analysis of the root cause..."></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="correctiveAction">Corrective/Preventive Action</label>
-                        <textarea id="correctiveAction" name="correctiveAction" placeholder="Actions to prevent recurrence..."></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="disposition">Disposition</label>
-                        <textarea id="disposition" name="disposition" placeholder="Final disposition of the quality alert..."></textarea>
-                    </div>
-
-                    <div style="margin-top: 25px; display: flex; gap: 15px;">
-                        <button type="submit" class="btn">💾 Save Quality Alert</button>
-                        <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Data Table -->
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>QA #</th>
-                        <th>Type</th>
-                        <th>Priority</th>
-                        <th>Date</th>
-                        <th>Part #</th>
-                        <th>Customer/Supplier</th>
-                        <th>Assigned To</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="qaTableBody">
-                    <!-- Sample data will be inserted here -->
-                </tbody>
-            </table>
         </div>
     </div>
-<script>
-// Supabase configuration
-const SUPABASE_URL = 'https://ocrslcciwdpkgtrehkfg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jcnNsY2Npd2Rwa2d0cmVoa2ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzNTQ2NjEsImV4cCI6MjA3MDkzMDY2MX0.TpX8okjsPiwtH3xCjkWMVLOkc3YNvLf6suzHKL4tuJU';
 
-// Initialize Supabase client
-const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script>
+        // Application State
+        let currentPage = 'home';
+        let alerts = [];
+        let currentEditId = null;
+        let alertIdCounter = 1001;
 
-// Global variables
-let qualityAlerts = [];
-let nextQANumber = 1;
-let editingQAId = null;
-
-// Load data from Supabase
-async function loadQualityAlerts() {
-    try {
-        console.log('Loading quality alerts from Supabase...');
-        const { data, error } = await supabaseClient
-            .from('quality_alerts')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error loading data:', error);
-            return;
-        }
-
-        qualityAlerts = data || [];
-        console.log('Loaded', qualityAlerts.length, 'quality alerts');
-        
-        if (qualityAlerts.length > 0) {
-            const lastQA = qualityAlerts[0];
-            const lastNumber = parseInt(lastQA.qa_number.replace('QA-', ''));
-            nextQANumber = lastNumber + 1;
-        }
-
-        updateTable();
-        
-    } catch (error) {
-        console.error('Error loading quality alerts:', error);
-        alert('Error loading data from database');
-    }
-}
-
-// Save QA to Supabase
-async function saveToSupabase(qaData) {
-    try {
-        console.log('Saving to Supabase:', qaData);
-        
-        const dbData = {
-            qa_number: qaData.qaNumber,
-            complaint_type: qaData.complaintType,
-            date_complaint: qaData.dateComplaint,
-            part_number: qaData.partNumber,
-            customer_supplier: qaData.customerSupplier,
-            facility: qaData.facility,
-            revision_level: qaData.revisionLevel,
-            department: qaData.department,
-            assigned_to: qaData.assignedTo,
-            report_by: qaData.reportBy,
-            contact: qaData.contact,
-            contact_phone: qaData.contactPhone,
-            contact_email: qaData.contactEmail,
-            reject_category: qaData.rejectCategory,
-            qty_rejected: qaData.qtyRejected ? parseInt(qaData.qtyRejected) : null,
-            qty_returned: qaData.qtyReturned ? parseInt(qaData.qtyReturned) : null,
-            qty_scrapped: qaData.qtyScrapped ? parseInt(qaData.qtyScrapped) : null,
-            priority: qaData.priority,
-            reason_rejection: qaData.reasonRejection,
-            containment_actions: qaData.containmentActions,
-            root_cause: qaData.rootCause,
-            corrective_action: qaData.correctiveAction,
-            disposition: qaData.disposition,
-            status: qaData.status || 'Open'
-        };
-
-        if (editingQAId) {
-            const { data, error } = await supabaseClient
-                .from('quality_alerts')
-                .update(dbData)
-                .eq('id', editingQAId)
-                .select();
-
-            if (error) throw error;
-            console.log('Updated QA in database');
-        } else {
-            const { data, error } = await supabaseClient
-                .from('quality_alerts')
-                .insert(dbData)
-                .select();
-
-            if (error) throw error;
-            console.log('Inserted new QA in database');
-            nextQANumber++;
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Error saving to Supabase:', error);
-        throw error;
-    }
-}
-
-// Global save function
-window.saveQA = async function() {
-    console.log('saveQA called!');
-    
-    try {
-        const formData = {
-            qaNumber: document.getElementById('qaNumber').value,
-            complaintType: document.getElementById('complaintType').value,
-            dateComplaint: document.getElementById('dateComplaint').value,
-            partNumber: document.getElementById('partNumber').value || '',
-            customerSupplier: document.getElementById('customerSupplier').value || '',
-            facility: document.getElementById('facility').value || '',
-            revisionLevel: document.getElementById('revisionLevel').value || '',
-            department: document.getElementById('department').value || '',
-            assignedTo: document.getElementById('assignedTo').value || '',
-            reportBy: document.getElementById('reportBy').value || '',
-            contact: document.getElementById('contact').value || '',
-            contactPhone: document.getElementById('contactPhone').value || '',
-            contactEmail: document.getElementById('contactEmail').value || '',
-            rejectCategory: document.getElementById('rejectCategory').value || '',
-            qtyRejected: document.getElementById('qtyRejected').value || '',
-            qtyReturned: document.getElementById('qtyReturned').value || '',
-            qtyScrapped: document.getElementById('qtyScrapped').value || '',
-            priority: document.getElementById('priority').value || 'Medium',
-            reasonRejection: document.getElementById('reasonRejection').value || '',
-            containmentActions: document.getElementById('containmentActions').value || '',
-            rootCause: document.getElementById('rootCause').value || '',
-            correctiveAction: document.getElementById('correctiveAction').value || '',
-            disposition: document.getElementById('disposition').value || ''
-        };
-        
-        if (!formData.complaintType || !formData.dateComplaint) {
-            alert('Please fill in Complaint Type and Date of Complaint');
-            return false;
-        }
-
-        await saveToSupabase(formData);
-        editingQAId = null;
-        await loadQualityAlerts();
-        document.getElementById('qaFormContainer').classList.remove('show');
-        
-        alert('Quality Alert saved successfully!');
-        return false;
-        
-    } catch (error) {
-        console.error('Save error:', error);
-        alert('Error saving Quality Alert: ' + error.message);
-        return false;
-    }
-};
-
-window.cancelQA = function() {
-    editingQAId = null;
-    document.getElementById('qaFormContainer').classList.remove('show');
-    return false;
-};
-
-function editQA(id) {
-    const qa = qualityAlerts.find(q => q.id === id);
-    if (!qa) {
-        alert('Quality Alert not found');
-        return;
-    }
-    
-    editingQAId = id;
-    const container = document.getElementById('qaFormContainer');
-    container.classList.add('show');
-    
-    document.getElementById('formTitle').textContent = 'Edit Quality Alert - ' + qa.qa_number;
-    document.getElementById('qaNumber').value = qa.qa_number || '';
-    document.getElementById('complaintType').value = qa.complaint_type || '';
-    document.getElementById('dateComplaint').value = qa.date_complaint || '';
-    document.getElementById('partNumber').value = qa.part_number || '';
-    document.getElementById('customerSupplier').value = qa.customer_supplier || '';
-    document.getElementById('facility').value = qa.facility || '';
-    document.getElementById('revisionLevel').value = qa.revision_level || '';
-    document.getElementById('department').value = qa.department || '';
-    document.getElementById('assignedTo').value = qa.assigned_to || '';
-    document.getElementById('reportBy').value = qa.report_by || '';
-    document.getElementById('contact').value = qa.contact || '';
-    document.getElementById('contactPhone').value = qa.contact_phone || '';
-    document.getElementById('contactEmail').value = qa.contact_email || '';
-    document.getElementById('rejectCategory').value = qa.reject_category || '';
-    document.getElementById('qtyRejected').value = qa.qty_rejected || '';
-    document.getElementById('qtyReturned').value = qa.qty_returned || '';
-    document.getElementById('qtyScrapped').value = qa.qty_scrapped || '';
-    document.getElementById('priority').value = qa.priority || 'Medium';
-    document.getElementById('reasonRejection').value = qa.reason_rejection || '';
-    document.getElementById('containmentActions').value = qa.containment_actions || '';
-    document.getElementById('rootCause').value = qa.root_cause || '';
-    document.getElementById('correctiveAction').value = qa.corrective_action || '';
-    document.getElementById('disposition').value = qa.disposition || '';
-    
-    container.scrollIntoView({ behavior: 'smooth' });
-}
-
-function deleteQA(id) {
-    if (confirm('Are you sure you want to delete this Quality Alert?')) {
-        supabaseClient.from('quality_alerts').delete().eq('id', id).then(() => {
-            loadQualityAlerts();
-            alert('Quality Alert deleted successfully');
-        }).catch(error => {
-            alert('Error deleting Quality Alert: ' + error.message);
+        // Initialize the system
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSampleData();
+            updateStats();
+            updateHomeStats();
+            generateAlertId();
+            showHomePage();
         });
-    }
-}
 
-function updateTable() {
-    console.log('updateTable called, records:', qualityAlerts.length);
-    const tbody = document.getElementById('qaTableBody');
-    
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    qualityAlerts.forEach((qa, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${qa.qa_number || 'N/A'}</td>
-            <td>${qa.complaint_type || '-'}</td>
-            <td>${qa.priority || 'Medium'}</td>
-            <td>${qa.date_complaint || '-'}</td>
-            <td>${qa.part_number || '-'}</td>
-            <td>${qa.customer_supplier || '-'}</td>
-            <td>${qa.assigned_to || '-'}</td>
-            <td><span class="status-badge status-open">${qa.status || 'Open'}</span></td>
-            <td class="actions">
-                <input type="button" class="action-btn edit-btn" value="Edit" onclick="editQA(${qa.id}); return false;">
-                <button class="action-btn print-btn">Print</button>
-                <button class="action-btn delete-btn" onclick="deleteQA(${qa.id})">Delete</button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-}
+        // Navigation Functions
+        function showHomePage() {
+            currentPage = 'home';
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('qualityAlertsPage').classList.add('hidden');
+            document.getElementById('breadcrumb').style.display = 'none';
+            updateHomeStats();
+        }
 
-function showHome() {
-    document.getElementById('homeScreen').style.display = 'grid';
-    document.getElementById('qualityAlertsInterface').classList.remove('active');
-}
+        function showQualityAlerts() {
+            currentPage = 'qualityAlerts';
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('qualityAlertsPage').classList.remove('hidden');
+            document.getElementById('breadcrumb').style.display = 'block';
+            document.getElementById('currentPage').textContent = 'Quality Alerts';
+            showAllAlerts();
+            updateStats();
+        }
 
-function showQualityAlerts() {
-    document.getElementById('homeScreen').style.display = 'none';
-    document.getElementById('qualityAlertsInterface').classList.add('active');
-    loadQualityAlerts();
-}
+        function updateHomeStats() {
+            const openAlertsCount = alerts.filter(a => a.status === 'Open').length;
+            document.getElementById('homeOpenAlerts').textContent = openAlertsCount;
+        }
 
-function showNewQAForm() {
-    editingQAId = null;
-    const container = document.getElementById('qaFormContainer');
-    container.classList.add('show');
-    
-    document.getElementById('formTitle').textContent = 'New Quality Alert';
-    
-    // Clear all fields
-    const fields = ['qaNumber', 'complaintType', 'dateComplaint', 'partNumber', 'customerSupplier', 'facility', 'revisionLevel', 'department', 'assignedTo', 'reportBy', 'contact', 'contactPhone', 'contactEmail', 'rejectCategory', 'qtyRejected', 'qtyReturned', 'qtyScrapped', 'priority', 'reasonRejection', 'containmentActions', 'rootCause', 'correctiveAction', 'disposition'];
-    
-    fields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            if (field.type === 'select-one') {
-                field.selectedIndex = 0;
+        // Load sample data for demonstration
+        function loadSampleData() {
+            const sampleAlerts = [
+                {
+                    id: '1001',
+                    title: 'Dimensional tolerance issue on Part #ABC-123',
+                    description: 'Parts consistently measuring 0.002" over tolerance on critical dimension',
+                    priority: 'High',
+                    status: 'Open',
+                    assignedTo: 'John Smith',
+                    department: 'Quality Control',
+                    createdDate: '2025-09-01',
+                    dueDate: '2025-09-05'
+                },
+                {
+                    id: '1002',
+                    title: 'Surface finish defects in machining center #3',
+                    description: 'Roughness measurements exceeding Ra 3.2 specification',
+                    priority: 'Medium',
+                    status: 'In Progress',
+                    assignedTo: 'Sarah Johnson',
+                    department: 'Production',
+                    createdDate: '2025-09-02',
+                    dueDate: '2025-09-08'
+                },
+                {
+                    id: '1003',
+                    title: 'Calibration overdue for CMM #2',
+                    description: 'Coordinate measuring machine requires annual calibration',
+                    priority: 'Low',
+                    status: 'Resolved',
+                    assignedTo: 'Mike Davis',
+                    department: 'Maintenance',
+                    createdDate: '2025-08-28',
+                    dueDate: '2025-09-15'
+                }
+            ];
+            
+            alerts = sampleAlerts;
+            alertIdCounter = 1004;
+        }
+
+        // Generate new alert ID
+        function generateAlertId() {
+            document.getElementById('alertId').value = alertIdCounter.toString();
+        }
+
+        // Show create form
+        function showCreateForm() {
+            document.getElementById('createForm').classList.remove('hidden');
+            document.getElementById('alertsList').classList.add('hidden');
+            document.getElementById('printView').classList.add('hidden');
+            currentEditId = null;
+            document.getElementById('alertForm').reset();
+            generateAlertId();
+            document.getElementById('status').value = 'Open';
+        }
+
+        // Show all alerts
+        function showAllAlerts() {
+            document.getElementById('createForm').classList.add('hidden');
+            document.getElementById('alertsList').classList.remove('hidden');
+            document.getElementById('printView').classList.add('hidden');
+            displayAlerts(alerts);
+        }
+
+        // Display alerts in table
+        function displayAlerts(alertsToShow) {
+            const tableBody = document.getElementById('alertsTableBody');
+            tableBody.innerHTML = '';
+
+            alertsToShow.forEach(alert => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${alert.id}</td>
+                    <td>${alert.title}</td>
+                    <td class="priority-${alert.priority.toLowerCase()}">${alert.priority}</td>
+                    <td><span class="status-${alert.status.toLowerCase().replace(' ', '-')}">${alert.status}</span></td>
+                    <td>${alert.assignedTo || 'Unassigned'}</td>
+                    <td>${alert.department || 'N/A'}</td>
+                    <td>${formatDate(alert.createdDate)}</td>
+                    <td>${alert.dueDate ? formatDate(alert.dueDate) : 'No due date'}</td>
+                    <td>
+                        <button class="btn" onclick="editAlert('${alert.id}')" style="padding: 8px 12px; margin: 2px;">✏️ Edit</button>
+                        <button class="btn btn-secondary" onclick="printAlert('${alert.id}')" style="padding: 8px 12px; margin: 2px;">🖨️ Print</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;" onclick="deleteAlert('${alert.id}')">🗑️ Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = alerts.length;
+            const open = alerts.filter(a => a.status === 'Open').length;
+            const inProgress = alerts.filter(a => a.status === 'In Progress').length;
+            const resolved = alerts.filter(a => a.status === 'Resolved').length;
+
+            document.getElementById('totalAlerts').textContent = total;
+            document.getElementById('openAlerts').textContent = open;
+            document.getElementById('inProgressAlerts').textContent = inProgress;
+            document.getElementById('resolvedAlerts').textContent = resolved;
+        }
+
+        // Handle form submission
+        document.getElementById('alertForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const alertData = {
+                id: document.getElementById('alertId').value,
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                priority: document.getElementById('priority').value,
+                assignedTo: document.getElementById('assignedTo').value,
+                department: document.getElementById('department').value,
+                status: document.getElementById('status').value,
+                dueDate: document.getElementById('dueDate').value,
+                createdDate: currentEditId ? alerts.find(a => a.id === currentEditId).createdDate : new Date().toISOString().split('T')[0]
+            };
+
+            if (currentEditId) {
+                // Update existing alert
+                const index = alerts.findIndex(a => a.id === currentEditId);
+                alerts[index] = alertData;
             } else {
-                field.value = '';
+                // Create new alert
+                alerts.push(alertData);
+                alertIdCounter++;
+            }
+
+            showAllAlerts();
+            updateStats();
+            updateHomeStats();
+            alert(currentEditId ? 'Alert updated successfully!' : 'Alert created successfully!');
+        });
+
+        // Edit alert
+        function editAlert(id) {
+            const alert = alerts.find(a => a.id === id);
+            if (!alert) return;
+
+            currentEditId = id;
+            
+            document.getElementById('alertId').value = alert.id;
+            document.getElementById('title').value = alert.title;
+            document.getElementById('description').value = alert.description;
+            document.getElementById('priority').value = alert.priority;
+            document.getElementById('assignedTo').value = alert.assignedTo || '';
+            document.getElementById('department').value = alert.department || '';
+            document.getElementById('status').value = alert.status;
+            document.getElementById('dueDate').value = alert.dueDate || '';
+
+            showCreateForm();
+        }
+
+        // Delete alert
+        function deleteAlert(id) {
+            if (confirm('Are you sure you want to delete this alert?')) {
+                alerts = alerts.filter(a => a.id !== id);
+                displayAlerts(alerts);
+                updateStats();
+                updateHomeStats();
             }
         }
-    });
-    
-    document.getElementById('qaNumber').value = 'QA-' + String(nextQANumber).padStart(4, '0');
-    document.getElementById('dateComplaint').valueAsDate = new Date();
-    document.getElementById('priority').value = 'Medium';
-    
-    container.scrollIntoView({ behavior: 'smooth' });
-}
 
-function exportData() {
-    const csvContent = "data:text/csv;charset=utf-8," + 
-        "QA Number,Complaint Type,Priority,Date,Part Number,Customer/Supplier,Status\n" +
-        qualityAlerts.map(qa => 
-            `"${qa.qa_number}","${qa.complaint_type}","${qa.priority}","${qa.date_complaint}","${qa.part_number || ''}","${qa.customer_supplier || ''}","${qa.status}"`
-        ).join("\n");
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "quality_alerts.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+        // Cancel edit
+        function cancelEdit() {
+            currentEditId = null;
+            showAllAlerts();
+        }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded successfully');
-    window.editQA = editQA;
-    window.deleteQA = deleteQA;
-    showHome();
-});
-</script>
+        // Search alerts
+        function searchAlerts() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const filteredAlerts = alerts.filter(alert =>
+                alert.title.toLowerCase().includes(searchTerm) ||
+                alert.description.toLowerCase().includes(searchTerm) ||
+                alert.assignedTo.toLowerCase().includes(searchTerm) ||
+                alert.department.toLowerCase().includes(searchTerm) ||
+                alert.id.toLowerCase().includes(searchTerm)
+            );
+            displayAlerts(filteredAlerts);
+        }
+
+        // Filter by priority
+        function filterByPriority(priority) {
+            const filteredAlerts = alerts.filter(alert => alert.priority === priority);
+            displayAlerts(filteredAlerts);
+        }
+
+        // Filter by status
+        function filterByStatus(status) {
+            const filteredAlerts = alerts.filter(alert => alert.status === status);
+            displayAlerts(filteredAlerts);
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('searchBox').value = '';
+            displayAlerts(alerts);
+        }
+
+        // Print individual alert
+        function printAlert(id) {
+            const alert = alerts.find(a => a.id === id);
+            if (!alert) return;
+
+            const printContent = `
+                <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
+                        <h1 style="color: #2c3e50; margin-bottom: 10px;">Quality Alert Report</h1>
+                        <p style="color: #7f8c8d; font-size: 16px;">Engineering Portal System</p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h2 style="color: #667eea; margin-bottom: 15px;">Alert Details</h2>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold; width: 150px;">Alert ID:</td>
+                                <td style="padding: 10px;">${alert.id}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Title:</td>
+                                <td style="padding: 10px;">${alert.title}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Priority:</td>
+                                <td style="padding: 10px;"><span style="background: ${getPriorityColor(alert.priority)}; color: white; padding: 4px 8px; border-radius: 4px;">${alert.priority}</span></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Status:</td>
+                                <td style="padding: 10px;"><span style="background: ${getStatusColor(alert.status)}; color: white; padding: 4px 8px; border-radius: 4px;">${alert.status}</span></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Assigned To:</td>
+                                <td style="padding: 10px;">${alert.assignedTo || 'Unassigned'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Department:</td>
+                                <td style="padding: 10px;">${alert.department || 'N/A'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Created Date:</td>
+                                <td style="padding: 10px;">${formatDate(alert.createdDate)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold;">Due Date:</td>
+                                <td style="padding: 10px;">${alert.dueDate ? formatDate(alert.dueDate) : 'No due date'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h2 style="color: #667eea; margin-bottom: 15px;">Description</h2>
+                        <p style="line-height: 1.6; color: #2c3e50;">${alert.description}</p>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 40px; border-top: 1px solid #dee2e6; padding-top: 20px; color: #7f8c8d;">
+                        <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                        <p>Engineering Portal - Quality Alert System</p>
+                    </div>
+                </div>
+            `;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Quality Alert ${alert.id}</title>
+                    <style>
+                        body { margin: 20px; }
+                        @media print {
+                            body { margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Helper functions for colors
+        function getPriorityColor(priority) {
+            switch(priority) {
+                case 'High': return '#e74c3c';
+                case 'Medium': return '#f39c12';
+                case 'Low': return '#27ae60';
+                default: return '#95a5a6';
+            }
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Open': return '#e74c3c';
+                case 'In Progress': return '#f39c12';
+                case 'Resolved': return '#27ae60';
+                default: return '#95a5a6';
+            }
+        }
+
+        // Export data functionality
+        function exportData() {
+            const dataStr = JSON.stringify(alerts, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `quality_alerts_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+    </script>
 </body>
 </html>
