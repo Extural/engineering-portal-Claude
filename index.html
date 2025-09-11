@@ -270,6 +270,30 @@
             min-height: 100px;
         }
 
+        /* Four column row for manufacturing fields */
+        .four-column-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .four-column-row .form-group {
+            margin-bottom: 0;
+        }
+
+        /* Three column row for contact/assignment fields */
+        .three-column-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .three-column-row .form-group {
+            margin-bottom: 0;
+        }
+
         .alert-table {
             width: 100%;
             border-collapse: collapse;
@@ -285,6 +309,13 @@
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
+        }
+
+        .alert-table th:first-child,
+        .alert-table td:first-child {
+            width: 120px;
+            min-width: 120px;
+            white-space: nowrap;
         }
 
         .alert-table th {
@@ -360,6 +391,28 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .connection-status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .connection-status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -399,10 +452,31 @@
             .stats-preview {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .four-column-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .three-column-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .four-column-row {
+                grid-template-columns: 1fr;
+            }
+
+            .three-column-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="connection-status disconnected">⚠️ Connecting to Database...</div>
+
     <div class="container">
         <div class="header">
             <h1>🔧 Engineering Portal</h1>
@@ -424,7 +498,7 @@
                 
                 <div class="stats-preview">
                     <div class="stat-card">
-                        <h4 id="homeOpenAlerts">3</h4>
+                        <h4 id="homeOpenAlerts">0</h4>
                         <p>Open Quality Alerts</p>
                     </div>
                     <div class="stat-card">
@@ -541,16 +615,72 @@
 
                 <div class="main-panel">
                     <div id="createForm" class="hidden">
-                        <h2>Create New Quality Alert</h2>
+                        <h2 id="formTitle">Create New Quality Alert</h2>
                         <form id="alertForm">
                             <div class="form-group">
                                 <label for="alertId">Alert ID</label>
                                 <input type="text" id="alertId" readonly>
                             </div>
-                            <div class="form-group">
-                                <label for="title">Title *</label>
-                                <input type="text" id="title" required>
+                            
+                            <!-- ROW 1: FOUR MANUFACTURING FIELDS -->
+                            <div class="four-column-row">
+                                <div class="form-group">
+                                    <label for="customerSupplier">Customer/Supplier</label>
+                                    <input type="text" id="customerSupplier" placeholder="Customer name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="facility">Facility</label>
+                                    <input type="text" id="facility" placeholder="Facility location">
+                                </div>
+                                <div class="form-group">
+                                    <label for="partNumber">Part Number</label>
+                                    <input type="text" id="partNumber" placeholder="Part number">
+                                </div>
+                                <div class="form-group">
+                                    <label for="revisionLevel">Revision Level</label>
+                                    <input type="text" id="revisionLevel" placeholder="Rev A, Rev 1.2">
+                                </div>
                             </div>
+
+                            <!-- ROW 2: THREE CONTACT FIELDS -->
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="contact">Contact</label>
+                                    <input type="text" id="contact" placeholder="Contact person name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactPhone">Contact Phone #</label>
+                                    <input type="tel" id="contactPhone" placeholder="(555) 123-4567">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactEmail">Contact Email</label>
+                                    <input type="email" id="contactEmail" placeholder="contact@company.com">
+                                </div>
+                            </div>
+
+                            <!-- ROW 3: THREE ASSIGNMENT FIELDS -->
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="department">Department</label>
+                                    <select id="department">
+                                        <option value="">Select Department</option>
+                                        <option value="Production">Production</option>
+                                        <option value="Quality Control">Quality Control</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Safety">Safety</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="assignedTo">Assigned To</label>
+                                    <input type="text" id="assignedTo" placeholder="Enter assigned person">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reportBy">Report By</label>
+                                    <input type="date" id="reportBy">
+                                </div>
+                            </div>
+                            
                             <div class="form-group">
                                 <label for="description">Description *</label>
                                 <textarea id="description" required></textarea>
@@ -562,21 +692,6 @@
                                     <option value="High">High</option>
                                     <option value="Medium">Medium</option>
                                     <option value="Low">Low</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="assignedTo">Assigned To</label>
-                                <input type="text" id="assignedTo">
-                            </div>
-                            <div class="form-group">
-                                <label for="department">Department</label>
-                                <select id="department">
-                                    <option value="">Select Department</option>
-                                    <option value="Production">Production</option>
-                                    <option value="Quality Control">Quality Control</option>
-                                    <option value="Engineering">Engineering</option>
-                                    <option value="Maintenance">Maintenance</option>
-                                    <option value="Safety">Safety</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -605,13 +720,14 @@
                             <thead>
                                 <tr>
                                     <th>Alert ID</th>
-                                    <th>Title</th>
+                                    <th>Customer/Supplier</th>
+                                    <th>Facility</th>
+                                    <th>Part Number</th>
+                                    <th>Revision Level</th>
                                     <th>Priority</th>
                                     <th>Status</th>
                                     <th>Assigned To</th>
-                                    <th>Department</th>
                                     <th>Created</th>
-                                    <th>Due Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -629,20 +745,331 @@
         </div>
     </div>
 
+    <!-- Load Supabase CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://ocrslcciwdpkgtrehkfg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jcnNsY2Npd2Rwa2d0cmVoa2ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzNTQ2NjEsImV4cCI6MjA3MDkzMDY2MX0.TpX8okjsPiwtH3xCjkWMVLOkc3YNvLf6suzHKL4tuJU';
+        
         // Application State
         let currentPage = 'home';
         let alerts = [];
         let currentEditId = null;
         let alertIdCounter = 1001;
 
-        // Initialize the system
+        // Update connection status indicator
+        function updateConnectionStatus(status, message) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.textContent = message;
+            statusEl.className = `connection-status ${status}`;
+            
+            if (status === 'connected') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Direct API calls to Supabase REST API
+        async function directApiCall(method, endpoint, data = null) {
+            try {
+                const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+                const headers = {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                };
+
+                const config = {
+                    method: method,
+                    headers: headers
+                };
+
+                if (data && (method === 'POST' || method === 'PATCH')) {
+                    config.body = JSON.stringify(data);
+                }
+
+                console.log(`Making direct API call: ${method} ${endpoint}`);
+                const response = await fetch(url, config);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', response.status, errorText);
+                    throw new Error(`API Error: ${response.status} - ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('Direct API result:', result);
+                return { data: result, error: null };
+            } catch (error) {
+                console.error('Direct API call failed:', error);
+                return { data: null, error: error };
+            }
+        }
+
+        // Test database connection
+        async function testDatabaseConnection() {
+            try {
+                console.log('Testing database connection...');
+                updateConnectionStatus('connected', 'Testing Database...');
+                
+                // Try a simple select query
+                const result = await directApiCall('GET', 'quality_alerts?limit=1');
+                
+                if (result.error) {
+                    throw result.error;
+                }
+                
+                console.log('Database connection successful!');
+                updateConnectionStatus('connected', 'Database Ready');
+                
+                // Load alerts from database
+                loadAlertsFromDatabase();
+                
+            } catch (error) {
+                console.error('Database connection failed:', error);
+                updateConnectionStatus('disconnected', `Database Error: ${error.message}`);
+                
+                // Load sample data as fallback
+                console.log('Loading sample data as fallback...');
+                loadSampleData();
+                updateStats();
+                updateHomeStats();
+            }
+        }
+
+        // Load alerts from database
+        async function loadAlertsFromDatabase() {
+            try {
+                console.log('Loading alerts from database...');
+                const result = await directApiCall('GET', 'quality_alerts?order=created_at.desc');
+                
+                if (result.error) {
+                    throw result.error;
+                }
+                
+                const data = result.data;
+                console.log('Raw data from database:', data);
+                
+                // Map database columns to our UI format
+                alerts = (data || []).map(item => ({
+                    id: `QA-${item.id}`,
+                    description: item.qa_number || '',
+                    priority: item.priority || 'Medium',
+                    status: item.status || 'Open',
+                    assignedTo: item.assigned_to || '',
+                    department: item.facility || '',
+                    facility: item.facility || '',
+                    createdDate: item.date_complaint || new Date().toISOString().split('T')[0],
+                    dueDate: item.date_complaint || '',
+                    partNumber: item.part_number || '',
+                    customerSupplier: item.customer_supplier || '',
+                    revisionLevel: item.revision_level || '',
+                    contact: item.contact || '',
+                    contactPhone: item.contact_phone || '',
+                    contactEmail: item.contact_email || '',
+                    reportBy: item.report_by || ''
+                }));
+                
+                console.log('Mapped alerts:', alerts);
+                
+                if (alerts.length > 0) {
+                    const numericIds = alerts.map(a => parseInt(a.id.replace('QA-', '')) || 0);
+                    const maxId = Math.max(...numericIds);
+                    alertIdCounter = maxId + 1;
+                    console.log('Set alertIdCounter to:', alertIdCounter);
+                }
+                
+                updateConnectionStatus('connected', 'Data Loaded');
+                updateStats();
+                updateHomeStats();
+                
+            } catch (error) {
+                console.error('Failed to load alerts:', error);
+                // Load sample data as fallback
+                loadSampleData();
+                updateStats();
+                updateHomeStats();
+            }
+        }
+
+        // Save alert to database
+        async function saveAlertToDatabase(alertData) {
+            try {
+                console.log('Saving alert to database:', alertData);
+                
+                // Extract numeric ID from QA-XXXX format
+                const numericId = alertData.id.replace('QA-', '');
+                
+                // Check if this ID already exists in our local alerts array
+                const existingAlert = alerts.find(a => a.id === alertData.id);
+                const isUpdating = !!existingAlert;
+                
+                console.log('Existing alert found:', existingAlert);
+                console.log('Is this an update?', isUpdating);
+                
+                if (isUpdating) {
+                    console.log('UPDATING existing alert with ID:', alertData.id);
+                    // Update existing alert - use PATCH with WHERE clause
+                    const result = await directApiCall('PATCH', `quality_alerts?id=eq.${numericId}`, {
+                        qa_number: alertData.description,
+                        priority: alertData.priority,
+                        assigned_to: alertData.assignedTo,
+                        facility: alertData.facility,
+                        status: alertData.status,
+                        date_complaint: alertData.dueDate || null,
+                        part_number: alertData.partNumber || null,
+                        customer_supplier: alertData.customerSupplier || null,
+                        revision_level: alertData.revisionLevel || null,
+                        contact: alertData.contact || null,
+                        contact_phone: alertData.contactPhone || null,
+                        contact_email: alertData.contactEmail || null,
+                        report_by: alertData.reportBy || null
+                    });
+
+                    if (result.error) {
+                        throw result.error;
+                    }
+                    
+                    console.log('Alert updated successfully');
+                    
+                } else {
+                    console.log('CREATING new alert');
+                    // Create new alert
+                    const result = await directApiCall('POST', 'quality_alerts', {
+                        id: parseInt(numericId),
+                        qa_number: alertData.description,
+                        priority: alertData.priority,
+                        assigned_to: alertData.assignedTo,
+                        facility: alertData.facility,
+                        status: alertData.status,
+                        date_complaint: alertData.dueDate || null,
+                        part_number: alertData.partNumber || null,
+                        customer_supplier: alertData.customerSupplier || null,
+                        revision_level: alertData.revisionLevel || null,
+                        contact: alertData.contact || null,
+                        contact_phone: alertData.contactPhone || null,
+                        contact_email: alertData.contactEmail || null,
+                        report_by: alertData.reportBy || null
+                    });
+
+                    if (result.error) {
+                        throw result.error;
+                    }
+                    
+                    console.log('Alert created successfully');
+                    alertIdCounter++;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error saving alert:', error);
+                alert(`Error saving to database: ${error.message}. Please try again.`);
+                return false;
+            }
+        }
+
+        // Delete alert from database
+        async function deleteAlertFromDatabase(id) {
+            try {
+                // Extract numeric ID from QA-XXXX format
+                const numericId = id.replace('QA-', '');
+                const result = await directApiCall('DELETE', `quality_alerts?id=eq.${parseInt(numericId)}`);
+                
+                if (result.error) {
+                    throw result.error;
+                }
+
+                // Remove from local array
+                alerts = alerts.filter(a => a.id !== id);
+                return true;
+            } catch (error) {
+                console.error('Error deleting alert:', error);
+                alert('Error deleting from database. Please try again.');
+                return false;
+            }
+        }
+
+        // Load sample data for demonstration (fallback)
+        function loadSampleData() {
+            console.log('Loading sample data as fallback...');
+            const sampleAlerts = [
+                {
+                    id: 'QA-1001',
+                    customerSupplier: 'ABC Manufacturing Corp',
+                    facility: 'Building A - Line 3',
+                    partNumber: 'ABC-123-456',
+                    revisionLevel: 'Rev C',
+                    contact: 'John Smith',
+                    contactPhone: '(555) 123-4567',
+                    contactEmail: 'john.smith@abcmfg.com',
+                    department: 'Quality Control',
+                    assignedTo: 'John Smith',
+                    reportBy: '2025-09-05',
+                    description: 'Parts consistently measuring 0.002" over tolerance on critical dimension',
+                    priority: 'High',
+                    status: 'Open',
+                    createdDate: '2025-09-01',
+                    dueDate: '2025-09-05'
+                },
+                {
+                    id: 'QA-1002',
+                    customerSupplier: 'XYZ Automotive',
+                    facility: 'Building B - CNC Department',
+                    partNumber: 'XYZ-789-012',
+                    revisionLevel: 'Rev 2.1',
+                    contact: 'Sarah Johnson',
+                    contactPhone: '(555) 987-6543',
+                    contactEmail: 'sarah.j@xyzauto.com',
+                    department: 'Production',
+                    assignedTo: 'Sarah Johnson',
+                    reportBy: '2025-09-08',
+                    description: 'Roughness measurements exceeding Ra 3.2 specification',
+                    priority: 'Medium',
+                    status: 'In Progress',
+                    createdDate: '2025-09-02',
+                    dueDate: '2025-09-08'
+                },
+                {
+                    id: 'QA-1003',
+                    customerSupplier: 'Internal Quality',
+                    facility: 'QC Lab - Station 2',
+                    partNumber: 'CAL-CMM-002',
+                    revisionLevel: 'Rev A',
+                    contact: 'Mike Davis',
+                    contactPhone: '(555) 456-7890',
+                    contactEmail: 'mike.davis@company.com',
+                    department: 'Maintenance',
+                    assignedTo: 'Mike Davis',
+                    reportBy: '2025-09-15',
+                    description: 'Coordinate measuring machine requires annual calibration',
+                    priority: 'Low',
+                    status: 'Resolved',
+                    createdDate: '2025-08-28',
+                    dueDate: '2025-09-15'
+                }
+            ];
+            
+            alerts = sampleAlerts;
+            alertIdCounter = 1004;
+        }
+
+        // Initialize system
         document.addEventListener('DOMContentLoaded', function() {
-            loadSampleData();
-            updateStats();
-            updateHomeStats();
+            console.log('Engineering Portal starting up...');
+            console.log('Testing QA format - alertIdCounter:', alertIdCounter);
+            
             generateAlertId();
+            console.log('Generated ID:', document.getElementById('alertId')?.value);
             showHomePage();
+            
+            // Test database connection after a short delay
+            setTimeout(() => {
+                testDatabaseConnection();
+            }, 1000);
         });
 
         // Navigation Functions
@@ -669,51 +1096,9 @@
             document.getElementById('homeOpenAlerts').textContent = openAlertsCount;
         }
 
-        // Load sample data for demonstration
-        function loadSampleData() {
-            const sampleAlerts = [
-                {
-                    id: '1001',
-                    title: 'Dimensional tolerance issue on Part #ABC-123',
-                    description: 'Parts consistently measuring 0.002" over tolerance on critical dimension',
-                    priority: 'High',
-                    status: 'Open',
-                    assignedTo: 'John Smith',
-                    department: 'Quality Control',
-                    createdDate: '2025-09-01',
-                    dueDate: '2025-09-05'
-                },
-                {
-                    id: '1002',
-                    title: 'Surface finish defects in machining center #3',
-                    description: 'Roughness measurements exceeding Ra 3.2 specification',
-                    priority: 'Medium',
-                    status: 'In Progress',
-                    assignedTo: 'Sarah Johnson',
-                    department: 'Production',
-                    createdDate: '2025-09-02',
-                    dueDate: '2025-09-08'
-                },
-                {
-                    id: '1003',
-                    title: 'Calibration overdue for CMM #2',
-                    description: 'Coordinate measuring machine requires annual calibration',
-                    priority: 'Low',
-                    status: 'Resolved',
-                    assignedTo: 'Mike Davis',
-                    department: 'Maintenance',
-                    createdDate: '2025-08-28',
-                    dueDate: '2025-09-15'
-                }
-            ];
-            
-            alerts = sampleAlerts;
-            alertIdCounter = 1004;
-        }
-
-        // Generate new alert ID
+        // Generate new alert ID with QA prefix
         function generateAlertId() {
-            document.getElementById('alertId').value = alertIdCounter.toString();
+            document.getElementById('alertId').value = `QA-${alertIdCounter}`;
         }
 
         // Show create form
@@ -725,6 +1110,8 @@
             document.getElementById('alertForm').reset();
             generateAlertId();
             document.getElementById('status').value = 'Open';
+            document.getElementById('formTitle').textContent = 'Create New Quality Alert';
+            document.getElementById('formTitle').style.color = '#2c3e50';
         }
 
         // Show all alerts
@@ -735,7 +1122,7 @@
             displayAlerts(alerts);
         }
 
-        // Display alerts in table
+        // Display alerts in table with event listeners
         function displayAlerts(alertsToShow) {
             const tableBody = document.getElementById('alertsTableBody');
             tableBody.innerHTML = '';
@@ -744,20 +1131,98 @@
                 const row = tableBody.insertRow();
                 row.innerHTML = `
                     <td>${alert.id}</td>
-                    <td>${alert.title}</td>
+                    <td>${alert.customerSupplier || 'N/A'}</td>
+                    <td>${alert.facility || 'N/A'}</td>
+                    <td>${alert.partNumber || 'N/A'}</td>
+                    <td>${alert.revisionLevel || 'N/A'}</td>
                     <td class="priority-${alert.priority.toLowerCase()}">${alert.priority}</td>
                     <td><span class="status-${alert.status.toLowerCase().replace(' ', '-')}">${alert.status}</span></td>
                     <td>${alert.assignedTo || 'Unassigned'}</td>
-                    <td>${alert.department || 'N/A'}</td>
                     <td>${formatDate(alert.createdDate)}</td>
-                    <td>${alert.dueDate ? formatDate(alert.dueDate) : 'No due date'}</td>
                     <td>
-                        <button class="btn" onclick="editAlert('${alert.id}')" style="padding: 8px 12px; margin: 2px;">✏️ Edit</button>
-                        <button class="btn btn-secondary" onclick="printAlert('${alert.id}')" style="padding: 8px 12px; margin: 2px;">🖨️ Print</button>
-                        <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;" onclick="deleteAlert('${alert.id}')">🗑️ Delete</button>
+                        <button class="btn edit-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;" title="Edit Alert">Edit</button>
+                        <button class="btn btn-secondary print-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;" title="Print Alert">Print</button>
+                        <button class="btn delete-btn" data-alert-id="${alert.id}" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;" title="Delete Alert">Delete</button>
                     </td>
                 `;
             });
+            
+            // Add event listeners after creating buttons
+            addButtonEventListeners();
+            console.log('Displayed', alertsToShow.length, 'alerts in table');
+        }
+
+        // Add event listeners to buttons
+        function addButtonEventListeners() {
+            // Edit buttons
+            const editButtons = document.querySelectorAll('.edit-btn');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alertId = this.getAttribute('data-alert-id');
+                    console.log('Edit button clicked for ID:', alertId);
+                    editAlert(alertId);
+                });
+            });
+            
+            // Print buttons
+            const printButtons = document.querySelectorAll('.print-btn');
+            printButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alertId = this.getAttribute('data-alert-id');
+                    printAlert(alertId);
+                });
+            });
+            
+            // Delete buttons
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alertId = this.getAttribute('data-alert-id');
+                    deleteAlert(alertId);
+                });
+            });
+        }
+
+        // Edit alert function
+        function editAlert(id) {
+            console.log('Editing alert with ID:', id);
+            const alert = alerts.find(a => a.id === id);
+            
+            if (!alert) {
+                console.error('Alert not found:', id);
+                return;
+            }
+
+            console.log('Found alert to edit:', alert);
+            currentEditId = id;
+            
+            // Show the form
+            document.getElementById('createForm').classList.remove('hidden');
+            document.getElementById('alertsList').classList.add('hidden');
+            document.getElementById('printView').classList.add('hidden');
+            
+            // Update form title
+            document.getElementById('formTitle').textContent = `Edit Quality Alert #${id}`;
+            document.getElementById('formTitle').style.color = '#f39c12';
+            
+            // Populate form fields including all three rows
+            document.getElementById('alertId').value = alert.id;
+            document.getElementById('customerSupplier').value = alert.customerSupplier || '';
+            document.getElementById('facility').value = alert.facility || '';
+            document.getElementById('partNumber').value = alert.partNumber || '';
+            document.getElementById('revisionLevel').value = alert.revisionLevel || '';
+            document.getElementById('contact').value = alert.contact || '';
+            document.getElementById('contactPhone').value = alert.contactPhone || '';
+            document.getElementById('contactEmail').value = alert.contactEmail || '';
+            document.getElementById('department').value = alert.department || '';
+            document.getElementById('assignedTo').value = alert.assignedTo || '';
+            document.getElementById('reportBy').value = alert.reportBy || '';
+            document.getElementById('description').value = alert.description || '';
+            document.getElementById('priority').value = alert.priority || '';
+            document.getElementById('status').value = alert.status || '';
+            document.getElementById('dueDate').value = alert.dueDate || '';
+            
+            console.log('Form populated for editing');
         }
 
         // Format date for display
@@ -780,63 +1245,58 @@
         }
 
         // Handle form submission
-        document.getElementById('alertForm').addEventListener('submit', function(e) {
+        document.getElementById('alertForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Form submission started...');
             
             const alertData = {
                 id: document.getElementById('alertId').value,
-                title: document.getElementById('title').value,
+                customerSupplier: document.getElementById('customerSupplier').value,
+                facility: document.getElementById('facility').value,
+                partNumber: document.getElementById('partNumber').value,
+                revisionLevel: document.getElementById('revisionLevel').value,
+                contact: document.getElementById('contact').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                department: document.getElementById('department').value,
+                assignedTo: document.getElementById('assignedTo').value,
+                reportBy: document.getElementById('reportBy').value,
                 description: document.getElementById('description').value,
                 priority: document.getElementById('priority').value,
-                assignedTo: document.getElementById('assignedTo').value,
-                department: document.getElementById('department').value,
                 status: document.getElementById('status').value,
                 dueDate: document.getElementById('dueDate').value,
-                createdDate: currentEditId ? alerts.find(a => a.id === currentEditId).createdDate : new Date().toISOString().split('T')[0]
+                createdDate: currentEditId ? alerts.find(a => a.id === currentEditId)?.createdDate : new Date().toISOString().split('T')[0]
             };
 
-            if (currentEditId) {
-                // Update existing alert
-                const index = alerts.findIndex(a => a.id === currentEditId);
-                alerts[index] = alertData;
-            } else {
-                // Create new alert
-                alerts.push(alertData);
-                alertIdCounter++;
-            }
+            console.log('Alert data:', alertData);
 
-            showAllAlerts();
-            updateStats();
-            updateHomeStats();
-            alert(currentEditId ? 'Alert updated successfully!' : 'Alert created successfully!');
-        });
-
-        // Edit alert
-        function editAlert(id) {
-            const alert = alerts.find(a => a.id === id);
-            if (!alert) return;
-
-            currentEditId = id;
+            // Save to database
+            const success = await saveAlertToDatabase(alertData);
             
-            document.getElementById('alertId').value = alert.id;
-            document.getElementById('title').value = alert.title;
-            document.getElementById('description').value = alert.description;
-            document.getElementById('priority').value = alert.priority;
-            document.getElementById('assignedTo').value = alert.assignedTo || '';
-            document.getElementById('department').value = alert.department || '';
-            document.getElementById('status').value = alert.status;
-            document.getElementById('dueDate').value = alert.dueDate || '';
-
-            showCreateForm();
-        }
-
-        // Delete alert
-        function deleteAlert(id) {
-            if (confirm('Are you sure you want to delete this alert?')) {
-                alerts = alerts.filter(a => a.id !== id);
-                displayAlerts(alerts);
+            if (success) {
+                // Clear edit mode
+                currentEditId = null;
+                
+                // Reload data from database
+                await loadAlertsFromDatabase();
+                showAllAlerts();
                 updateStats();
                 updateHomeStats();
+                alert('Alert saved successfully!');
+            }
+        });
+
+        // Delete alert
+        async function deleteAlert(id) {
+            if (confirm('Are you sure you want to delete this alert?')) {
+                const success = await deleteAlertFromDatabase(id);
+                if (success) {
+                    displayAlerts(alerts);
+                    updateStats();
+                    updateHomeStats();
+                }
             }
         }
 
@@ -850,10 +1310,12 @@
         function searchAlerts() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
             const filteredAlerts = alerts.filter(alert =>
-                alert.title.toLowerCase().includes(searchTerm) ||
                 alert.description.toLowerCase().includes(searchTerm) ||
-                alert.assignedTo.toLowerCase().includes(searchTerm) ||
-                alert.department.toLowerCase().includes(searchTerm) ||
+                (alert.assignedTo && alert.assignedTo.toLowerCase().includes(searchTerm)) ||
+                (alert.department && alert.department.toLowerCase().includes(searchTerm)) ||
+                (alert.customerSupplier && alert.customerSupplier.toLowerCase().includes(searchTerm)) ||
+                (alert.partNumber && alert.partNumber.toLowerCase().includes(searchTerm)) ||
+                (alert.contact && alert.contact.toLowerCase().includes(searchTerm)) ||
                 alert.id.toLowerCase().includes(searchTerm)
             );
             displayAlerts(filteredAlerts);
@@ -897,32 +1359,56 @@
                                 <td style="padding: 10px;">${alert.id}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Title:</td>
-                                <td style="padding: 10px;">${alert.title}</td>
+                                <td style="padding: 10px; font-weight: bold;">Customer/Supplier:</td>
+                                <td style="padding: 10px;">${alert.customerSupplier || 'N/A'}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Priority:</td>
-                                <td style="padding: 10px;"><span style="background: ${getPriorityColor(alert.priority)}; color: white; padding: 4px 8px; border-radius: 4px;">${alert.priority}</span></td>
+                                <td style="padding: 10px; font-weight: bold;">Facility:</td>
+                                <td style="padding: 10px;">${alert.facility || 'N/A'}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Status:</td>
-                                <td style="padding: 10px;"><span style="background: ${getStatusColor(alert.status)}; color: white; padding: 4px 8px; border-radius: 4px;">${alert.status}</span></td>
+                                <td style="padding: 10px; font-weight: bold;">Part Number:</td>
+                                <td style="padding: 10px;">${alert.partNumber || 'N/A'}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Assigned To:</td>
-                                <td style="padding: 10px;">${alert.assignedTo || 'Unassigned'}</td>
+                                <td style="padding: 10px; font-weight: bold;">Revision Level:</td>
+                                <td style="padding: 10px;">${alert.revisionLevel || 'N/A'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Contact:</td>
+                                <td style="padding: 10px;">${alert.contact || 'N/A'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Contact Phone:</td>
+                                <td style="padding: 10px;">${alert.contactPhone || 'N/A'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Contact Email:</td>
+                                <td style="padding: 10px;">${alert.contactEmail || 'N/A'}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #dee2e6;">
                                 <td style="padding: 10px; font-weight: bold;">Department:</td>
                                 <td style="padding: 10px;">${alert.department || 'N/A'}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Created Date:</td>
-                                <td style="padding: 10px;">${formatDate(alert.createdDate)}</td>
+                                <td style="padding: 10px; font-weight: bold;">Assigned To:</td>
+                                <td style="padding: 10px;">${alert.assignedTo || 'Unassigned'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Report By:</td>
+                                <td style="padding: 10px;">${alert.reportBy ? formatDate(alert.reportBy) : 'N/A'}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Priority:</td>
+                                <td style="padding: 10px;">${alert.priority}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px; font-weight: bold;">Status:</td>
+                                <td style="padding: 10px;">${alert.status}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px; font-weight: bold;">Due Date:</td>
-                                <td style="padding: 10px;">${alert.dueDate ? formatDate(alert.dueDate) : 'No due date'}</td>
+                                <td style="padding: 10px; font-weight: bold;">Created Date:</td>
+                                <td style="padding: 10px;">${formatDate(alert.createdDate)}</td>
                             </tr>
                         </table>
                     </div>
@@ -961,25 +1447,6 @@
             printWindow.print();
         }
 
-        // Helper functions for colors
-        function getPriorityColor(priority) {
-            switch(priority) {
-                case 'High': return '#e74c3c';
-                case 'Medium': return '#f39c12';
-                case 'Low': return '#27ae60';
-                default: return '#95a5a6';
-            }
-        }
-
-        function getStatusColor(status) {
-            switch(status) {
-                case 'Open': return '#e74c3c';
-                case 'In Progress': return '#f39c12';
-                case 'Resolved': return '#27ae60';
-                default: return '#95a5a6';
-            }
-        }
-
         // Export data functionality
         function exportData() {
             const dataStr = JSON.stringify(alerts, null, 2);
@@ -993,3 +1460,4 @@
     </script>
 </body>
 </html>
+            
