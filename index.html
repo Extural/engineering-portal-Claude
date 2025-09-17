@@ -475,17 +475,17 @@
 </head>
 <body>
     <!-- Connection Status Indicator -->
-    <div id="connectionStatus" class="connection-status disconnected">⚠️ Connecting to Database...</div>
+    <div id="connectionStatus" class="connection-status disconnected">Connecting to Database...</div>
 
     <div class="container">
         <div class="header">
-            <h1>🔧 Engineering Portal</h1>
+            <h1>Engineering Portal</h1>
             <p>Streamlined Operations Management System</p>
         </div>
 
         <!-- Breadcrumb Navigation -->
         <div class="breadcrumb" id="breadcrumb" style="display: none;">
-            <a href="#" onclick="showHomePage()">🏠 Home</a>
+            <a href="#" onclick="showHomePage()">Home</a>
             <span>></span>
             <span id="currentPage">Quality Alerts</span>
         </div>
@@ -596,9 +596,10 @@
             <div class="main-content">
                 <div class="sidebar">
                     <h2>Quick Actions</h2>
-                    <button class="btn" onclick="showCreateForm()">➕ Create New Alert</button>
-                    <button class="btn btn-secondary" onclick="showAllAlerts()">📋 View All Alerts</button>
-                    <button class="btn btn-secondary" onclick="exportData()">💾 Export Data</button>
+                    <button class="btn" onclick="showCreateForm()">Create New Alert</button>
+                    <button class="btn btn-secondary" onclick="showAllAlerts()">View All Alerts</button>
+                    <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+                    <button class="btn btn-secondary" onclick="importData()">Import Data</button>
                     
                     <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Priority</h3>
                     <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterByPriority('High')">High Priority</button>
@@ -680,41 +681,86 @@
                                     <input type="date" id="reportBy">
                                 </div>
                             </div>
+
+                            <!-- ROW 4: FOUR REJECT FIELDS -->
+                            <div class="four-column-row">
+                                <div class="form-group">
+                                    <label for="rejectCategory">Reject Category</label>
+                                    <select id="rejectCategory">
+                                        <option value="">Select Category</option>
+                                        <option value="Dimensional">Dimensional</option>
+                                        <option value="Surface Finish">Surface Finish</option>
+                                        <option value="Material Defect">Material Defect</option>
+                                        <option value="Assembly">Assembly</option>
+                                        <option value="Packaging">Packaging</option>
+                                        <option value="Documentation">Documentation</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="qtyRejected">Qty Rejected</label>
+                                    <input type="number" id="qtyRejected" placeholder="0" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="qtyReturned">Qty Returned</label>
+                                    <input type="number" id="qtyReturned" placeholder="0" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="qtyScrapped">Qty Scrapped</label>
+                                    <input type="number" id="qtyScrapped" placeholder="0" min="0">
+                                </div>
+                            </div>
                             
                             <div class="form-group">
-                                <label for="description">Description *</label>
-                                <textarea id="description" required></textarea>
+                                <label for="description">Reason for Rejection *</label>
+                                <textarea id="description" required placeholder="Describe the specific reason for rejection..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="priority">Priority *</label>
-                                <select id="priority" required>
-                                    <option value="">Select Priority</option>
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Low">Low</option>
-                                </select>
+                                <label for="rootCause">Root Cause</label>
+                                <textarea id="rootCause" placeholder="Identify the underlying root cause of the issue..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="status">Status</label>
-                                <select id="status">
-                                    <option value="Open">Open</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Resolved">Resolved</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="dueDate">Due Date</label>
-                                <input type="date" id="dueDate">
+                                <label for="correctiveAction">Corrective/Preventive Action</label>
+                                <textarea id="correctiveAction" placeholder="Describe actions taken or planned to correct and prevent recurrence..."></textarea>
                             </div>
                             
-                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">💾 Save Alert</button>
-                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">❌ Cancel</button>
+                            <!-- FOUR COLUMN ROW: PRIORITY, CLOSE DATE, SIGN OFF, STATUS -->
+                            <div class="four-column-row">
+                                <div class="form-group">
+                                    <label for="priority">Priority *</label>
+                                    <select id="priority" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dueDate">Close Date</label>
+                                    <input type="date" id="dueDate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="correctiveSignOff">Sign Off</label>
+                                    <input type="text" id="correctiveSignOff" placeholder="Enter sign-off name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="status">Status</label>
+                                    <select id="status">
+                                        <option value="Open">Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">Save Alert</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
                         </form>
                     </div>
 
                     <div id="alertsList">
                         <h2>Quality Alerts Dashboard</h2>
-                        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search alerts..." onkeyup="searchAlerts()">
+                        <input type="text" class="search-box" id="searchBox" placeholder="Search alerts..." onkeyup="searchAlerts()">
                         
                         <table class="alert-table" id="alertsTable">
                             <thead>
@@ -858,6 +904,9 @@
                 alerts = (data || []).map(item => ({
                     id: `QA-${item.id}`,
                     description: item.qa_number || '',
+                    rootCause: item.root_cause || '',
+                    correctiveAction: item.corrective_action || '',
+                    correctiveSignOff: item.corrective_sign_off || '',
                     priority: item.priority || 'Medium',
                     status: item.status || 'Open',
                     assignedTo: item.assigned_to || '',
@@ -871,7 +920,12 @@
                     contact: item.contact || '',
                     contactPhone: item.contact_phone || '',
                     contactEmail: item.contact_email || '',
-                    reportBy: item.report_by || ''
+                    reportBy: item.report_by || '',
+                    // Reject fields
+                    rejectCategory: item.reject_category || '',
+                    qtyRejected: item.qty_rejected || 0,
+                    qtyReturned: item.qty_returned || 0,
+                    qtyScrapped: item.qty_scrapped || 0
                 }));
                 
                 console.log('Mapped alerts:', alerts);
@@ -889,7 +943,6 @@
                 
             } catch (error) {
                 console.error('Failed to load alerts:', error);
-                // Load sample data as fallback
                 loadSampleData();
                 updateStats();
                 updateHomeStats();
@@ -899,64 +952,62 @@
         // Save alert to database
         async function saveAlertToDatabase(alertData) {
             try {
-                console.log('Saving alert to database:', alertData);
+                console.log('=== SAVE ALERT DEBUG ===');
+                console.log('Full alertData object:', alertData);
                 
-                // Extract numeric ID from QA-XXXX format
                 const numericId = alertData.id.replace('QA-', '');
-                
-                // Check if this ID already exists in our local alerts array
                 const existingAlert = alerts.find(a => a.id === alertData.id);
                 const isUpdating = !!existingAlert;
                 
-                console.log('Existing alert found:', existingAlert);
-                console.log('Is this an update?', isUpdating);
+                console.log('Numeric ID:', numericId);
+                console.log('Is updating existing alert?', isUpdating);
+
+                const dbData = {
+                    qa_number: alertData.description,
+                    root_cause: alertData.rootCause,
+                    corrective_action: alertData.correctiveAction,
+                    corrective_sign_off: alertData.correctiveSignOff,
+                    priority: alertData.priority,
+                    assigned_to: alertData.assignedTo,
+                    facility: alertData.facility,
+                    status: alertData.status,
+                    date_complaint: alertData.dueDate || null,
+                    part_number: alertData.partNumber || null,
+                    customer_supplier: alertData.customerSupplier || null,
+                    revision_level: alertData.revisionLevel || null,
+                    contact: alertData.contact || null,
+                    contact_phone: alertData.contactPhone || null,
+                    contact_email: alertData.contactEmail || null,
+                    report_by: alertData.reportBy || null,
+                    reject_category: alertData.rejectCategory || null,
+                    qty_rejected: parseInt(alertData.qtyRejected) || null,
+                    qty_returned: parseInt(alertData.qtyReturned) || null,
+                    qty_scrapped: parseInt(alertData.qtyScrapped) || null
+                };
+                
+                console.log('Database payload:', dbData);
                 
                 if (isUpdating) {
-                    console.log('UPDATING existing alert with ID:', alertData.id);
-                    // Update existing alert - use PATCH with WHERE clause
-                    const result = await directApiCall('PATCH', `quality_alerts?id=eq.${numericId}`, {
-                        qa_number: alertData.description,
-                        priority: alertData.priority,
-                        assigned_to: alertData.assignedTo,
-                        facility: alertData.facility,
-                        status: alertData.status,
-                        date_complaint: alertData.dueDate || null,
-                        part_number: alertData.partNumber || null,
-                        customer_supplier: alertData.customerSupplier || null,
-                        revision_level: alertData.revisionLevel || null,
-                        contact: alertData.contact || null,
-                        contact_phone: alertData.contactPhone || null,
-                        contact_email: alertData.contactEmail || null,
-                        report_by: alertData.reportBy || null
-                    });
-
+                    console.log('Attempting UPDATE...');
+                    const result = await directApiCall('PATCH', `quality_alerts?id=eq.${numericId}`, dbData);
+                    console.log('UPDATE result:', result);
+                    
                     if (result.error) {
+                        console.error('UPDATE failed:', result.error);
                         throw result.error;
                     }
                     
                     console.log('Alert updated successfully');
-                    
                 } else {
-                    console.log('CREATING new alert');
-                    // Create new alert
-                    const result = await directApiCall('POST', 'quality_alerts', {
-                        id: parseInt(numericId),
-                        qa_number: alertData.description,
-                        priority: alertData.priority,
-                        assigned_to: alertData.assignedTo,
-                        facility: alertData.facility,
-                        status: alertData.status,
-                        date_complaint: alertData.dueDate || null,
-                        part_number: alertData.partNumber || null,
-                        customer_supplier: alertData.customerSupplier || null,
-                        revision_level: alertData.revisionLevel || null,
-                        contact: alertData.contact || null,
-                        contact_phone: alertData.contactPhone || null,
-                        contact_email: alertData.contactEmail || null,
-                        report_by: alertData.reportBy || null
-                    });
-
+                    console.log('Attempting INSERT...');
+                    dbData.id = parseInt(numericId);
+                    console.log('INSERT payload with ID:', dbData);
+                    
+                    const result = await directApiCall('POST', 'quality_alerts', dbData);
+                    console.log('INSERT result:', result);
+                    
                     if (result.error) {
+                        console.error('INSERT failed:', result.error);
                         throw result.error;
                     }
                     
@@ -964,10 +1015,15 @@
                     alertIdCounter++;
                 }
 
+                console.log('=== SAVE COMPLETED SUCCESSFULLY ===');
                 return true;
             } catch (error) {
-                console.error('Error saving alert:', error);
-                alert(`Error saving to database: ${error.message}. Please try again.`);
+                console.error('=== SAVE FAILED ===');
+                console.error('Error details:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                alert(`Database Error: ${error.message}\n\nCheck browser console for details.`);
                 return false;
             }
         }
@@ -975,15 +1031,10 @@
         // Delete alert from database
         async function deleteAlertFromDatabase(id) {
             try {
-                // Extract numeric ID from QA-XXXX format
                 const numericId = id.replace('QA-', '');
                 const result = await directApiCall('DELETE', `quality_alerts?id=eq.${parseInt(numericId)}`);
                 
-                if (result.error) {
-                    throw result.error;
-                }
-
-                // Remove from local array
+                if (result.error) throw result.error;
                 alerts = alerts.filter(a => a.id !== id);
                 return true;
             } catch (error) {
@@ -993,7 +1044,7 @@
             }
         }
 
-        // Load sample data for demonstration (fallback)
+        // Load sample data
         function loadSampleData() {
             console.log('Loading sample data as fallback...');
             const sampleAlerts = [
@@ -1009,11 +1060,18 @@
                     department: 'Quality Control',
                     assignedTo: 'John Smith',
                     reportBy: '2025-09-05',
-                    description: 'Parts consistently measuring 0.002" over tolerance on critical dimension',
+                    description: 'Parts consistently measuring 0.002" over tolerance on critical dimension 4.250±0.001".',
+                    rootCause: 'Spindle bearing wear causing machine drift during extended production runs.',
+                    correctiveAction: 'Replace spindle bearings and implement hourly dimension checks. Schedule preventive bearing replacement every 6 months.',
+                    correctiveSignOff: '',
                     priority: 'High',
                     status: 'Open',
                     createdDate: '2025-09-01',
-                    dueDate: '2025-09-05'
+                    dueDate: '2025-09-05',
+                    rejectCategory: 'Dimensional',
+                    qtyRejected: 25,
+                    qtyReturned: 20,
+                    qtyScrapped: 5
                 },
                 {
                     id: 'QA-1002',
@@ -1027,11 +1085,18 @@
                     department: 'Production',
                     assignedTo: 'Sarah Johnson',
                     reportBy: '2025-09-08',
-                    description: 'Roughness measurements exceeding Ra 3.2 specification',
+                    description: 'Surface roughness measurements exceeding Ra 3.2 µm specification. Multiple parts showing tool wear marks.',
+                    rootCause: 'Cutting tool exceeded recommended tool life. Insufficient tool change monitoring in current process.',
+                    correctiveAction: 'Implemented tool life tracking system. Reduced tool change intervals by 20%. Added surface finish inspection at mid-cycle.',
+                    correctiveSignOff: 'M. Anderson - Production Mgr',
                     priority: 'Medium',
                     status: 'In Progress',
                     createdDate: '2025-09-02',
-                    dueDate: '2025-09-08'
+                    dueDate: '2025-09-08',
+                    rejectCategory: 'Surface Finish',
+                    qtyRejected: 12,
+                    qtyReturned: 12,
+                    qtyScrapped: 0
                 },
                 {
                     id: 'QA-1003',
@@ -1045,11 +1110,18 @@
                     department: 'Maintenance',
                     assignedTo: 'Mike Davis',
                     reportBy: '2025-09-15',
-                    description: 'Coordinate measuring machine requires annual calibration',
+                    description: 'Calibration equipment out of specification. CMM requires annual certification and adjustment.',
+                    rootCause: 'Missed scheduled calibration due to inadequate preventive maintenance tracking system.',
+                    correctiveAction: 'Completed emergency calibration. Implemented automated calendar reminders and upgraded CMMS system for better tracking.',
+                    correctiveSignOff: 'J. Wilson - QA Director',
                     priority: 'Low',
                     status: 'Resolved',
                     createdDate: '2025-08-28',
-                    dueDate: '2025-09-15'
+                    dueDate: '2025-09-15',
+                    rejectCategory: 'Other',
+                    qtyRejected: 0,
+                    qtyReturned: 0,
+                    qtyScrapped: 0
                 }
             ];
             
@@ -1060,13 +1132,9 @@
         // Initialize system
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Engineering Portal starting up...');
-            console.log('Testing QA format - alertIdCounter:', alertIdCounter);
-            
             generateAlertId();
-            console.log('Generated ID:', document.getElementById('alertId')?.value);
             showHomePage();
             
-            // Test database connection after a short delay
             setTimeout(() => {
                 testDatabaseConnection();
             }, 1000);
@@ -1122,7 +1190,7 @@
             displayAlerts(alerts);
         }
 
-        // Display alerts in table with event listeners
+        // Display alerts in table
         function displayAlerts(alertsToShow) {
             const tableBody = document.getElementById('alertsTableBody');
             tableBody.innerHTML = '';
@@ -1140,72 +1208,52 @@
                     <td>${alert.assignedTo || 'Unassigned'}</td>
                     <td>${formatDate(alert.createdDate)}</td>
                     <td>
-                        <button class="btn edit-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;" title="Edit Alert">Edit</button>
-                        <button class="btn btn-secondary print-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;" title="Print Alert">Print</button>
-                        <button class="btn delete-btn" data-alert-id="${alert.id}" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;" title="Delete Alert">Delete</button>
+                        <button class="btn edit-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;">Edit</button>
+                        <button class="btn btn-secondary print-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;">Print</button>
+                        <button class="btn delete-btn" data-alert-id="${alert.id}" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;">Delete</button>
                     </td>
                 `;
             });
             
-            // Add event listeners after creating buttons
             addButtonEventListeners();
-            console.log('Displayed', alertsToShow.length, 'alerts in table');
         }
 
         // Add event listeners to buttons
         function addButtonEventListeners() {
-            // Edit buttons
-            const editButtons = document.querySelectorAll('.edit-btn');
-            editButtons.forEach(button => {
+            document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    const alertId = this.getAttribute('data-alert-id');
-                    console.log('Edit button clicked for ID:', alertId);
-                    editAlert(alertId);
+                    editAlert(this.getAttribute('data-alert-id'));
                 });
             });
             
-            // Print buttons
-            const printButtons = document.querySelectorAll('.print-btn');
-            printButtons.forEach(button => {
+            document.querySelectorAll('.print-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    const alertId = this.getAttribute('data-alert-id');
-                    printAlert(alertId);
+                    printAlert(this.getAttribute('data-alert-id'));
                 });
             });
             
-            // Delete buttons
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            deleteButtons.forEach(button => {
+            document.querySelectorAll('.delete-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    const alertId = this.getAttribute('data-alert-id');
-                    deleteAlert(alertId);
+                    deleteAlert(this.getAttribute('data-alert-id'));
                 });
             });
         }
 
         // Edit alert function
         function editAlert(id) {
-            console.log('Editing alert with ID:', id);
             const alert = alerts.find(a => a.id === id);
-            
-            if (!alert) {
-                console.error('Alert not found:', id);
-                return;
-            }
+            if (!alert) return;
 
-            console.log('Found alert to edit:', alert);
             currentEditId = id;
             
-            // Show the form
             document.getElementById('createForm').classList.remove('hidden');
             document.getElementById('alertsList').classList.add('hidden');
             document.getElementById('printView').classList.add('hidden');
             
-            // Update form title
-            document.getElementById('formTitle').textContent = `Edit Quality Alert #${id}`;
+            document.getElementById('formTitle').textContent = `Edit Quality Alert ${id}`;
             document.getElementById('formTitle').style.color = '#f39c12';
             
-            // Populate form fields including all three rows
+            // Populate all form fields
             document.getElementById('alertId').value = alert.id;
             document.getElementById('customerSupplier').value = alert.customerSupplier || '';
             document.getElementById('facility').value = alert.facility || '';
@@ -1217,18 +1265,22 @@
             document.getElementById('department').value = alert.department || '';
             document.getElementById('assignedTo').value = alert.assignedTo || '';
             document.getElementById('reportBy').value = alert.reportBy || '';
+            document.getElementById('rejectCategory').value = alert.rejectCategory || '';
+            document.getElementById('qtyRejected').value = alert.qtyRejected || '';
+            document.getElementById('qtyReturned').value = alert.qtyReturned || '';
+            document.getElementById('qtyScrapped').value = alert.qtyScrapped || '';
             document.getElementById('description').value = alert.description || '';
+            document.getElementById('rootCause').value = alert.rootCause || '';
+            document.getElementById('correctiveAction').value = alert.correctiveAction || '';
             document.getElementById('priority').value = alert.priority || '';
-            document.getElementById('status').value = alert.status || '';
             document.getElementById('dueDate').value = alert.dueDate || '';
-            
-            console.log('Form populated for editing');
+            document.getElementById('correctiveSignOff').value = alert.correctiveSignOff || '';
+            document.getElementById('status').value = alert.status || '';
         }
 
         // Format date for display
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString();
+            return new Date(dateString).toLocaleDateString();
         }
 
         // Update statistics
@@ -1247,9 +1299,6 @@
         // Handle form submission
         document.getElementById('alertForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('Form submission started...');
             
             const alertData = {
                 id: document.getElementById('alertId').value,
@@ -1263,23 +1312,24 @@
                 department: document.getElementById('department').value,
                 assignedTo: document.getElementById('assignedTo').value,
                 reportBy: document.getElementById('reportBy').value,
+                rejectCategory: document.getElementById('rejectCategory').value,
+                qtyRejected: document.getElementById('qtyRejected').value,
+                qtyReturned: document.getElementById('qtyReturned').value,
+                qtyScrapped: document.getElementById('qtyScrapped').value,
                 description: document.getElementById('description').value,
+                rootCause: document.getElementById('rootCause').value,
+                correctiveAction: document.getElementById('correctiveAction').value,
                 priority: document.getElementById('priority').value,
-                status: document.getElementById('status').value,
                 dueDate: document.getElementById('dueDate').value,
+                correctiveSignOff: document.getElementById('correctiveSignOff').value,
+                status: document.getElementById('status').value,
                 createdDate: currentEditId ? alerts.find(a => a.id === currentEditId)?.createdDate : new Date().toISOString().split('T')[0]
             };
 
-            console.log('Alert data:', alertData);
-
-            // Save to database
             const success = await saveAlertToDatabase(alertData);
             
             if (success) {
-                // Clear edit mode
                 currentEditId = null;
-                
-                // Reload data from database
                 await loadAlertsFromDatabase();
                 showAllAlerts();
                 updateStats();
@@ -1316,111 +1366,187 @@
                 (alert.customerSupplier && alert.customerSupplier.toLowerCase().includes(searchTerm)) ||
                 (alert.partNumber && alert.partNumber.toLowerCase().includes(searchTerm)) ||
                 (alert.contact && alert.contact.toLowerCase().includes(searchTerm)) ||
+                (alert.rejectCategory && alert.rejectCategory.toLowerCase().includes(searchTerm)) ||
                 alert.id.toLowerCase().includes(searchTerm)
             );
             displayAlerts(filteredAlerts);
         }
 
-        // Filter by priority
+        // Filter functions
         function filterByPriority(priority) {
-            const filteredAlerts = alerts.filter(alert => alert.priority === priority);
-            displayAlerts(filteredAlerts);
+            displayAlerts(alerts.filter(alert => alert.priority === priority));
         }
 
-        // Filter by status
         function filterByStatus(status) {
-            const filteredAlerts = alerts.filter(alert => alert.status === status);
-            displayAlerts(filteredAlerts);
+            displayAlerts(alerts.filter(alert => alert.status === status));
         }
 
-        // Clear filters
         function clearFilters() {
             document.getElementById('searchBox').value = '';
             displayAlerts(alerts);
         }
 
-        // Print individual alert
+        // Print alert
         function printAlert(id) {
             const alert = alerts.find(a => a.id === id);
             if (!alert) return;
 
             const printContent = `
-                <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+                <div style="max-width: 900px; margin: 0 auto; font-family: Arial, sans-serif; padding: 20px;">
+                    <!-- Header -->
                     <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
-                        <h1 style="color: #2c3e50; margin-bottom: 10px;">Quality Alert Report</h1>
-                        <p style="color: #7f8c8d; font-size: 16px;">Engineering Portal System</p>
+                        <h1 style="color: #2c3e50; margin-bottom: 5px; font-size: 28px;">VEE Engineering, Inc.</h1>
+                        <h2 style="color: #667eea; margin-bottom: 10px; font-size: 24px;">Quality Alert/6D Report</h2>
+                        <div style="margin-top: 15px;">
+                            <strong style="font-size: 20px; color: #667eea;">Alert ID: ${alert.id}</strong>
+                        </div>
                     </div>
                     
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h2 style="color: #667eea; margin-bottom: 15px;">Alert Details</h2>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold; width: 150px;">Alert ID:</td>
-                                <td style="padding: 10px;">${alert.id}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Customer/Supplier:</td>
-                                <td style="padding: 10px;">${alert.customerSupplier || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Facility:</td>
-                                <td style="padding: 10px;">${alert.facility || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Part Number:</td>
-                                <td style="padding: 10px;">${alert.partNumber || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Revision Level:</td>
-                                <td style="padding: 10px;">${alert.revisionLevel || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Contact:</td>
-                                <td style="padding: 10px;">${alert.contact || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Contact Phone:</td>
-                                <td style="padding: 10px;">${alert.contactPhone || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Contact Email:</td>
-                                <td style="padding: 10px;">${alert.contactEmail || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Department:</td>
-                                <td style="padding: 10px;">${alert.department || 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Assigned To:</td>
-                                <td style="padding: 10px;">${alert.assignedTo || 'Unassigned'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Report By:</td>
-                                <td style="padding: 10px;">${alert.reportBy ? formatDate(alert.reportBy) : 'N/A'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Priority:</td>
-                                <td style="padding: 10px;">${alert.priority}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 10px; font-weight: bold;">Status:</td>
-                                <td style="padding: 10px;">${alert.status}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; font-weight: bold;">Created Date:</td>
-                                <td style="padding: 10px;">${formatDate(alert.createdDate)}</td>
-                            </tr>
-                        </table>
+                    <!-- ROW 1: Manufacturing Details -->
+                    <div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Manufacturing Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px;">
+                            <div style="border-right: 1px solid #dee2e6; padding-right: 15px;">
+                                <strong>Customer/Supplier:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.customerSupplier || ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Facility:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.facility || ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Part Number:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.partNumber || ''}</span>
+                            </div>
+                            <div style="padding-left: 15px;">
+                                <strong>Revision Level:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.revisionLevel || ''}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROW 2: Contact Information -->
+                    <div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Contact Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                            <div style="border-right: 1px solid #dee2e6; padding-right: 15px;">
+                                <strong>Contact Person:</strong><br>
+                                <span style="display: inline-block; min-width: 180px; padding: 2px 0;">${alert.contact || ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Phone Number:</strong><br>
+                                <span style="display: inline-block; min-width: 180px; padding: 2px 0;">${alert.contactPhone || ''}</span>
+                            </div>
+                            <div style="padding-left: 15px;">
+                                <strong>Email Address:</strong><br>
+                                <span style="display: inline-block; min-width: 180px; padding: 2px 0;">${alert.contactEmail || ''}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROW 3: Assignment Details -->
+                    <div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Assignment Details</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                            <div style="border-right: 1px solid #dee2e6; padding-right: 15px;">
+                                <strong>Department:</strong><br>
+                                <span style="display: inline-block; min-width: 180px; padding: 2px 0;">${alert.department || ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Assigned To:</strong><br>
+                                <span style="display: inline-block; min-width: 180px; padding: 2px 0;">${alert.assignedTo || ''}</span>
+                            </div>
+                            <div style="padding-left: 15px;">
+                                <strong>Report By:</strong><br>
+                                <span style="display: inline-block; min-width: 180px; padding: 2px 0;">${alert.reportBy ? formatDate(alert.reportBy) : ''}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROW 4: Reject Data -->
+                    <div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Reject Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px;">
+                            <div style="border-right: 1px solid #dee2e6; padding-right: 15px;">
+                                <strong>Reject Category:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.rejectCategory || ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Qty Rejected:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.qtyRejected || ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Qty Returned:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.qtyReturned || ''}</span>
+                            </div>
+                            <div style="padding-left: 15px;">
+                                <strong>Qty Scrapped:</strong><br>
+                                <span style="display: inline-block; min-width: 150px; padding: 2px 0;">${alert.qtyScrapped || ''}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reason for Rejection -->
+                    <div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Reason for Rejection</h3>
+                        <div style="border: 1px solid #ccc; padding: 10px; min-height: 80px; background: #f9f9f9;">
+                            ${alert.description || '<em style="color: #999;">Not specified</em>'}
+                        </div>
+                    </div>
+
+                    ${alert.rootCause ? `<div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Root Cause Analysis</h3>
+                        <div style="border: 1px solid #ccc; padding: 10px; min-height: 80px; background: #f9f9f9;">
+                            ${alert.rootCause}
+                        </div>
+                    </div>` : `<div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Root Cause Analysis</h3>
+                        <div style="border: 1px solid #ccc; padding: 10px; min-height: 80px; background: #f9f9f9;">
+                            <em style="color: #999;">To be completed</em>
+                        </div>
+                    </div>`}
+
+                    ${alert.correctiveAction ? `<div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Corrective/Preventive Action</h3>
+                        <div style="border: 1px solid #ccc; padding: 10px; min-height: 80px; background: #f9f9f9;">
+                            ${alert.correctiveAction}
+                        </div>
+                    </div>` : `<div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 20px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Corrective/Preventive Action</h3>
+                        <div style="border: 1px solid #ccc; padding: 10px; min-height: 80px; background: #f9f9f9;">
+                            <em style="color: #999;">To be completed</em>
+                        </div>
+                    </div>`}
+
+                    <!-- Final Row: Status Information -->
+                    <div style="border: 2px solid #667eea; border-radius: 8px; margin-bottom: 30px; padding: 15px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; border-bottom: 1px solid #667eea; padding-bottom: 5px;">Status & Closure Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px;">
+                            <div style="border-right: 1px solid #dee2e6; padding-right: 15px;">
+                                <strong>Priority:</strong><br>
+                                <span style="display: inline-block; min-width: 120px; padding: 2px 0; font-weight: bold; color: ${alert.priority === 'High' ? '#e74c3c' : alert.priority === 'Medium' ? '#f39c12' : '#27ae60'};">${alert.priority}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Close Date:</strong><br>
+                                <span style="display: inline-block; min-width: 120px; padding: 2px 0;">${alert.dueDate ? formatDate(alert.dueDate) : ''}</span>
+                            </div>
+                            <div style="border-right: 1px solid #dee2e6; padding: 0 15px;">
+                                <strong>Sign Off:</strong><br>
+                                <span style="display: inline-block; min-width: 120px; padding: 2px 0;">${alert.correctiveSignOff || ''}</span>
+                            </div>
+                            <div style="padding-left: 15px;">
+                                <strong>Status:</strong><br>
+                                <span style="display: inline-block; min-width: 120px; padding: 2px 0; font-weight: bold;">${alert.status}</span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h2 style="color: #667eea; margin-bottom: 15px;">Description</h2>
-                        <p style="line-height: 1.6; color: #2c3e50;">${alert.description}</p>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 40px; border-top: 1px solid #dee2e6; padding-top: 20px; color: #7f8c8d;">
-                        <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
-                        <p>Engineering Portal - Quality Alert System</p>
+                    <!-- Footer -->
+                    <div style="text-align: center; margin-top: 40px; border-top: 2px solid #667eea; padding-top: 20px; color: #7f8c8d;">
+                        <p style="margin: 5px 0;"><strong>Generated:</strong> ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                        <p style="margin: 5px 0;"><strong>Created:</strong> ${formatDate(alert.createdDate)}</p>
+                        <p style="margin: 15px 0 5px 0; font-weight: bold; color: #667eea;">VEE Engineering, Inc. - Quality Alert System</p>
+                        <p style="margin: 5px 0; font-size: 12px; color: #999;">VE-QY4 / (09/17/2025) / Rev B</p>
                     </div>
                 </div>
             `;
@@ -1432,9 +1558,16 @@
                 <head>
                     <title>Quality Alert ${alert.id}</title>
                     <style>
-                        body { margin: 20px; }
+                        body { 
+                            margin: 0; 
+                            font-family: Arial, sans-serif;
+                        }
                         @media print {
                             body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                        @media screen {
+                            body { background: #f5f5f5; padding: 20px; }
                         }
                     </style>
                 </head>
@@ -1447,7 +1580,7 @@
             printWindow.print();
         }
 
-        // Export data functionality
+        // Export data
         function exportData() {
             const dataStr = JSON.stringify(alerts, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
@@ -1460,4 +1593,3 @@
     </script>
 </body>
 </html>
-            
