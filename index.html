@@ -1161,6 +1161,8 @@ async function loadTasksFromDatabase() {
         
         const data = result.data;
         console.log('Raw tasks data from database:', data);
+		console.log('First task raw data:', data[0]);
+		console.log('assigned_to field value:', data[0]?.assigned_to);
         
         // Map database columns to UI format
         tasks = (data || []).map(item => ({
@@ -1168,9 +1170,8 @@ async function loadTasksFromDatabase() {
             title: item.title || '',
             category: item.category || '',
             description: item.description || '',
-            assignee: item.assignee || '',
+            assignee: item.assigned_to || '',
             department: item.task_type || '', // DB: task_type → UI: department
-            reporter: item.reporter || '',
             priority: item.priority || 'Medium',
             status: item.status || 'Open',
             dueDate: item.due_date || '',
@@ -1180,7 +1181,9 @@ async function loadTasksFromDatabase() {
             createdDate: item.created_date || new Date().toISOString().split('T')[0]
         }));
         
-        console.log('Mapped tasks:', tasks);
+		console.log('Mapped tasks:', tasks);
+		console.log('First mapped task:', tasks[0]);
+		console.log('Mapped assignee field:', tasks[0]?.assignee);
         
         if (tasks.length > 0) {
             const numericIds = tasks.map(t => parseInt(t.id.replace('TK-', '')) || 0);
@@ -1208,6 +1211,8 @@ async function saveTaskToDatabase(taskData) {
         const numericId = taskData.id.replace('TK-', '');
         const existingTask = tasks.find(t => t.id === taskData.id);
         const isUpdating = !!existingTask;
+		
+		
         
 const dbData = {
     title: taskData.title,
@@ -1224,7 +1229,11 @@ const dbData = {
     // REMOVED: reporter field (doesn't exist in DB)
 };
 
-        
+console.log('=== TASK ASSIGNEE DEBUG ===');
+console.log('taskData.assignee:', taskData.assignee);
+console.log('assigned_to in dbData:', dbData.assigned_to);
+console.log('Full dbData:', dbData); 
+ 
         if (isUpdating) {
             const result = await directApiCall('PATCH', `tasks?id=eq.${numericId}`, dbData);
             if (result.error) throw result.error;
@@ -2015,7 +2024,6 @@ async function deleteTaskFromDatabase(id) {
             document.getElementById('taskDescription').value = task.description || '';
             document.getElementById('taskAssignee').value = task.assignee || '';
             document.getElementById('taskDepartment').value = task.department || '';
-            document.getElementById('taskReporter').value = task.reporter || '';
             document.getElementById('taskPriority').value = task.priority || '';
             document.getElementById('taskDueDate').value = task.dueDate || '';
             document.getElementById('taskStatus').value = task.status || '';
