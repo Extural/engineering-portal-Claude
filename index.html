@@ -63,6 +63,7 @@
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
+            cursor: pointer;
         }
 
         .breadcrumb a:hover {
@@ -167,6 +168,16 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+        }
+
         .btn-secondary {
             background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
         }
@@ -195,7 +206,7 @@
             border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
-        .stat-card h4 {
+        .stat-card h4, .stat-card h3 {
             font-size: 1.8em;
             color: #667eea;
             margin-bottom: 5px;
@@ -210,7 +221,7 @@
             display: none;
         }
 
-        /* Quality Alerts Page Styles */
+        /* Main content layout */
         .main-content {
             display: grid;
             grid-template-columns: 1fr 2fr;
@@ -270,19 +281,18 @@
             min-height: 100px;
         }
 
-        /* Four column row for manufacturing fields */
-        .four-column-row {
+        /* Grid layouts for forms */
+        .two-column-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 20px;
         }
 
-        .four-column-row .form-group {
+        .two-column-row .form-group {
             margin-bottom: 0;
         }
 
-        /* Three column row for contact/assignment fields */
         .three-column-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -294,7 +304,19 @@
             margin-bottom: 0;
         }
 
-        .alert-table {
+        .four-column-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .four-column-row .form-group {
+            margin-bottom: 0;
+        }
+
+        /* Table styles */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
@@ -304,68 +326,40 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .alert-table th,
-        .alert-table td {
+        .data-table th,
+        .data-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
         }
 
-        .alert-table th:first-child,
-        .alert-table td:first-child {
+        .data-table th:first-child,
+        .data-table td:first-child {
             width: 120px;
             min-width: 120px;
             white-space: nowrap;
         }
 
-        .alert-table th {
+        .data-table th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-weight: 600;
         }
 
-        .alert-table tr:hover {
+        .data-table tr:hover {
             background-color: #f8f9fa;
         }
 
-        .priority-high {
-            color: #e74c3c;
-            font-weight: bold;
-        }
+        /* Priority and status badges */
+        .priority-high { color: #e74c3c; font-weight: bold; }
+        .priority-medium { color: #f39c12; font-weight: bold; }
+        .priority-low { color: #27ae60; font-weight: bold; }
 
-        .priority-medium {
-            color: #f39c12;
-            font-weight: bold;
-        }
-
-        .priority-low {
-            color: #27ae60;
-            font-weight: bold;
-        }
-
-        .status-open {
-            background-color: #e74c3c;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .status-in-progress {
-            background-color: #f39c12;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .status-resolved {
-            background-color: #27ae60;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
+        .status-open { background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        .status-in-progress { background-color: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        .status-resolved { background-color: #27ae60; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        .status-completed { background-color: #27ae60; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        .status-on-hold { background-color: #95a5a6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
 
         .stats-grid {
             display: grid;
@@ -381,14 +375,6 @@
             border-radius: 8px;
             font-size: 1em;
             margin-bottom: 20px;
-        }
-
-        .print-section {
-            background: white;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .connection-status {
@@ -413,61 +399,19 @@
             border: 1px solid #f5c6cb;
         }
 
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .print-section, .print-section * {
-                visibility: visible;
-            }
-            .print-section {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-            }
-            .btn {
-                display: none;
-            }
-        }
-
         @media (max-width: 768px) {
-            .nav-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .stats-preview {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .four-column-row {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .three-column-row {
-                grid-template-columns: 1fr 1fr;
-            }
+            .nav-grid { grid-template-columns: 1fr; }
+            .main-content { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 2em; }
+            .stats-preview { grid-template-columns: repeat(2, 1fr); }
+            .four-column-row { grid-template-columns: 1fr 1fr; }
+            .three-column-row { grid-template-columns: 1fr 1fr; }
+            .two-column-row { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
-            .four-column-row {
-                grid-template-columns: 1fr;
-            }
-
-            .three-column-row {
+            .four-column-row, .three-column-row, .two-column-row {
                 grid-template-columns: 1fr;
             }
         }
@@ -487,7 +431,7 @@
         <div class="breadcrumb" id="breadcrumb" style="display: none;">
             <a href="#" onclick="showHomePage()">Home</a>
             <span>></span>
-            <span id="currentPage">Quality Alerts</span>
+            <span id="currentPage">Dashboard</span>
         </div>
 
         <!-- Home Page -->
@@ -502,18 +446,25 @@
                         <p>Open Quality Alerts</p>
                     </div>
                     <div class="stat-card">
-                        <h4>24</h4>
-                        <p>Active Projects</p>
+                        <h4 id="homePendingTasks">0</h4>
+                        <p>Pending Tasks</p>
                     </div>
                     <div class="stat-card">
-                        <h4>12</h4>
-                        <p>Pending Tasks</p>
+                        <h4>24</h4>
+                        <p>Active Projects</p>
                     </div>
                     <div class="stat-card">
                         <h4>98%</h4>
                         <p>System Uptime</p>
                     </div>
                 </div>
+				
+				<div style="margin-top: 30px; text-align: center;">
+					<h3 style="margin-bottom: 15px;">System Backup & Restore</h3>
+					<button class="btn" onclick="exportAllData()">Export All Data</button>
+					<button class="btn" onclick="importData()">Import Backup</button>
+				</div>
+				
             </div>
 
             <div class="nav-section">
@@ -529,12 +480,12 @@
                         <button class="btn">Access Module →</button>
                     </div>
 
-                    <div class="nav-card">
+                    <div class="nav-card" onclick="showTaskManagement()">
                         <div class="icon">📋</div>
-                        <div class="status status-coming-soon">Coming Soon</div>
+                        <div class="status status-active">Active</div>
                         <h3>Task Management</h3>
                         <p>Assign, track, and manage engineering tasks. Set priorities, deadlines, and monitor completion status across your team.</p>
-                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                        <button class="btn">Access Module →</button>
                     </div>
 
                     <div class="nav-card">
@@ -554,7 +505,7 @@
                     </div>
 
                     <div class="nav-card">
-                        <div class="icon">📁</div>
+                        <div class="icon">📄</div>
                         <div class="status status-coming-soon">Coming Soon</div>
                         <h3>Document Control</h3>
                         <p>Centralized document management with version control, approval workflows, and secure access controls.</p>
@@ -596,33 +547,33 @@
             <div class="main-content">
                 <div class="sidebar">
                     <h2>Quick Actions</h2>
-                    <button class="btn" onclick="showCreateForm()">Create New Alert</button>
+                    <button class="btn" onclick="showCreateAlertForm()">Create New Alert</button>
                     <button class="btn btn-secondary" onclick="showAllAlerts()">View All Alerts</button>
-                    <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
-                    <button class="btn btn-secondary" onclick="importData()">Import Data</button>
+                    
                     
                     <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Priority</h3>
-                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterByPriority('High')">High Priority</button>
-                    <button class="btn" onclick="filterByPriority('Medium')">Medium Priority</button>
-                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterByPriority('Low')">Low Priority</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterAlertsByPriority('High')">High Priority</button>
+                    <button class="btn" onclick="filterAlertsByPriority('Medium')">Medium Priority</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterAlertsByPriority('Low')">Low Priority</button>
                     
                     <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Status</h3>
-                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterByStatus('Open')">Open</button>
-                    <button class="btn" onclick="filterByStatus('In Progress')">In Progress</button>
-                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterByStatus('Resolved')">Resolved</button>
-                    
-                    <button class="btn btn-secondary" onclick="clearFilters()" style="margin-top: 20px; width: 100%;">Clear All Filters</button>
-                </div>
+                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterAlertsByStatus('Open')">Open</button>
+                    <button class="btn" onclick="filterAlertsByStatus('In Progress')">In Progress</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterAlertsByStatus('Resolved')">Resolved</button>
+					<button class="btn btn-secondary" onclick="clearAlertsFilters()" style="margin-top: 20px; width: 100%;">Clear All Filters</button>
+					<h3 style="margin-top: 30px; margin-bottom: 15px;">Data Management</h3>
+					<button class="btn btn-secondary" onclick="exportAlertsToCSV()">Export Alerts CSV</button>
+					<button class="btn btn-secondary" onclick="importAlertsFromCSV()">Import Alerts CSV</button>
+				</div>
 
                 <div class="main-panel">
-                    <div id="createForm" class="hidden">
-                        <h2 id="formTitle">Create New Quality Alert</h2>
+                    <div id="createAlertForm" class="hidden">
+                        <h2 id="alertFormTitle">Create New Quality Alert</h2>
                         <form id="alertForm">
                             <div class="form-group">
                                 <label for="alertId">Alert ID</label>
                                 <input type="text" id="alertId" readonly>
                             </div>
-                            
                             <!-- ROW 1: FOUR MANUFACTURING FIELDS -->
                             <div class="four-column-row">
                                 <div class="form-group">
@@ -685,18 +636,19 @@
                             <!-- ROW 4: FOUR REJECT FIELDS -->
                             <div class="four-column-row">
                                 <div class="form-group">
-                                    <label for="rejectCategory">Reject Category</label>
-                                    <select id="rejectCategory">
-                                        <option value="">Select Category</option>
-                                        <option value="Dimensional">Dimensional</option>
-                                        <option value="Surface Finish">Surface Finish</option>
-                                        <option value="Material Defect">Material Defect</option>
-                                        <option value="Assembly">Assembly</option>
-                                        <option value="Packaging">Packaging</option>
-                                        <option value="Documentation">Documentation</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
+									<label for="rejectCategory">Reject Category</label>
+									<select id="rejectCategory" onchange="toggleCustomRejectCategory()">
+										<option value="">Select Category</option>
+										<option value="Dimensional">Dimensional</option>
+										<option value="Surface Finish">Surface Finish</option>
+										<option value="Material Defect">Material Defect</option>
+										<option value="Assembly">Assembly</option>
+										<option value="Packaging">Packaging</option>
+										<option value="Documentation">Documentation</option>
+										<option value="Custom">Custom (specify below)</option>
+									</select>
+									<input type="text" id="customRejectCategory" placeholder="Enter custom category" style="display: none; margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+								</div>
                                 <div class="form-group">
                                     <label for="qtyRejected">Qty Rejected</label>
                                     <input type="number" id="qtyRejected" placeholder="0" min="0">
@@ -744,8 +696,8 @@
                                     <input type="text" id="correctiveSignOff" placeholder="Enter sign-off name">
                                 </div>
                                 <div class="form-group">
-                                    <label for="status">Status</label>
-                                    <select id="status">
+                                    <label for="alertStatus">Status</label>
+                                    <select id="alertStatus">
                                         <option value="Open">Open</option>
                                         <option value="In Progress">In Progress</option>
                                         <option value="Resolved">Resolved</option>
@@ -754,15 +706,15 @@
                             </div>
                             
                             <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">Save Alert</button>
-                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelAlertEdit()">Cancel</button>
                         </form>
                     </div>
 
                     <div id="alertsList">
                         <h2>Quality Alerts Dashboard</h2>
-                        <input type="text" class="search-box" id="searchBox" placeholder="Search alerts..." onkeyup="searchAlerts()">
+                        <input type="text" class="search-box" id="alertsSearchBox" placeholder="Search alerts..." onkeyup="searchAlerts()">
                         
-                        <table class="alert-table" id="alertsTable">
+                        <table class="data-table" id="alertsTable">
                             <thead>
                                 <tr>
                                     <th>Alert ID</th>
@@ -782,9 +734,178 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div id="printView" class="print-section hidden">
-                        <!-- Print content will be populated here -->
+        <!-- Task Management Page -->
+        <div id="taskManagementPage" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalTasks">0</h3>
+                    <p>Total Tasks</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="openTasks">0</h3>
+                    <p>Open Tasks</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="inProgressTasks">0</h3>
+                    <p>In Progress</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="completedTasks">0</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="sidebar">
+                    <h2>Quick Actions</h2>
+                    <button class="btn" onclick="showCreateTaskForm()">Create New Task</button>
+                    <button class="btn btn-secondary" onclick="showAllTasks()">View All Tasks</button>
+                    
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Priority</h3>
+                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterTasksByPriority('High')">High Priority</button>
+                    <button class="btn" onclick="filterTasksByPriority('Medium')">Medium Priority</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterTasksByPriority('Low')">Low Priority</button>
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Status</h3>
+                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterTasksByStatus('Open')">Open</button>
+                    <button class="btn" onclick="filterTasksByStatus('In Progress')">In Progress</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);" onclick="filterTasksByStatus('On Hold')">On Hold</button>
+                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterTasksByStatus('Completed')">Completed</button>
+                    
+                    <button class="btn btn-secondary" onclick="clearTasksFilters()" style="margin-top: 20px; width: 100%;">Clear All Filters</button>
+                
+					<h3 style="margin-top: 30px; margin-bottom: 15px;">Data Management</h3>
+					<button class="btn btn-secondary" onclick="exportTasksToCSV()">Export Tasks CSV</button>
+				
+				</div>
+
+                <div class="main-panel">
+                    <div id="createTaskForm" class="hidden">
+                        <h2 id="taskFormTitle">Create New Task</h2>
+                        <form id="taskForm">
+                            <div class="form-group">
+                                <label for="taskId">Task ID</label>
+                                <input type="text" id="taskId" readonly>
+                            </div>
+                            
+                            <div class="two-column-row">
+                                <div class="form-group">
+                                    <label for="taskTitle">Task Title *</label>
+                                    <input type="text" id="taskTitle" required placeholder="Enter task title">
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskCategory">Category</label>
+                                    <select id="taskCategory">
+                                        <option value="">Select Category</option>
+                                        <option value="Design">Design</option>
+                                        <option value="Manufacturing">Manufacturing</option>
+                                        <option value="Quality Control">Quality Control</option>
+                                        <option value="Testing">Testing</option>
+                                        <option value="Documentation">Documentation</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Research">Research</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="taskDescription">Task Description *</label>
+                                <textarea id="taskDescription" required placeholder="Describe the task in detail..."></textarea>
+                            </div>
+
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="taskAssignee">Assigned To</label>
+                                    <input type="text" id="taskAssignee" placeholder="Enter assignee name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskDepartment">Department</label>
+                                    <select id="taskDepartment">
+                                        <option value="">Select Department</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Production">Production</option>
+                                        <option value="Quality Control">Quality Control</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Research & Development">Research & Development</option>
+                                        <option value="Safety">Safety</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="taskPriority">Priority *</label>
+                                    <select id="taskPriority" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskDueDate">Due Date</label>
+                                    <input type="date" id="taskDueDate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskStatus">Status</label>
+                                    <select id="taskStatus">
+                                        <option value="Open">Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="On Hold">On Hold</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="two-column-row">
+                                <div class="form-group">
+                                    <label for="taskEstimatedHours">Estimated Hours</label>
+                                    <input type="number" id="taskEstimatedHours" placeholder="0" min="0" step="0.5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskActualHours">Actual Hours</label>
+                                    <input type="number" id="taskActualHours" placeholder="0" min="0" step="0.5">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="taskNotes">Notes</label>
+                                <textarea id="taskNotes" placeholder="Add any additional notes or comments..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">Save Task</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelTaskEdit()">Cancel</button>
+                        </form>
+                    </div>
+
+                    <div id="tasksList">
+                        <h2>Task Management Dashboard</h2>
+                        <input type="text" class="search-box" id="tasksSearchBox" placeholder="Search tasks..." onkeyup="searchTasks()">
+                        
+                        <table class="data-table" id="tasksTable">
+                            <thead>
+                                <tr>
+                                    <th>Task ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Assigned To</th>
+                                    <th>Department</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasksTableBody">
+                                <!-- Tasks will be populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -800,10 +921,50 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jcnNsY2Npd2Rwa2d0cmVoa2ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzNTQ2NjEsImV4cCI6MjA3MDkzMDY2MX0.TpX8okjsPiwtH3xCjkWMVLOkc3YNvLf6suzHKL4tuJU';
         
         // Application State
-        let currentPage = 'home';
-        let alerts = [];
-        let currentEditId = null;
-        let alertIdCounter = 1001;
+let currentPage = 'home';
+let alerts = [];
+let tasks = [];
+let currentEditAlertId = null;
+let currentEditTaskId = null;
+let alertIdCounter = 1001;
+let taskIdCounter = 2001;
+
+// Check what columns the tasks table expects by trying a minimal insert
+async function checkTasksSchema() {
+    try {
+        console.log('Testing tasks table structure...');
+        
+        // Try inserting a minimal record to see what fields are required/accepted
+        const testData = {
+            id: 9999,
+            title: 'Test Task'
+        };
+        
+        const result = await directApiCall('POST', 'tasks', testData);
+        
+        if (result.error) {
+            console.log('Insert failed - this will show us what fields are missing/wrong:');
+            console.log('Error message:', result.error.message);
+        } else {
+            console.log('Test insert succeeded. Now let\'s see the structure:');
+            
+            // Now fetch it back to see the actual structure
+            const fetchResult = await directApiCall('GET', 'tasks?id=eq.9999');
+            if (fetchResult.data && fetchResult.data.length > 0) {
+                console.log('Tasks table columns:', Object.keys(fetchResult.data[0]));
+                console.log('Sample data:', fetchResult.data[0]);
+            }
+            
+            // Clean up the test record
+            await directApiCall('DELETE', 'tasks?id=eq.9999');
+        }
+    } catch (error) {
+        console.error('Schema test failed:', error);
+    }
+}
+
+// Call it to see your actual columns
+checkTasksSchema();
 
         // Update connection status indicator
         function updateConnectionStatus(status, message) {
@@ -818,10 +979,15 @@
             }
         }
 
-        // Direct API calls to Supabase REST API
+        // Direct API calls to Supabase REST API with detailed debugging
         async function directApiCall(method, endpoint, data = null) {
             try {
                 const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+                console.log(`Making API call to: ${url}`);
+                console.log(`Method: ${method}`);
+                console.log(`SUPABASE_URL: ${SUPABASE_URL}`);
+                console.log(`API Key (first 20 chars): ${SUPABASE_ANON_KEY.substring(0, 20)}...`);
+                
                 const headers = {
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
@@ -836,56 +1002,88 @@
 
                 if (data && (method === 'POST' || method === 'PATCH')) {
                     config.body = JSON.stringify(data);
+                    console.log('Request body:', config.body);
                 }
 
-                console.log(`Making direct API call: ${method} ${endpoint}`);
+                console.log('Request headers:', headers);
+                console.log('Full request config:', config);
+
                 const response = await fetch(url, config);
+                
+                console.log('Response status:', response.status);
+                console.log('Response statusText:', response.statusText);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
                 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('API Error:', response.status, errorText);
-                    throw new Error(`API Error: ${response.status} - ${errorText}`);
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
                 }
 
                 const result = await response.json();
-                console.log('Direct API result:', result);
+                console.log('API Success - Response data:', result);
                 return { data: result, error: null };
             } catch (error) {
-                console.error('Direct API call failed:', error);
+                console.error('API Call Exception:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
                 return { data: null, error: error };
             }
         }
-
-        // Test database connection
-        async function testDatabaseConnection() {
-            try {
-                console.log('Testing database connection...');
-                updateConnectionStatus('connected', 'Testing Database...');
-                
-                // Try a simple select query
-                const result = await directApiCall('GET', 'quality_alerts?limit=1');
-                
-                if (result.error) {
-                    throw result.error;
-                }
-                
-                console.log('Database connection successful!');
-                updateConnectionStatus('connected', 'Database Ready');
-                
-                // Load alerts from database
-                loadAlertsFromDatabase();
-                
-            } catch (error) {
-                console.error('Database connection failed:', error);
-                updateConnectionStatus('disconnected', `Database Error: ${error.message}`);
-                
-                // Load sample data as fallback
-                console.log('Loading sample data as fallback...');
-                loadSampleData();
-                updateStats();
-                updateHomeStats();
+async function testDatabaseConnection() {
+    try {
+        console.log('Testing database connection...');
+        updateConnectionStatus('disconnected', 'Testing Database...');
+        
+        const testUrl = `${SUPABASE_URL}/rest/v1/`;
+        console.log('Testing connection to:', testUrl);
+        
+        const healthCheck = await fetch(testUrl, {
+            method: 'GET',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
             }
+        });
+        
+        console.log('Health check response status:', healthCheck.status);
+        
+        if (!healthCheck.ok) {
+            throw new Error(`Health check failed: ${healthCheck.status}`);
         }
+        
+        console.log('Health check passed, trying to query quality_alerts...');
+        
+        const result = await directApiCall('GET', 'quality_alerts?limit=1');
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        console.log('Database connection successful!');
+        console.log('Sample data from database:', result.data);
+        updateConnectionStatus('connected', 'Database Connected');
+        
+        // Load both alerts and tasks from database
+        await loadAlertsFromDatabase();
+        await loadTasksFromDatabase();
+        
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+        
+        updateConnectionStatus('disconnected', `Database Error: ${error.message}`);
+        
+        console.log('Loading sample data as fallback...');
+        loadSampleData();
+        updateAllStats();
+    }
+}
 
         // Load alerts from database
         async function loadAlertsFromDatabase() {
@@ -910,7 +1108,7 @@
                     priority: item.priority || 'Medium',
                     status: item.status || 'Open',
                     assignedTo: item.assigned_to || '',
-                    department: item.facility || '',
+                    department: item.department || '',
                     facility: item.facility || '',
                     createdDate: item.date_complaint || new Date().toISOString().split('T')[0],
                     dueDate: item.date_complaint || '',
@@ -937,19 +1135,132 @@
                     console.log('Set alertIdCounter to:', alertIdCounter);
                 }
                 
+                // Load sample tasks data for now
+                loadTasksSampleData();
+                
                 updateConnectionStatus('connected', 'Data Loaded');
-                updateStats();
-                updateHomeStats();
+                updateAllStats();
                 
             } catch (error) {
-                console.error('Failed to load alerts:', error);
-                loadSampleData();
-                updateStats();
-                updateHomeStats();
-            }
+				console.error('Failed to load tasks from database:', error);
+				loadTasksSampleData();
+				taskIdCounter = 2001;  // ← ADD THIS LINE TO OVERRIDE
+				return false;
+			}
         }
 
-        // Save alert to database
+        // ADD THIS - Load tasks from database with correct field mappings
+async function loadTasksFromDatabase() {
+    try {
+        console.log('Loading tasks from database...');
+        const result = await directApiCall('GET', 'tasks?order=created_date.desc');
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        const data = result.data;
+        console.log('Raw tasks data from database:', data);
+        
+        // Map database columns to UI format
+        tasks = (data || []).map(item => ({
+            id: `TK-${item.id}`,
+            title: item.title || '',
+            category: item.category || '',
+            description: item.description || '',
+            assignee: item.assignee || '',
+            department: item.task_type || '', // DB: task_type → UI: department
+            reporter: item.reporter || '',
+            priority: item.priority || 'Medium',
+            status: item.status || 'Open',
+            dueDate: item.due_date || '',
+            estimatedHours: item.estimated_hours || 0,
+            actualHours: item.progress || 0, // DB: progress → UI: actualHours
+            notes: item.notes || '',
+            createdDate: item.created_date || new Date().toISOString().split('T')[0]
+        }));
+        
+        console.log('Mapped tasks:', tasks);
+        
+        if (tasks.length > 0) {
+            const numericIds = tasks.map(t => parseInt(t.id.replace('TK-', '')) || 0);
+            const maxId = Math.max(...numericIds);
+            taskIdCounter = maxId + 1;
+            console.log('Set taskIdCounter to:', taskIdCounter);
+        }
+        
+        console.log('Tasks loaded successfully from database');
+        return true;
+        
+    } catch (error) {
+        console.error('Failed to load tasks from database:', error);
+        loadTasksSampleData();
+        return false;
+    }
+}
+
+// ADD THIS - Save task to database
+async function saveTaskToDatabase(taskData) {
+    try {
+        console.log('=== SAVE TASK DEBUG ===');
+        console.log('Full taskData object:', taskData);
+        
+        const numericId = taskData.id.replace('TK-', '');
+        const existingTask = tasks.find(t => t.id === taskData.id);
+        const isUpdating = !!existingTask;
+        
+const dbData = {
+    title: taskData.title,
+    category: taskData.category || null,
+    description: taskData.description,
+    assigned_to: taskData.assignee || null,  // ← FIXED: assignee → assigned_to
+    task_type: taskData.department || null,
+    priority: taskData.priority,
+    status: taskData.status,
+    due_date: taskData.dueDate || null,
+    estimated_hours: parseFloat(taskData.estimatedHours) || null,
+    progress: parseFloat(taskData.actualHours) || null,
+    created_date: taskData.createdDate || new Date().toISOString().split('T')[0]
+    // REMOVED: reporter field (doesn't exist in DB)
+};
+
+        
+        if (isUpdating) {
+            const result = await directApiCall('PATCH', `tasks?id=eq.${numericId}`, dbData);
+            if (result.error) throw result.error;
+        } else {
+            dbData.id = parseInt(numericId);
+            const result = await directApiCall('POST', 'tasks', dbData);
+            if (result.error) throw result.error;
+            taskIdCounter++;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Task save failed:', error);
+        alert(`Database Error: ${error.message}`);
+        return false;
+    }
+}
+
+// ADD THIS - Delete task from database
+async function deleteTaskFromDatabase(id) {
+    try {
+        const numericId = id.replace('TK-', '');
+        const result = await directApiCall('DELETE', `tasks?id=eq.${parseInt(numericId)}`);
+        
+        if (result.error) throw result.error;
+        tasks = tasks.filter(t => t.id !== id);
+        return true;
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        alert('Error deleting from database. Please try again.');
+        return false;
+    }
+}
+	
+
+	// Save alert to database
         async function saveAlertToDatabase(alertData) {
             try {
                 console.log('=== SAVE ALERT DEBUG ===');
@@ -963,27 +1274,28 @@
                 console.log('Is updating existing alert?', isUpdating);
 
                 const dbData = {
-                    qa_number: alertData.description,
-                    root_cause: alertData.rootCause,
-                    corrective_action: alertData.correctiveAction,
-                    corrective_sign_off: alertData.correctiveSignOff,
-                    priority: alertData.priority,
-                    assigned_to: alertData.assignedTo,
-                    facility: alertData.facility,
-                    status: alertData.status,
-                    date_complaint: alertData.dueDate || null,
-                    part_number: alertData.partNumber || null,
-                    customer_supplier: alertData.customerSupplier || null,
-                    revision_level: alertData.revisionLevel || null,
-                    contact: alertData.contact || null,
-                    contact_phone: alertData.contactPhone || null,
-                    contact_email: alertData.contactEmail || null,
-                    report_by: alertData.reportBy || null,
-                    reject_category: alertData.rejectCategory || null,
-                    qty_rejected: parseInt(alertData.qtyRejected) || null,
-                    qty_returned: parseInt(alertData.qtyReturned) || null,
-                    qty_scrapped: parseInt(alertData.qtyScrapped) || null
-                };
+					qa_number: alertData.description,
+					root_cause: alertData.rootCause,
+					corrective_action: alertData.correctiveAction,
+					corrective_sign_off: alertData.correctiveSignOff,
+					priority: alertData.priority,
+					assigned_to: alertData.assignedTo,
+					facility: alertData.facility,
+					department: alertData.department,  // ← ADD THIS LINE
+					status: alertData.status,
+					date_complaint: alertData.dueDate || null,
+					part_number: alertData.partNumber || null,
+					customer_supplier: alertData.customerSupplier || null,
+					revision_level: alertData.revisionLevel || null,
+					contact: alertData.contact || null,
+					contact_phone: alertData.contactPhone || null,
+					contact_email: alertData.contactEmail || null,
+					report_by: alertData.reportBy || null,
+					reject_category: alertData.rejectCategory || null,
+					qty_rejected: parseInt(alertData.qtyRejected) || null,
+					qty_returned: parseInt(alertData.qtyReturned) || null,
+					qty_scrapped: parseInt(alertData.qtyScrapped) || null
+				};
                 
                 console.log('Database payload:', dbData);
                 
@@ -1044,10 +1356,81 @@
             }
         }
 
-        // Load sample data
+        // Load sample tasks data (since we don't have tasks database table yet)
+        function loadTasksSampleData() {
+            tasks = [
+                {
+                    id: 'TK-2001',
+                    title: 'Update CNC Machine Calibration Procedures',
+                    category: 'Documentation',
+                    description: 'Review and update the standard operating procedures for CNC machine calibration to include new quality standards and measurement protocols.',
+                    assignee: 'Mike Davis',
+                    department: 'Engineering',
+                    reporter: 'Jane Wilson',
+                    priority: 'High',
+                    status: 'Open',
+                    dueDate: '2025-10-15',
+                    estimatedHours: 8,
+                    actualHours: 0,
+                    notes: 'Coordinate with Quality Control team for review',
+                    createdDate: '2025-09-20'
+                },
+                {
+                    id: 'TK-2002',
+                    title: 'Implement Preventive Maintenance Schedule',
+                    category: 'Maintenance',
+                    description: 'Develop and implement a comprehensive preventive maintenance schedule for all production equipment to reduce downtime and improve reliability.',
+                    assignee: 'Tom Rodriguez',
+                    department: 'Maintenance',
+                    reporter: 'Susan Lee',
+                    priority: 'Medium',
+                    status: 'In Progress',
+                    dueDate: '2025-10-30',
+                    estimatedHours: 20,
+                    actualHours: 12,
+                    notes: 'Phase 1 complete - equipment audit finished',
+                    createdDate: '2025-09-15'
+                },
+                {
+                    id: 'TK-2003',
+                    title: 'Design New Fixture for Part XYZ-456',
+                    category: 'Design',
+                    description: 'Create engineering drawings and prototype for new holding fixture to improve machining accuracy and reduce setup time.',
+                    assignee: 'Lisa Chen',
+                    department: 'Engineering',
+                    reporter: 'Mark Thompson',
+                    priority: 'Medium',
+                    status: 'Completed',
+                    dueDate: '2025-09-25',
+                    estimatedHours: 16,
+                    actualHours: 18,
+                    notes: 'Prototype tested successfully, ready for production',
+                    createdDate: '2025-09-10'
+                },
+                {
+                    id: 'TK-2004',
+                    title: 'Safety Training Module Development',
+                    category: 'Documentation',
+                    description: 'Develop comprehensive safety training materials for new equipment operators, including video content and assessment modules.',
+                    assignee: 'Robert Kim',
+                    department: 'Safety',
+                    reporter: 'Jennifer Adams',
+                    priority: 'High',
+                    status: 'On Hold',
+                    dueDate: '2025-11-01',
+                    estimatedHours: 25,
+                    actualHours: 5,
+                    notes: 'Waiting for approval from corporate safety department',
+                    createdDate: '2025-09-18'
+                }
+            ];
+            taskIdCounter = 2001;
+        }
+
+        // Load sample data for both alerts and tasks (fallback when database fails)
         function loadSampleData() {
-            console.log('Loading sample data as fallback...');
-            const sampleAlerts = [
+            // Sample alerts data
+            alerts = [
                 {
                     id: 'QA-1001',
                     customerSupplier: 'ABC Manufacturing Corp',
@@ -1060,18 +1443,18 @@
                     department: 'Quality Control',
                     assignedTo: 'John Smith',
                     reportBy: '2025-09-05',
+                    rejectCategory: 'Dimensional',
+                    qtyRejected: 25,
+                    qtyReturned: 20,
+                    qtyScrapped: 5,
                     description: 'Parts consistently measuring 0.002" over tolerance on critical dimension 4.250±0.001".',
                     rootCause: 'Spindle bearing wear causing machine drift during extended production runs.',
-                    correctiveAction: 'Replace spindle bearings and implement hourly dimension checks. Schedule preventive bearing replacement every 6 months.',
+                    correctiveAction: 'Replace spindle bearings and implement hourly dimension checks.',
                     correctiveSignOff: '',
                     priority: 'High',
                     status: 'Open',
                     createdDate: '2025-09-01',
-                    dueDate: '2025-09-05',
-                    rejectCategory: 'Dimensional',
-                    qtyRejected: 25,
-                    qtyReturned: 20,
-                    qtyScrapped: 5
+                    dueDate: '2025-09-05'
                 },
                 {
                     id: 'QA-1002',
@@ -1085,54 +1468,43 @@
                     department: 'Production',
                     assignedTo: 'Sarah Johnson',
                     reportBy: '2025-09-08',
-                    description: 'Surface roughness measurements exceeding Ra 3.2 µm specification. Multiple parts showing tool wear marks.',
-                    rootCause: 'Cutting tool exceeded recommended tool life. Insufficient tool change monitoring in current process.',
-                    correctiveAction: 'Implemented tool life tracking system. Reduced tool change intervals by 20%. Added surface finish inspection at mid-cycle.',
+                    rejectCategory: 'Surface Finish',
+                    qtyRejected: 12,
+                    qtyReturned: 12,
+                    qtyScrapped: 0,
+                    description: 'Surface roughness measurements exceeding Ra 3.2 µm specification.',
+                    rootCause: 'Cutting tool exceeded recommended tool life.',
+                    correctiveAction: 'Implemented tool life tracking system.',
                     correctiveSignOff: 'M. Anderson - Production Mgr',
                     priority: 'Medium',
                     status: 'In Progress',
                     createdDate: '2025-09-02',
-                    dueDate: '2025-09-08',
-                    rejectCategory: 'Surface Finish',
-                    qtyRejected: 12,
-                    qtyReturned: 12,
-                    qtyScrapped: 0
-                },
-                {
-                    id: 'QA-1003',
-                    customerSupplier: 'Internal Quality',
-                    facility: 'QC Lab - Station 2',
-                    partNumber: 'CAL-CMM-002',
-                    revisionLevel: 'Rev A',
-                    contact: 'Mike Davis',
-                    contactPhone: '(555) 456-7890',
-                    contactEmail: 'mike.davis@company.com',
-                    department: 'Maintenance',
-                    assignedTo: 'Mike Davis',
-                    reportBy: '2025-09-15',
-                    description: 'Calibration equipment out of specification. CMM requires annual certification and adjustment.',
-                    rootCause: 'Missed scheduled calibration due to inadequate preventive maintenance tracking system.',
-                    correctiveAction: 'Completed emergency calibration. Implemented automated calendar reminders and upgraded CMMS system for better tracking.',
-                    correctiveSignOff: 'J. Wilson - QA Director',
-                    priority: 'Low',
-                    status: 'Resolved',
-                    createdDate: '2025-08-28',
-                    dueDate: '2025-09-15',
-                    rejectCategory: 'Other',
-                    qtyRejected: 0,
-                    qtyReturned: 0,
-                    qtyScrapped: 0
+                    dueDate: '2025-09-08'
                 }
             ];
-            
-            alerts = sampleAlerts;
-            alertIdCounter = 1004;
+
+            // Load tasks sample data
+            loadTasksSampleData();
+
+            alertIdCounter = 1003;
         }
 
+        // Generate new alert and task IDs
+        function generateAlertId() {
+            document.getElementById('alertId').value = `QA-${alertIdCounter}`;
+        }
+
+        function generateTaskId() {
+    console.log('Current taskIdCounter:', taskIdCounter);
+    console.log('Current tasks array:', tasks);
+    document.getElementById('taskId').value = `TK-${taskIdCounter}`;
+}
+		
         // Initialize system
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Engineering Portal starting up...');
             generateAlertId();
+            generateTaskId();
             showHomePage();
             
             setTimeout(() => {
@@ -1145,6 +1517,7 @@
             currentPage = 'home';
             document.getElementById('homePage').classList.remove('hidden');
             document.getElementById('qualityAlertsPage').classList.add('hidden');
+            document.getElementById('taskManagementPage').classList.add('hidden');
             document.getElementById('breadcrumb').style.display = 'none';
             updateHomeStats();
         }
@@ -1153,44 +1526,42 @@
             currentPage = 'qualityAlerts';
             document.getElementById('homePage').classList.add('hidden');
             document.getElementById('qualityAlertsPage').classList.remove('hidden');
+            document.getElementById('taskManagementPage').classList.add('hidden');
             document.getElementById('breadcrumb').style.display = 'block';
             document.getElementById('currentPage').textContent = 'Quality Alerts';
             showAllAlerts();
-            updateStats();
+            updateAlertsStats();
         }
 
-        function updateHomeStats() {
-            const openAlertsCount = alerts.filter(a => a.status === 'Open').length;
-            document.getElementById('homeOpenAlerts').textContent = openAlertsCount;
+        function showTaskManagement() {
+            currentPage = 'taskManagement';
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('qualityAlertsPage').classList.add('hidden');
+            document.getElementById('taskManagementPage').classList.remove('hidden');
+            document.getElementById('breadcrumb').style.display = 'block';
+            document.getElementById('currentPage').textContent = 'Task Management';
+            showAllTasks();
+            updateTasksStats();
         }
 
-        // Generate new alert ID with QA prefix
-        function generateAlertId() {
-            document.getElementById('alertId').value = `QA-${alertIdCounter}`;
-        }
-
-        // Show create form
-        function showCreateForm() {
-            document.getElementById('createForm').classList.remove('hidden');
+        // Quality Alerts Functions
+        function showCreateAlertForm() {
+            document.getElementById('createAlertForm').classList.remove('hidden');
             document.getElementById('alertsList').classList.add('hidden');
-            document.getElementById('printView').classList.add('hidden');
-            currentEditId = null;
+            currentEditAlertId = null;
             document.getElementById('alertForm').reset();
             generateAlertId();
-            document.getElementById('status').value = 'Open';
-            document.getElementById('formTitle').textContent = 'Create New Quality Alert';
-            document.getElementById('formTitle').style.color = '#2c3e50';
+            document.getElementById('alertStatus').value = 'Open';
+            document.getElementById('alertFormTitle').textContent = 'Create New Quality Alert';
+            document.getElementById('alertFormTitle').style.color = '#2c3e50';
         }
 
-        // Show all alerts
         function showAllAlerts() {
-            document.getElementById('createForm').classList.add('hidden');
+            document.getElementById('createAlertForm').classList.add('hidden');
             document.getElementById('alertsList').classList.remove('hidden');
-            document.getElementById('printView').classList.add('hidden');
             displayAlerts(alerts);
         }
 
-        // Display alerts in table
         function displayAlerts(alertsToShow) {
             const tableBody = document.getElementById('alertsTableBody');
             tableBody.innerHTML = '';
@@ -1208,50 +1579,47 @@
                     <td>${alert.assignedTo || 'Unassigned'}</td>
                     <td>${formatDate(alert.createdDate)}</td>
                     <td>
-                        <button class="btn edit-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;">Edit</button>
-                        <button class="btn btn-secondary print-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;">Print</button>
-                        <button class="btn delete-btn" data-alert-id="${alert.id}" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;">Delete</button>
+                        <button class="btn edit-alert-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;">Edit</button>
+                        <button class="btn btn-secondary print-alert-btn" data-alert-id="${alert.id}" style="padding: 8px 12px; margin: 2px;">Print</button>
+                        <button class="btn delete-alert-btn" data-alert-id="${alert.id}" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;">Delete</button>
                     </td>
                 `;
             });
             
-            addButtonEventListeners();
+            addAlertButtonEventListeners();
         }
 
-        // Add event listeners to buttons
-        function addButtonEventListeners() {
-            document.querySelectorAll('.edit-btn').forEach(button => {
+        function addAlertButtonEventListeners() {
+            document.querySelectorAll('.edit-alert-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     editAlert(this.getAttribute('data-alert-id'));
                 });
             });
             
-            document.querySelectorAll('.print-btn').forEach(button => {
+            document.querySelectorAll('.print-alert-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     printAlert(this.getAttribute('data-alert-id'));
                 });
             });
             
-            document.querySelectorAll('.delete-btn').forEach(button => {
+            document.querySelectorAll('.delete-alert-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     deleteAlert(this.getAttribute('data-alert-id'));
                 });
             });
         }
 
-        // Edit alert function
         function editAlert(id) {
             const alert = alerts.find(a => a.id === id);
             if (!alert) return;
 
-            currentEditId = id;
+            currentEditAlertId = id;
             
-            document.getElementById('createForm').classList.remove('hidden');
+            document.getElementById('createAlertForm').classList.remove('hidden');
             document.getElementById('alertsList').classList.add('hidden');
-            document.getElementById('printView').classList.add('hidden');
             
-            document.getElementById('formTitle').textContent = `Edit Quality Alert ${id}`;
-            document.getElementById('formTitle').style.color = '#f39c12';
+            document.getElementById('alertFormTitle').textContent = `Edit Quality Alert ${id}`;
+            document.getElementById('alertFormTitle').style.color = '#f39c12';
             
             // Populate all form fields
             document.getElementById('alertId').value = alert.id;
@@ -1266,6 +1634,13 @@
             document.getElementById('assignedTo').value = alert.assignedTo || '';
             document.getElementById('reportBy').value = alert.reportBy || '';
             document.getElementById('rejectCategory').value = alert.rejectCategory || '';
+			document.getElementById('rejectCategory').value = alert.rejectCategory || '';
+			// Handle custom categories when editing
+			if (alert.rejectCategory && !['', 'Dimensional', 'Surface Finish', 'Material Defect', 'Assembly', 'Packaging', 'Documentation'].includes(alert.rejectCategory)) {
+				document.getElementById('rejectCategory').value = 'Custom';
+				document.getElementById('customRejectCategory').value = alert.rejectCategory;
+				toggleCustomRejectCategory();
+			}
             document.getElementById('qtyRejected').value = alert.qtyRejected || '';
             document.getElementById('qtyReturned').value = alert.qtyReturned || '';
             document.getElementById('qtyScrapped').value = alert.qtyScrapped || '';
@@ -1275,28 +1650,26 @@
             document.getElementById('priority').value = alert.priority || '';
             document.getElementById('dueDate').value = alert.dueDate || '';
             document.getElementById('correctiveSignOff').value = alert.correctiveSignOff || '';
-            document.getElementById('status').value = alert.status || '';
+            document.getElementById('alertStatus').value = alert.status || '';
         }
 
-        // Format date for display
-        function formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString();
+        function deleteAlert(id) {
+            if (confirm('Are you sure you want to delete this alert?')) {
+                deleteAlertFromDatabase(id).then(success => {
+                    if (success) {
+                        displayAlerts(alerts);
+                        updateAllStats();
+                    }
+                });
+            }
         }
 
-        // Update statistics
-        function updateStats() {
-            const total = alerts.length;
-            const open = alerts.filter(a => a.status === 'Open').length;
-            const inProgress = alerts.filter(a => a.status === 'In Progress').length;
-            const resolved = alerts.filter(a => a.status === 'Resolved').length;
-
-            document.getElementById('totalAlerts').textContent = total;
-            document.getElementById('openAlerts').textContent = open;
-            document.getElementById('inProgressAlerts').textContent = inProgress;
-            document.getElementById('resolvedAlerts').textContent = resolved;
+        function cancelAlertEdit() {
+            currentEditAlertId = null;
+            showAllAlerts();
         }
 
-        // Handle form submission
+        // Alert form submission
         document.getElementById('alertForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1312,7 +1685,11 @@
                 department: document.getElementById('department').value,
                 assignedTo: document.getElementById('assignedTo').value,
                 reportBy: document.getElementById('reportBy').value,
-                rejectCategory: document.getElementById('rejectCategory').value,
+                rejectCategory: (() => {
+					const selectValue = document.getElementById('rejectCategory').value;
+					const customValue = document.getElementById('customRejectCategory').value;
+					return selectValue === 'Custom' ? customValue : selectValue;
+				})(),
                 qtyRejected: document.getElementById('qtyRejected').value,
                 qtyReturned: document.getElementById('qtyReturned').value,
                 qtyScrapped: document.getElementById('qtyScrapped').value,
@@ -1322,71 +1699,53 @@
                 priority: document.getElementById('priority').value,
                 dueDate: document.getElementById('dueDate').value,
                 correctiveSignOff: document.getElementById('correctiveSignOff').value,
-                status: document.getElementById('status').value,
-                createdDate: currentEditId ? alerts.find(a => a.id === currentEditId)?.createdDate : new Date().toISOString().split('T')[0]
+                status: document.getElementById('alertStatus').value,
+                createdDate: currentEditAlertId ? alerts.find(a => a.id === currentEditAlertId)?.createdDate : new Date().toISOString().split('T')[0]
             };
 
             const success = await saveAlertToDatabase(alertData);
             
             if (success) {
-                currentEditId = null;
+                currentEditAlertId = null;
                 await loadAlertsFromDatabase();
                 showAllAlerts();
-                updateStats();
-                updateHomeStats();
+                updateAllStats();
                 alert('Alert saved successfully!');
             }
         });
 
-        // Delete alert
-        async function deleteAlert(id) {
-            if (confirm('Are you sure you want to delete this alert?')) {
-                const success = await deleteAlertFromDatabase(id);
-                if (success) {
-                    displayAlerts(alerts);
-                    updateStats();
-                    updateHomeStats();
-                }
-            }
-        }
-
-        // Cancel edit
-        function cancelEdit() {
-            currentEditId = null;
-            showAllAlerts();
-        }
-
-        // Search alerts
+        // Search and filter functions for alerts
         function searchAlerts() {
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const searchTerm = document.getElementById('alertsSearchBox').value.toLowerCase();
             const filteredAlerts = alerts.filter(alert =>
                 alert.description.toLowerCase().includes(searchTerm) ||
                 (alert.assignedTo && alert.assignedTo.toLowerCase().includes(searchTerm)) ||
                 (alert.department && alert.department.toLowerCase().includes(searchTerm)) ||
                 (alert.customerSupplier && alert.customerSupplier.toLowerCase().includes(searchTerm)) ||
                 (alert.partNumber && alert.partNumber.toLowerCase().includes(searchTerm)) ||
-                (alert.contact && alert.contact.toLowerCase().includes(searchTerm)) ||
-                (alert.rejectCategory && alert.rejectCategory.toLowerCase().includes(searchTerm)) ||
                 alert.id.toLowerCase().includes(searchTerm)
             );
             displayAlerts(filteredAlerts);
         }
 
-        // Filter functions
-        function filterByPriority(priority) {
+        function filterAlertsByPriority(priority) {
             displayAlerts(alerts.filter(alert => alert.priority === priority));
         }
 
-        function filterByStatus(status) {
+        function filterAlertsByStatus(status) {
             displayAlerts(alerts.filter(alert => alert.status === status));
         }
 
-        function clearFilters() {
-            document.getElementById('searchBox').value = '';
+        function clearAlertsFilters() {
+            document.getElementById('alertsSearchBox').value = '';
             displayAlerts(alerts);
         }
 
-        // Print alert
+        function exportAlertsData() {
+			exportAlertsToCSV(); // Use the new CSV export function
+		}
+
+        // Print alert function with professional formatting
         function printAlert(id) {
             const alert = alerts.find(a => a.id === id);
             if (!alert) return;
@@ -1580,16 +1939,583 @@
             printWindow.print();
         }
 
-        // Export data
-        function exportData() {
-            const dataStr = JSON.stringify(alerts, null, 2);
+        // Task Management Functions
+        function showCreateTaskForm() {
+            document.getElementById('createTaskForm').classList.remove('hidden');
+            document.getElementById('tasksList').classList.add('hidden');
+            currentEditTaskId = null;
+            document.getElementById('taskForm').reset();
+            generateTaskId();
+            document.getElementById('taskStatus').value = 'Open';
+            document.getElementById('taskFormTitle').textContent = 'Create New Task';
+            document.getElementById('taskFormTitle').style.color = '#2c3e50';
+        }
+
+        function showAllTasks() {
+            document.getElementById('createTaskForm').classList.add('hidden');
+            document.getElementById('tasksList').classList.remove('hidden');
+            displayTasks(tasks);
+        }
+
+        function displayTasks(tasksToShow) {
+            const tableBody = document.getElementById('tasksTableBody');
+            tableBody.innerHTML = '';
+
+            tasksToShow.forEach(task => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${task.id}</td>
+                    <td>${task.title}</td>
+                    <td>${task.category || 'N/A'}</td>
+                    <td>${task.assignee || 'Unassigned'}</td>
+                    <td>${task.department || 'N/A'}</td>
+                    <td class="priority-${task.priority.toLowerCase()}">${task.priority}</td>
+                    <td><span class="status-${task.status.toLowerCase().replace(' ', '-')}">${task.status}</span></td>
+                    <td>${task.dueDate ? formatDate(task.dueDate) : 'No due date'}</td>
+                    <td>
+                        <button class="btn edit-task-btn" data-task-id="${task.id}" style="padding: 8px 12px; margin: 2px;">Edit</button>
+                        <button class="btn delete-task-btn" data-task-id="${task.id}" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 8px 12px; margin: 2px;">Delete</button>
+                    </td>
+                `;
+            });
+            
+            addTaskButtonEventListeners();
+        }
+
+        function addTaskButtonEventListeners() {
+            document.querySelectorAll('.edit-task-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    editTask(this.getAttribute('data-task-id'));
+                });
+            });
+            
+            document.querySelectorAll('.delete-task-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    deleteTask(this.getAttribute('data-task-id'));
+                });
+            });
+        }
+
+        function editTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            currentEditTaskId = id;
+            
+            document.getElementById('createTaskForm').classList.remove('hidden');
+            document.getElementById('tasksList').classList.add('hidden');
+            
+            document.getElementById('taskFormTitle').textContent = `Edit Task ${id}`;
+            document.getElementById('taskFormTitle').style.color = '#f39c12';
+            
+            // Populate form fields
+            document.getElementById('taskId').value = task.id;
+            document.getElementById('taskTitle').value = task.title || '';
+            document.getElementById('taskCategory').value = task.category || '';
+            document.getElementById('taskDescription').value = task.description || '';
+            document.getElementById('taskAssignee').value = task.assignee || '';
+            document.getElementById('taskDepartment').value = task.department || '';
+            document.getElementById('taskReporter').value = task.reporter || '';
+            document.getElementById('taskPriority').value = task.priority || '';
+            document.getElementById('taskDueDate').value = task.dueDate || '';
+            document.getElementById('taskStatus').value = task.status || '';
+            document.getElementById('taskEstimatedHours').value = task.estimatedHours || '';
+            document.getElementById('taskActualHours').value = task.actualHours || '';
+            document.getElementById('taskNotes').value = task.notes || '';
+        }
+
+function deleteTask(id) {
+    if (confirm('Are you sure you want to delete this task?')) {
+        deleteTaskFromDatabase(id).then(success => {
+            if (success) {
+                displayTasks(tasks);
+                updateAllStats();
+            }
+        });
+    }
+}
+
+        function cancelTaskEdit() {
+            currentEditTaskId = null;
+            showAllTasks();
+        }
+
+        // Task form submission
+document.getElementById('taskForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const taskData = {
+        id: document.getElementById('taskId').value,
+        title: document.getElementById('taskTitle').value,
+        category: document.getElementById('taskCategory').value,
+        description: document.getElementById('taskDescription').value,
+        assignee: document.getElementById('taskAssignee').value,
+        department: document.getElementById('taskDepartment').value,
+        priority: document.getElementById('taskPriority').value,
+        dueDate: document.getElementById('taskDueDate').value,
+        status: document.getElementById('taskStatus').value,
+        estimatedHours: parseFloat(document.getElementById('taskEstimatedHours').value) || 0,
+        actualHours: parseFloat(document.getElementById('taskActualHours').value) || 0,
+        notes: document.getElementById('taskNotes').value,
+        createdDate: currentEditTaskId ? tasks.find(t => t.id === currentEditTaskId)?.createdDate : new Date().toISOString().split('T')[0]
+    };
+
+    const success = await saveTaskToDatabase(taskData);
+    
+    if (success) {
+        currentEditTaskId = null;
+        await loadTasksFromDatabase();
+        showAllTasks();
+        updateAllStats();
+        alert('Task saved successfully!');
+    }
+});
+
+        // Search and filter functions for tasks
+        function searchTasks() {
+            const searchTerm = document.getElementById('tasksSearchBox').value.toLowerCase();
+            const filteredTasks = tasks.filter(task =>
+                task.title.toLowerCase().includes(searchTerm) ||
+                task.description.toLowerCase().includes(searchTerm) ||
+                (task.assignee && task.assignee.toLowerCase().includes(searchTerm)) ||
+                (task.department && task.department.toLowerCase().includes(searchTerm)) ||
+                (task.category && task.category.toLowerCase().includes(searchTerm)) ||
+                task.id.toLowerCase().includes(searchTerm)
+            );
+            displayTasks(filteredTasks);
+        }
+
+        function filterTasksByPriority(priority) {
+            displayTasks(tasks.filter(task => task.priority === priority));
+        }
+
+        function filterTasksByStatus(status) {
+            displayTasks(tasks.filter(task => task.status === status));
+        }
+
+        function clearTasksFilters() {
+            document.getElementById('tasksSearchBox').value = '';
+            displayTasks(tasks);
+        }
+
+        function exportTasksData() {
+            const dataStr = JSON.stringify(tasks, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = `quality_alerts_${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `engineering_tasks_${new Date().toISOString().split('T')[0]}.json`;
             link.click();
         }
+
+        // Statistics update functions
+        function updateHomeStats() {
+            const openAlertsCount = alerts.filter(a => a.status === 'Open').length;
+            const pendingTasksCount = tasks.filter(t => t.status === 'Open' || t.status === 'In Progress').length;
+            
+            document.getElementById('homeOpenAlerts').textContent = openAlertsCount;
+            document.getElementById('homePendingTasks').textContent = pendingTasksCount;
+        }
+
+        function updateAlertsStats() {
+            const total = alerts.length;
+            const open = alerts.filter(a => a.status === 'Open').length;
+            const inProgress = alerts.filter(a => a.status === 'In Progress').length;
+            const resolved = alerts.filter(a => a.status === 'Resolved').length;
+
+            document.getElementById('totalAlerts').textContent = total;
+            document.getElementById('openAlerts').textContent = open;
+            document.getElementById('inProgressAlerts').textContent = inProgress;
+            document.getElementById('resolvedAlerts').textContent = resolved;
+        }
+
+        function updateTasksStats() {
+            const total = tasks.length;
+            const open = tasks.filter(t => t.status === 'Open').length;
+            const inProgress = tasks.filter(t => t.status === 'In Progress').length;
+            const completed = tasks.filter(t => t.status === 'Completed').length;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('openTasks').textContent = open;
+            document.getElementById('inProgressTasks').textContent = inProgress;
+            document.getElementById('completedTasks').textContent = completed;
+        }
+
+        function updateAllStats() {
+            updateHomeStats();
+            updateAlertsStats();
+            updateTasksStats();
+        }
+
+        // Utility function
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString();
+        }
+		
+		// Export all data to JSON
+function exportAllData() {
+    const exportData = {
+        alerts: alerts,
+        tasks: tasks,
+        exportDate: new Date().toISOString(),
+        version: "1.0",
+        metadata: {
+            totalAlerts: alerts.length,
+            totalTasks: tasks.length,
+            alertIdCounter: alertIdCounter,
+            taskIdCounter: taskIdCounter
+        }
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `engineering_portal_backup_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    alert(`Data exported successfully!\nAlerts: ${alerts.length}\nTasks: ${tasks.length}`);
+}
+
+// Export alerts to CSV
+function exportAlertsToCSV() {
+    if (alerts.length === 0) {
+        alert('No alerts to export');
+        return;
+    }
+    
+    const csvHeaders = [
+        'Alert ID', 'Customer/Supplier', 'Facility', 'Part Number', 'Revision Level',
+        'Contact', 'Contact Phone', 'Contact Email', 'Department', 'Assigned To',
+        'Report By', 'Reject Category', 'Qty Rejected', 'Qty Returned', 'Qty Scrapped',
+        'Description', 'Root Cause', 'Corrective Action', 'Priority', 'Status',
+        'Created Date', 'Due Date', 'Sign Off'
+    ];
+    
+    const csvRows = alerts.map(alert => [
+        alert.id,
+        alert.customerSupplier || '',
+        alert.facility || '',
+        alert.partNumber || '',
+        alert.revisionLevel || '',
+        alert.contact || '',
+        alert.contactPhone || '',
+        alert.contactEmail || '',
+        alert.department || '',
+        alert.assignedTo || '',
+        alert.reportBy || '',
+        alert.rejectCategory || '',
+        alert.qtyRejected || '',
+        alert.qtyReturned || '',
+        alert.qtyScrapped || '',
+        `"${(alert.description || '').replace(/"/g, '""')}"`,
+        `"${(alert.rootCause || '').replace(/"/g, '""')}"`,
+        `"${(alert.correctiveAction || '').replace(/"/g, '""')}"`,
+        alert.priority || '',
+        alert.status || '',
+        alert.createdDate || '',
+        alert.dueDate || '',
+        alert.correctiveSignOff || ''
+    ]);
+    
+    const csvContent = [csvHeaders, ...csvRows]
+        .map(row => row.join(','))
+        .join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `quality_alerts_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+// Export tasks to CSV
+function exportTasksToCSV() {
+    if (tasks.length === 0) {
+        alert('No tasks to export');
+        return;
+    }
+    
+    const csvHeaders = [
+        'Task ID', 'Title', 'Category', 'Description', 'Assignee', 'Department',
+        'Reporter', 'Priority', 'Status', 'Due Date', 'Estimated Hours',
+        'Actual Hours', 'Notes', 'Created Date'
+    ];
+    
+    const csvRows = tasks.map(task => [
+        task.id,
+        `"${(task.title || '').replace(/"/g, '""')}"`,
+        task.category || '',
+        `"${(task.description || '').replace(/"/g, '""')}"`,
+        task.assignee || '',
+        task.department || '',
+        task.reporter || '',
+        task.priority || '',
+        task.status || '',
+        task.dueDate || '',
+        task.estimatedHours || '',
+        task.actualHours || '',
+        `"${(task.notes || '').replace(/"/g, '""')}"`,
+        task.createdDate || ''
+    ]);
+    
+    const csvContent = [csvHeaders, ...csvRows]
+        .map(row => row.join(','))
+        .join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `engineering_tasks_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+// Import data from JSON file
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                
+                // Validate data structure
+                if (!importedData.alerts || !importedData.tasks) {
+                    throw new Error('Invalid backup file format');
+                }
+                
+                // Show confirmation dialog
+                const alertCount = importedData.alerts.length;
+                const taskCount = importedData.tasks.length;
+                const exportDate = importedData.exportDate ? new Date(importedData.exportDate).toLocaleDateString() : 'Unknown';
+                
+                const confirmMessage = `Import backup data?\n\nFile contains:\n- ${alertCount} alerts\n- ${taskCount} tasks\n- Exported: ${exportDate}\n\nThis will REPLACE all current data!`;
+                
+                if (confirm(confirmMessage)) {
+                    importDataConfirmed(importedData);
+                }
+                
+            } catch (error) {
+                alert(`Error reading backup file: ${error.message}\n\nPlease check that this is a valid Engineering Portal backup file.`);
+            }
+        };
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// Confirmed import function
+async function importDataConfirmed(importedData) {
+    try {
+        // Store current data as safety backup
+        const currentData = {
+            alerts: [...alerts],
+            tasks: [...tasks],
+            alertIdCounter: alertIdCounter,
+            taskIdCounter: taskIdCounter
+        };
+        
+        // Import alerts
+        for (const alert of importedData.alerts) {
+            const success = await saveAlertToDatabase(alert);
+            if (!success) {
+                throw new Error(`Failed to import alert ${alert.id}`);
+            }
+        }
+        
+        // Import tasks
+        for (const task of importedData.tasks) {
+            const success = await saveTaskToDatabase(task);
+            if (!success) {
+                throw new Error(`Failed to import task ${task.id}`);
+            }
+        }
+        
+        // Update counters if provided
+        if (importedData.metadata) {
+            alertIdCounter = Math.max(alertIdCounter, importedData.metadata.alertIdCounter || alertIdCounter);
+            taskIdCounter = Math.max(taskIdCounter, importedData.metadata.taskIdCounter || taskIdCounter);
+        }
+        
+        // Reload data from database
+        await loadAlertsFromDatabase();
+        await loadTasksFromDatabase();
+        updateAllStats();
+        
+        // Refresh current view
+        if (currentPage === 'qualityAlerts') {
+            showAllAlerts();
+        } else if (currentPage === 'taskManagement') {
+            showAllTasks();
+        }
+        
+        alert(`Import completed successfully!\nImported ${importedData.alerts.length} alerts and ${importedData.tasks.length} tasks.`);
+        
+    } catch (error) {
+        alert(`Import failed: ${error.message}\n\nSome data may have been imported. Please check your records.`);
+        console.error('Import error:', error);
+    }
+}
+
+// Import from CSV (alerts)
+function importAlertsFromCSV() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const csvContent = e.target.result;
+                const lines = csvContent.split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                
+                const importedAlerts = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    if (lines[i].trim() === '') continue;
+                    
+                    const values = parseCSVLine(lines[i]);
+                    const alert = {};
+                    
+                    headers.forEach((header, index) => {
+                        const value = values[index] || '';
+                        // Map CSV headers to alert object properties
+                        switch (header) {
+                            case 'Alert ID': alert.id = value; break;
+                            case 'Customer/Supplier': alert.customerSupplier = value; break;
+                            case 'Facility': alert.facility = value; break;
+                            case 'Part Number': alert.partNumber = value; break;
+                            case 'Revision Level': alert.revisionLevel = value; break;
+                            case 'Contact': alert.contact = value; break;
+                            case 'Contact Phone': alert.contactPhone = value; break;
+                            case 'Contact Email': alert.contactEmail = value; break;
+                            case 'Department': alert.department = value; break;
+                            case 'Assigned To': alert.assignedTo = value; break;
+                            case 'Report By': alert.reportBy = value; break;
+                            case 'Reject Category': alert.rejectCategory = value; break;
+                            case 'Qty Rejected': alert.qtyRejected = parseInt(value) || 0; break;
+                            case 'Qty Returned': alert.qtyReturned = parseInt(value) || 0; break;
+                            case 'Qty Scrapped': alert.qtyScrapped = parseInt(value) || 0; break;
+                            case 'Description': alert.description = value; break;
+                            case 'Root Cause': alert.rootCause = value; break;
+                            case 'Corrective Action': alert.correctiveAction = value; break;
+                            case 'Priority': alert.priority = value; break;
+                            case 'Status': alert.status = value; break;
+                            case 'Created Date': alert.createdDate = value; break;
+                            case 'Due Date': alert.dueDate = value; break;
+                            case 'Sign Off': alert.correctiveSignOff = value; break;
+                        }
+                    });
+                    
+                    if (alert.id) {
+                        importedAlerts.push(alert);
+                    }
+                }
+                
+                if (confirm(`Import ${importedAlerts.length} alerts from CSV?\nThis will add to existing data.`)) {
+                    importAlertsConfirmed(importedAlerts);
+                }
+                
+            } catch (error) {
+                alert(`Error reading CSV file: ${error.message}`);
+            }
+        };
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// Helper function to parse CSV lines properly (handles quoted fields)
+function parseCSVLine(line) {
+    const values = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+        
+        if (char === '"' && inQuotes && nextChar === '"') {
+            current += '"';
+            i++; // Skip next quote
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            values.push(current.trim());
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    
+    values.push(current.trim());
+    return values;
+}
+
+// Confirmed CSV import for alerts
+async function importAlertsConfirmed(importedAlerts) {
+    try {
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const alert of importedAlerts) {
+            const success = await saveAlertToDatabase(alert);
+            if (success) {
+                successCount++;
+            } else {
+                errorCount++;
+            }
+        }
+        
+        await loadAlertsFromDatabase();
+        updateAllStats();
+        
+        if (currentPage === 'qualityAlerts') {
+            showAllAlerts();
+        }
+        
+        alert(`CSV Import completed!\nSuccess: ${successCount}\nErrors: ${errorCount}`);
+        
+    } catch (error) {
+        alert(`CSV Import failed: ${error.message}`);
+        console.error('CSV Import error:', error);
+    }
+}
+		
+		// Utility function
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString();
+}
+
+		// Handle custom reject category dropdown
+		function toggleCustomRejectCategory() {
+			const select = document.getElementById('rejectCategory');
+			const customInput = document.getElementById('customRejectCategory');
+    
+			if (select.value === 'Custom') {
+				customInput.style.display = 'block';
+				customInput.required = true;
+			} else {
+				customInput.style.display = 'none';
+				customInput.required = false;
+				customInput.value = '';
+			}
+}
+		
     </script>
 </body>
 </html>
