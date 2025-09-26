@@ -460,7 +460,8 @@
                 </div>
 				
 				<div style="margin-top: 30px; text-align: center;">
-					<h3 style="margin-bottom: 15px;">System Backup & Restore</h3>
+					<h3 style="margin-bottom: 15px;">System Administration</h3>
+					<button class="btn" onclick="showUserManagement()">User Management</button>
 					<button class="btn" onclick="exportAllData()">Export All Data</button>
 					<button class="btn" onclick="importData()">Import Backup</button>
 				</div>
@@ -547,7 +548,7 @@
             <div class="main-content">
                 <div class="sidebar">
                     <h2>Quick Actions</h2>
-                    <button class="btn" onclick="showCreateAlertForm()">Create New Alert</button>
+                    <button class="btn" onclick="showCreateAlertFormSecure()">Create New Alert</button>
                     <button class="btn btn-secondary" onclick="showAllAlerts()">View All Alerts</button>
                     
                     
@@ -762,7 +763,7 @@
             <div class="main-content">
                 <div class="sidebar">
                     <h2>Quick Actions</h2>
-                    <button class="btn" onclick="showCreateTaskForm()">Create New Task</button>
+                    <button class="btn" onclick="showCreateTaskFormSecure()">Create New Task</button>
                     <button class="btn btn-secondary" onclick="showAllTasks()">View All Tasks</button>
                     
                     
@@ -2159,6 +2160,749 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
         function formatDate(dateString) {
             return new Date(dateString).toLocaleDateString();
         }
+		
+		// User Management and Security System for Engineering Portal
+
+// Global user state
+let currentUser = null;
+let userPermissions = {};
+
+// User roles and permissions
+const USER_ROLES = {
+    ADMIN: 'admin',
+    MANAGER: 'manager', 
+    ENGINEER: 'engineer',
+    VIEWER: 'viewer'
+};
+
+const PERMISSIONS = {
+    // Quality Alerts
+    CREATE_ALERTS: 'create_alerts',
+    EDIT_ALERTS: 'edit_alerts',
+    DELETE_ALERTS: 'delete_alerts',
+    VIEW_ALERTS: 'view_alerts',
+    CLOSE_ALERTS: 'close_alerts',
+    
+    // Tasks
+    CREATE_TASKS: 'create_tasks',
+    EDIT_TASKS: 'edit_tasks',
+    DELETE_TASKS: 'delete_tasks',
+    VIEW_TASKS: 'view_tasks',
+    ASSIGN_TASKS: 'assign_tasks',
+    
+    // System
+    MANAGE_USERS: 'manage_users',
+    EXPORT_DATA: 'export_data',
+    IMPORT_DATA: 'import_data',
+    SYSTEM_ADMIN: 'system_admin'
+};
+
+// Role-based permissions mapping
+const ROLE_PERMISSIONS = {
+    [USER_ROLES.ADMIN]: Object.values(PERMISSIONS),
+    [USER_ROLES.MANAGER]: [
+        PERMISSIONS.CREATE_ALERTS, PERMISSIONS.EDIT_ALERTS, PERMISSIONS.VIEW_ALERTS, PERMISSIONS.CLOSE_ALERTS,
+        PERMISSIONS.CREATE_TASKS, PERMISSIONS.EDIT_TASKS, PERMISSIONS.VIEW_TASKS, PERMISSIONS.ASSIGN_TASKS,
+        PERMISSIONS.EXPORT_DATA, PERMISSIONS.IMPORT_DATA
+    ],
+    [USER_ROLES.ENGINEER]: [
+		PERMISSIONS.EDIT_ALERTS, PERMISSIONS.VIEW_ALERTS,
+		PERMISSIONS.EDIT_TASKS, PERMISSIONS.VIEW_TASKS,
+		PERMISSIONS.EXPORT_DATA
+	],
+    [USER_ROLES.VIEWER]: [
+        PERMISSIONS.VIEW_ALERTS, PERMISSIONS.VIEW_TASKS, PERMISSIONS.EXPORT_DATA
+    ]
+};
+
+// Initialize user management
+function initializeUserManagement() {
+    // Check if user is logged in from localStorage
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        userPermissions = ROLE_PERMISSIONS[currentUser.role] || [];
+        updateUIForUser();
+    } else {
+        showLoginForm();
+    }
+}
+
+// Show login form
+function showLoginForm() {
+    const loginModal = `
+        <div id="loginModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 400px; width: 90%;">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Engineering Portal Login</h2>
+                <form id="loginForm">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Username:</label>
+                        <input type="text" id="loginUsername" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Password:</label>
+                        <input type="password" id="loginPassword" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+                    </div>
+                    <button type="submit" style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;">Login</button>
+                </form>
+                
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', loginModal);
+    
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+    });
+}
+
+// Handle login
+function handleLogin() {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    // Demo user validation (replace with real authentication)
+    const demoUsers = {
+        'admin': { password: 'admin123', role: USER_ROLES.ADMIN, name: 'System Administrator' },
+        'manager': { password: 'mgr123', role: USER_ROLES.MANAGER, name: 'Quality Manager' },
+        'engineer': { password: 'eng123', role: USER_ROLES.ENGINEER, name: 'Design Engineer' },
+        'viewer': { password: 'view123', role: USER_ROLES.VIEWER, name: 'Quality Inspector' }
+    };
+    
+    const user = demoUsers[username];
+    if (user && user.password === password) {
+        currentUser = {
+            username: username,
+            name: user.name,
+            role: user.role,
+            loginTime: new Date().toISOString()
+        };
+        
+        userPermissions = ROLE_PERMISSIONS[user.role] || [];
+        
+        // Save to localStorage
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        // Remove login modal
+        document.getElementById('loginModal').remove();
+        
+        // Update UI
+        updateUIForUser();
+        
+        alert(`Welcome ${currentUser.name}!\nRole: ${currentUser.role}\nPermissions: ${userPermissions.length} modules accessible`);
+    } else {
+        alert('Invalid username or password');
+    }
+}
+
+// Update UI based on user permissions
+function updateUIForUser() {
+    if (!currentUser) return;
+    
+    // Add user info to header
+    addUserInfoToHeader();
+    
+    // Hide/show navigation based on permissions
+    updateNavigationAccess();
+    
+    // Hide/show buttons based on permissions
+    updateButtonAccess();
+    
+    // Update form access
+    updateFormAccess();
+}
+
+// Add user info to header
+function addUserInfoToHeader() {
+    const header = document.querySelector('.header');
+    const existingUserInfo = document.getElementById('userInfo');
+    
+    if (existingUserInfo) {
+        existingUserInfo.remove();
+    }
+    
+    const userInfo = `
+        <div id="userInfo" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <div style="font-weight: 600; color: #2c3e50;">${currentUser.name}</div>
+            <div style="font-size: 0.9em; color: #7f8c8d;">${currentUser.role}</div>
+            <button onclick="logout()" style="margin-top: 5px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">Logout</button>
+        </div>
+    `;
+    
+    header.style.position = 'relative';
+    header.insertAdjacentHTML('beforeend', userInfo);
+}
+
+// Update navigation access
+function updateNavigationAccess() {
+    // Quality Alerts module
+    const qaCard = document.querySelector('.nav-card[onclick="showQualityAlerts()"]');
+    if (qaCard) {
+        if (hasPermission(PERMISSIONS.VIEW_ALERTS)) {
+            qaCard.style.display = 'block';
+        } else {
+            qaCard.style.display = 'none';
+        }
+    }
+    
+    // Task Management module
+    const taskCard = document.querySelector('.nav-card[onclick="showTaskManagement()"]');
+    if (taskCard) {
+        if (hasPermission(PERMISSIONS.VIEW_TASKS)) {
+            taskCard.style.display = 'block';
+        } else {
+            taskCard.style.display = 'none';
+        }
+    }
+}
+
+// Update button access
+function updateButtonAccess() {
+    // Create buttons
+    const createAlertBtn = document.querySelector('button[onclick="showCreateAlertForm()"]');
+    if (createAlertBtn) {
+        createAlertBtn.style.display = hasPermission(PERMISSIONS.CREATE_ALERTS) ? 'inline-block' : 'none';
+    }
+    
+    const createTaskBtn = document.querySelector('button[onclick="showCreateTaskForm()"]');
+    if (createTaskBtn) {
+        createTaskBtn.style.display = hasPermission(PERMISSIONS.CREATE_TASKS) ? 'inline-block' : 'none';
+    }
+    
+    // Export/Import buttons
+    const exportBtns = document.querySelectorAll('button[onclick*="export"], button[onclick*="Export"]');
+    exportBtns.forEach(btn => {
+        btn.style.display = hasPermission(PERMISSIONS.EXPORT_DATA) ? 'inline-block' : 'none';
+    });
+    
+    const importBtns = document.querySelectorAll('button[onclick*="import"], button[onclick*="Import"]');
+    importBtns.forEach(btn => {
+        btn.style.display = hasPermission(PERMISSIONS.IMPORT_DATA) ? 'inline-block' : 'none';
+    });
+}
+
+// Update form access
+function updateFormAccess() {
+    // Make forms read-only for viewers
+    if (currentUser.role === USER_ROLES.VIEWER) {
+        const inputs = document.querySelectorAll('#createAlertForm input, #createAlertForm select, #createAlertForm textarea');
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+        
+        const taskInputs = document.querySelectorAll('#createTaskForm input, #createTaskForm select, #createTaskForm textarea');
+        taskInputs.forEach(input => {
+            input.disabled = true;
+        });
+    }
+}
+
+// Permission checking function
+function hasPermission(permission) {
+    return userPermissions.includes(permission);
+}
+
+// Check permission with error message
+function requirePermission(permission, action = 'perform this action') {
+    if (!hasPermission(permission)) {
+        alert(`Access denied. You don't have permission to ${action}.`);
+        return false;
+    }
+    return true;
+}
+
+// Logout function
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        currentUser = null;
+        userPermissions = {};
+        localStorage.removeItem('currentUser');
+        location.reload();
+    }
+}
+
+// Enhanced alert creation with permission check
+function showCreateAlertFormSecure() {
+    if (!requirePermission(PERMISSIONS.CREATE_ALERTS, 'create quality alerts')) {
+        return;
+    }
+    showCreateAlertForm();
+}
+
+// Enhanced task creation with permission check
+function showCreateTaskFormSecure() {
+    if (!requirePermission(PERMISSIONS.CREATE_TASKS, 'create tasks')) {
+        return;
+    }
+    showCreateTaskForm();
+}
+
+// Enhanced delete functions with permission checks
+function deleteAlertSecure(id) {
+    if (!requirePermission(PERMISSIONS.DELETE_ALERTS, 'delete alerts')) {
+        return;
+    }
+    deleteAlert(id);
+}
+
+function deleteTaskSecure(id) {
+    if (!requirePermission(PERMISSIONS.DELETE_TASKS, 'delete tasks')) {
+        return;
+    }
+    deleteTask(id);
+}
+
+// Enhanced edit functions with permission checks
+function editAlertSecure(id) {
+    if (!requirePermission(PERMISSIONS.EDIT_ALERTS, 'edit alerts')) {
+        return;
+    }
+    editAlert(id);
+}
+
+function editTaskSecure(id) {
+    if (!requirePermission(PERMISSIONS.EDIT_TASKS, 'edit tasks')) {
+        return;
+    }
+    editTask(id);
+}
+
+// Audit logging function
+function logUserAction(action, details = {}) {
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        user: currentUser ? currentUser.username : 'anonymous',
+        action: action,
+        details: details,
+        ip: 'client-side' // In real implementation, get from server
+    };
+    
+    console.log('Audit Log:', logEntry);
+    
+    // Store in localStorage for demo (use database in production)
+    const auditLog = JSON.parse(localStorage.getItem('auditLog') || '[]');
+    auditLog.push(logEntry);
+    
+    // Keep last 100 entries
+    if (auditLog.length > 100) {
+        auditLog.splice(0, auditLog.length - 100);
+    }
+    
+    localStorage.setItem('auditLog', JSON.stringify(auditLog));
+}
+
+// User management interface (admin only)
+function showUserManagement() {
+    if (!requirePermission(PERMISSIONS.MANAGE_USERS, 'manage users')) {
+        return;
+    }
+    
+    const userMgmtModal = `
+        <div id="userMgmtModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; overflow-y: auto;">
+            <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 800px; width: 90%; max-height: 90%; overflow-y: auto;">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">User Management</h2>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3>Current Session</h3>
+                    <p><strong>User:</strong> ${currentUser.name} (${currentUser.username})</p>
+                    <p><strong>Role:</strong> ${currentUser.role}</p>
+                    <p><strong>Login Time:</strong> ${new Date(currentUser.loginTime).toLocaleString()}</p>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3>System Users</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 10px; border: 1px solid #dee2e6;">Username</th>
+                                <th style="padding: 10px; border: 1px solid #dee2e6;">Name</th>
+                                <th style="padding: 10px; border: 1px solid #dee2e6;">Role</th>
+                                <th style="padding: 10px; border: 1px solid #dee2e6;">Permissions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 10px; border: 1px solid #dee2e6;">admin</td><td style="padding: 10px; border: 1px solid #dee2e6;">System Administrator</td><td style="padding: 10px; border: 1px solid #dee2e6;">admin</td><td style="padding: 10px; border: 1px solid #dee2e6;">All permissions</td></tr>
+                            <tr><td style="padding: 10px; border: 1px solid #dee2e6;">manager</td><td style="padding: 10px; border: 1px solid #dee2e6;">Quality Manager</td><td style="padding: 10px; border: 1px solid #dee2e6;">manager</td><td style="padding: 10px; border: 1px solid #dee2e6;">Create, Edit, View, Export</td></tr>
+                            <tr><td style="padding: 10px; border: 1px solid #dee2e6;">engineer</td><td style="padding: 10px; border: 1px solid #dee2e6;">Design Engineer</td><td style="padding: 10px; border: 1px solid #dee2e6;">engineer</td><td style="padding: 10px; border: 1px solid #dee2e6;">Create, Edit, View</td></tr>
+                            <tr><td style="padding: 10px; border: 1px solid #dee2e6;">viewer</td><td style="padding: 10px; border: 1px solid #dee2e6;">Quality Inspector</td><td style="padding: 10px; border: 1px solid #dee2e6;">viewer</td><td style="padding: 10px; border: 1px solid #dee2e6;">View only</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button onclick="closeUserManagement()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', userMgmtModal);
+}
+
+function closeUserManagement() {
+    const modal = document.getElementById('userMgmtModal');
+    if (modal) modal.remove();
+}
+
+// Dynamic User Management System for Engineering Portal
+
+// First, you'll need to create a 'users' table in your Supabase database
+// CREATE TABLE users (
+//     id SERIAL PRIMARY KEY,
+//     username VARCHAR(50) UNIQUE NOT NULL,
+//     password_hash VARCHAR(255) NOT NULL,
+//     full_name VARCHAR(100) NOT NULL,
+//     email VARCHAR(100),
+//     role VARCHAR(20) NOT NULL,
+//     is_active BOOLEAN DEFAULT true,
+//     created_at TIMESTAMP DEFAULT NOW(),
+//     created_by VARCHAR(50),
+//     last_login TIMESTAMP
+// );
+
+// Load users from database
+async function loadUsersFromDatabase() {
+    try {
+        const result = await directApiCall('GET', 'users?is_active=eq.true&order=username.asc');
+        if (result.error) {
+            console.error('Failed to load users:', result.error);
+            return [];
+        }
+        return result.data || [];
+    } catch (error) {
+        console.error('Error loading users:', error);
+        return [];
+    }
+}
+
+// Enhanced login function that checks database
+async function handleLoginDatabase() {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    try {
+        // First try database users
+        const users = await loadUsersFromDatabase();
+        const dbUser = users.find(u => u.username === username);
+        
+        if (dbUser && await verifyPassword(password, dbUser.password_hash)) {
+            // Database user found and password matches
+            currentUser = {
+                id: dbUser.id,
+                username: dbUser.username,
+                name: dbUser.full_name,
+                email: dbUser.email,
+                role: dbUser.role,
+                loginTime: new Date().toISOString()
+            };
+            
+            // Update last login
+            await directApiCall('PATCH', `users?id=eq.${dbUser.id}`, {
+                last_login: new Date().toISOString()
+            });
+            
+            loginSuccess();
+            return;
+        }
+        
+        // Fall back to demo users if database doesn't have the user
+        const demoUsers = {
+            'admin': { password: 'admin123', role: USER_ROLES.ADMIN, name: 'System Administrator' },
+            'manager': { password: 'mgr123', role: USER_ROLES.MANAGER, name: 'Quality Manager' },
+            'engineer': { password: 'eng123', role: USER_ROLES.ENGINEER, name: 'Design Engineer' },
+            'viewer': { password: 'view123', role: USER_ROLES.VIEWER, name: 'Quality Inspector' }
+        };
+        
+        const demoUser = demoUsers[username];
+        if (demoUser && demoUser.password === password) {
+            currentUser = {
+                username: username,
+                name: demoUser.name,
+                role: demoUser.role,
+                loginTime: new Date().toISOString()
+            };
+            
+            loginSuccess();
+            return;
+        }
+        
+        alert('Invalid username or password');
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Login system error. Please try again.');
+    }
+}
+
+// Login success helper
+function loginSuccess() {
+    userPermissions = ROLE_PERMISSIONS[currentUser.role] || [];
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    document.getElementById('loginModal').remove();
+    updateUIForUser();
+    alert(`Welcome ${currentUser.name}!\nRole: ${currentUser.role}`);
+}
+
+// Simple password verification (in production, use proper hashing)
+async function verifyPassword(inputPassword, storedHash) {
+    // For demo purposes, we'll store plain text passwords
+    // In production, use bcrypt or similar hashing
+    return inputPassword === storedHash;
+}
+
+// Hash password (simplified for demo)
+function hashPassword(password) {
+    // In production, use proper password hashing like bcrypt
+    // For demo, we'll store plain text (NOT SECURE)
+    return password;
+}
+
+// Add new user to database
+async function addNewUser(userData) {
+    try {
+        const newUser = {
+            username: userData.username,
+            password_hash: hashPassword(userData.password), // In production, hash this properly
+            full_name: userData.fullName,
+            email: userData.email,
+            role: userData.role,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            created_by: currentUser ? currentUser.username : 'system'
+        };
+        
+        const result = await directApiCall('POST', 'users', newUser);
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error adding user:', error);
+        return false;
+    }
+}
+
+// Enhanced User Management interface with add user functionality
+function showUserManagementEnhanced() {
+    if (!requirePermission(PERMISSIONS.MANAGE_USERS, 'manage users')) {
+        return;
+    }
+    
+    loadUsersFromDatabase().then(dbUsers => {
+        const userMgmtModal = `
+            <div id="userMgmtModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; overflow-y: auto;">
+                <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 1000px; width: 90%; max-height: 90%; overflow-y: auto;">
+                    <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">User Management</h2>
+                    
+                    <!-- Add New User Form -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px;">Add New User</h3>
+                        <form id="addUserForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Username *</label>
+                                <input type="text" id="newUsername" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Full Name *</label>
+                                <input type="text" id="newFullName" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Email</label>
+                                <input type="email" id="newEmail" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Role *</label>
+                                <select id="newRole" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <option value="">Select Role</option>
+                                    <option value="admin">Administrator</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="engineer">Engineer</option>
+                                    <option value="viewer">Viewer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Password *</label>
+                                <input type="password" id="newPassword" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div style="display: flex; align-items: end;">
+                                <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Add User</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Current Session -->
+                    <div style="margin-bottom: 30px; background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                        <h3>Current Session</h3>
+                        <p><strong>User:</strong> ${currentUser.name} (${currentUser.username})</p>
+                        <p><strong>Role:</strong> ${currentUser.role}</p>
+                        <p><strong>Login Time:</strong> ${new Date(currentUser.loginTime).toLocaleString()}</p>
+                    </div>
+                    
+                    <!-- Database Users -->
+                    ${dbUsers.length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h3>Database Users (${dbUsers.length})</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Username</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Full Name</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Email</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Role</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Last Login</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dbUsers.map(user => `
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${user.username}</td>
+                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${user.full_name}</td>
+                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${user.email || 'N/A'}</td>
+                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${user.role}</td>
+                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
+                                        <td style="padding: 10px; border: 1px solid #dee2e6;">
+                                            <button onclick="editUser(${user.id})" style="background: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px;">Edit</button>
+                                            <button onclick="deactivateUser(${user.id})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Deactivate</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ` : '<p style="color: #666; margin-bottom: 30px;">No database users found. Users will be created in the database when added.</p>'}
+                    
+                    <!-- Demo Users -->
+                    <div style="margin-bottom: 30px;">
+                        <h3>Demo Users (Hardcoded)</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Username</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Name</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Role</th>
+                                    <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Password</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 10px; border: 1px solid #dee2e6;">admin</td><td style="padding: 10px; border: 1px solid #dee2e6;">System Administrator</td><td style="padding: 10px; border: 1px solid #dee2e6;">admin</td><td style="padding: 10px; border: 1px solid #dee2e6;">admin123</td></tr>
+                                <tr><td style="padding: 10px; border: 1px solid #dee2e6;">manager</td><td style="padding: 10px; border: 1px solid #dee2e6;">Quality Manager</td><td style="padding: 10px; border: 1px solid #dee2e6;">manager</td><td style="padding: 10px; border: 1px solid #dee2e6;">mgr123</td></tr>
+                                <tr><td style="padding: 10px; border: 1px solid #dee2e6;">engineer</td><td style="padding: 10px; border: 1px solid #dee2e6;">Design Engineer</td><td style="padding: 10px; border: 1px solid #dee2e6;">engineer</td><td style="padding: 10px; border: 1px solid #dee2e6;">eng123</td></tr>
+                                <tr><td style="padding: 10px; border: 1px solid #dee2e6;">viewer</td><td style="padding: 10px; border: 1px solid #dee2e6;">Quality Inspector</td><td style="padding: 10px; border: 1px solid #dee2e6;">viewer</td><td style="padding: 10px; border: 1px solid #dee2e6;">view123</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button onclick="closeUserManagement()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', userMgmtModal);
+        
+        // Add form submission handler
+        document.getElementById('addUserForm').addEventListener('submit', handleAddUser);
+    });
+}
+
+// Handle add user form submission
+async function handleAddUser(e) {
+    e.preventDefault();
+    
+    const userData = {
+        username: document.getElementById('newUsername').value,
+        fullName: document.getElementById('newFullName').value,
+        email: document.getElementById('newEmail').value,
+        role: document.getElementById('newRole').value,
+        password: document.getElementById('newPassword').value
+    };
+    
+    // Basic validation
+    if (userData.username.length < 3) {
+        alert('Username must be at least 3 characters');
+        return;
+    }
+    
+    if (userData.password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+    }
+    
+    const success = await addNewUser(userData);
+    
+    if (success) {
+        alert(`User ${userData.username} added successfully!`);
+        closeUserManagement();
+        showUserManagementEnhanced(); // Refresh the user list
+    } else {
+        alert('Failed to add user. Username may already exist.');
+    }
+}
+
+// Deactivate user
+async function deactivateUser(userId) {
+    if (!confirm('Are you sure you want to deactivate this user?')) {
+        return;
+    }
+    
+    try {
+        const result = await directApiCall('PATCH', `users?id=eq.${userId}`, {
+            is_active: false
+        });
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        alert('User deactivated successfully');
+        closeUserManagement();
+        showUserManagementEnhanced(); // Refresh the list
+        
+    } catch (error) {
+        alert('Failed to deactivate user');
+        console.error('Deactivate user error:', error);
+    }
+}
+
+// Placeholder for edit user function
+function editUser(userId) {
+    alert(`Edit user functionality coming soon. User ID: ${userId}`);
+    // TODO: Implement edit user modal
+}
+
+// Update the original handleLogin function to use database
+const originalHandleLogin = handleLogin;
+handleLogin = handleLoginDatabase;
+
+// Update showUserManagement to use enhanced version
+const originalShowUserManagement = showUserManagement;
+showUserManagement = showUserManagementEnhanced;
+
+// Initialize user management when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        initializeUserManagement();
+    }, 1000);
+});
+
+// Enhanced alert and task functions that log actions
+const originalSaveAlert = saveAlertToDatabase;
+saveAlertToDatabase = function(alertData) {
+    logUserAction('save_alert', { alertId: alertData.id, priority: alertData.priority });
+    return originalSaveAlert(alertData);
+};
+
+const originalSaveTask = saveTaskToDatabase;
+saveTaskToDatabase = function(taskData) {
+    logUserAction('save_task', { taskId: taskData.id, assignee: taskData.assignee });
+    return originalSaveTask(taskData);
+};
 		
 		// Export all data to JSON
 function exportAllData() {
