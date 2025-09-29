@@ -915,12 +915,52 @@
 
     <!-- Load Supabase CDN -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <script>
         // Supabase Configuration
         const SUPABASE_URL = 'https://ocrslcciwdpkgtrehkfg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jcnNsY2Npd2Rwa2d0cmVoa2ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzNTQ2NjEsImV4cCI6MjA3MDkzMDY2MX0.TpX8okjsPiwtH3xCjkWMVLOkc3YNvLf6suzHKL4tuJU';
         
+		// EmailJS Configuration
+		const EMAILJS_PUBLIC_KEY = '5UBPNb5GxaduPp4C6';
+		const EMAILJS_SERVICE_ID = 'service_hyv1wjl';
+		const EMAILJS_TEMPLATE_ID = 'template_yhquvxm';	
+		
+		// Initialize EmailJS
+(function() {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+})();
+
+// Send email notification function
+async function sendAssignmentEmail(assigneeName, assigneeEmail, itemType, itemData) {
+    try {
+        const templateParams = {
+            to_name: assigneeName,
+            to_email: assigneeEmail,
+            type: itemType,
+            item_id: itemData.id,
+            title: itemData.title || itemData.description.substring(0, 50),
+            priority: itemData.priority,
+            status: itemData.status,
+            due_date: itemData.dueDate || 'Not set',
+            description: itemData.description || itemData.title
+        };
+        
+        const response = await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            templateParams
+        );
+        
+        console.log('Email sent successfully:', response);
+        return true;
+    } catch (error) {
+        console.error('Email send failed:', error);
+        return false;
+    }
+}
+		
         // Application State
 let currentPage = 'home';
 let alerts = [];
@@ -1244,7 +1284,20 @@ console.log('Full dbData:', dbData);
             if (result.error) throw result.error;
             taskIdCounter++;
         }
-
+// Send email notification if task has an assignee
+if (taskData.assignee) {
+    const users = await loadUsersFromDatabase();
+    const assignedUser = users.find(u => u.full_name === taskData.assignee);
+    
+    if (assignedUser && assignedUser.email) {
+        await sendAssignmentEmail(
+            assignedUser.full_name,
+            assignedUser.email,
+            'Task',
+            taskData
+        );
+    }
+}
         return true;
     } catch (error) {
         console.error('Task save failed:', error);
@@ -1338,6 +1391,29 @@ async function deleteTaskFromDatabase(id) {
                 }
 
                 console.log('=== SAVE COMPLETED SUCCESSFULLY ===');
+				
+				// Send email notification if alert has an assignee
+if (alertData.assignedTo) {
+    const users = await loadUsersFromDatabase();
+    const assignedUser = users.find(u => u.full_name === alertData.assignedTo);
+    
+    if (assignedUser && assignedUser.email) {
+        await sendAssignmentEmail(
+            assignedUser.full_name,
+            assignedUser.email,
+            'Quality Alert',
+            {
+                id: alertData.id,
+                title: alertData.description.substring(0, 100),
+                description: alertData.description,
+                priority: alertData.priority,
+                status: alertData.status,
+                dueDate: alertData.dueDate
+            }
+        );
+    }
+}
+				
                 return true;
             } catch (error) {
                 console.error('=== SAVE FAILED ===');
@@ -2870,10 +2946,188 @@ async function deactivateUser(userId) {
     }
 }
 
-// Placeholder for edit user function
+// Edit User Functionality
+
+// Show edit user modal
 function editUser(userId) {
-    alert(`Edit user functionality coming soon. User ID: ${userId}`);
-    // TODO: Implement edit user modal
+    loadUsersFromDatabase().then(users => {
+        const user = users.find(u => u.id === userId);
+        if (!user) {
+            alert('User not found');
+            return;
+        }
+        
+        const editModal = `
+            <div id="editUserModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; display: flex; align-items: center; justify-content: center;">
+                <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 500px; width: 90%;">
+                    <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Edit User</h2>
+                    
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId" value="${user.id}">
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Username</label>
+                            <input type="text" id="editUsername" value="${user.username}" readonly style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em; background: #f8f9fa;">
+                            <small style="color: #6c757d;">Username cannot be changed</small>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Full Name *</label>
+                            <input type="text" id="editFullName" value="${user.full_name}" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Email</label>
+                            <input type="email" id="editEmail" value="${user.email || ''}" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Role *</label>
+                            <select id="editRole" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Administrator (Full Access)</option>
+                                <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager (Create & Edit)</option>
+                                <option value="engineer" ${user.role === 'engineer' ? 'selected' : ''}>Engineer (Edit Only)</option>
+                                <option value="viewer" ${user.role === 'viewer' ? 'selected' : ''}>Viewer (Read Only)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">New Password</label>
+                            <input type="password" id="editPassword" placeholder="Leave blank to keep current password" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 1em;">
+                            <small style="color: #6c757d;">Only enter if you want to change the password</small>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="editIsActive" ${user.is_active ? 'checked' : ''} style="margin-right: 8px; width: 18px; height: 18px;">
+                                <span style="font-weight: 600; color: #2c3e50;">Active User</span>
+                            </label>
+                            <small style="color: #6c757d; display: block; margin-top: 5px;">Uncheck to deactivate user login</small>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 30px;">
+                            <button type="submit" style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;">Save Changes</button>
+                            <button type="button" onclick="closeEditUser()" style="flex: 1; background: #6c757d; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', editModal);
+        
+        // Add form submission handler
+        document.getElementById('editUserForm').addEventListener('submit', handleEditUser);
+    });
+}
+
+// Handle edit user form submission
+async function handleEditUser(e) {
+    e.preventDefault();
+    
+    const userId = parseInt(document.getElementById('editUserId').value);
+    const updateData = {
+        full_name: document.getElementById('editFullName').value,
+        email: document.getElementById('editEmail').value || null,
+        role: document.getElementById('editRole').value,
+        is_active: document.getElementById('editIsActive').checked
+    };
+    
+    // Only update password if a new one was entered
+    const newPassword = document.getElementById('editPassword').value;
+    if (newPassword && newPassword.length > 0) {
+        if (newPassword.length < 6) {
+            alert('Password must be at least 6 characters');
+            return;
+        }
+        updateData.password_hash = hashPassword(newPassword);
+    }
+    
+    try {
+        const result = await directApiCall('PATCH', `users?id=eq.${userId}`, updateData);
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        alert('User updated successfully!');
+        
+        // If user edited themselves, update current session
+        if (currentUser && currentUser.id === userId) {
+            currentUser.name = updateData.full_name;
+            currentUser.email = updateData.email;
+            currentUser.role = updateData.role;
+            userPermissions = ROLE_PERMISSIONS[updateData.role] || [];
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // If role changed, update UI
+            updateUIForUser();
+        }
+        
+        closeEditUser();
+        closeUserManagement();
+        showUserManagement(); // Refresh the user list
+        
+    } catch (error) {
+        alert('Failed to update user. Please try again.');
+        console.error('Update user error:', error);
+    }
+}
+
+// Close edit user modal
+function closeEditUser() {
+    const modal = document.getElementById('editUserModal');
+    if (modal) modal.remove();
+}
+
+// Update deactivate user function to use the edit functionality
+async function deactivateUser(userId) {
+    if (!confirm('Are you sure you want to deactivate this user? They will not be able to log in.')) {
+        return;
+    }
+    
+    try {
+        const result = await directApiCall('PATCH', `users?id=eq.${userId}`, {
+            is_active: false
+        });
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        alert('User deactivated successfully');
+        closeUserManagement();
+        showUserManagement(); // Refresh the list
+        
+    } catch (error) {
+        alert('Failed to deactivate user');
+        console.error('Deactivate user error:', error);
+    }
+}
+
+// Add reactivate user function
+async function reactivateUser(userId) {
+    if (!confirm('Reactivate this user account?')) {
+        return;
+    }
+    
+    try {
+        const result = await directApiCall('PATCH', `users?id=eq.${userId}`, {
+            is_active: true
+        });
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        alert('User reactivated successfully');
+        closeUserManagement();
+        showUserManagement(); // Refresh the list
+        
+    } catch (error) {
+        alert('Failed to reactivate user');
+        console.error('Reactivate user error:', error);
+    }
 }
 
 // Update the original handleLogin function to use database
