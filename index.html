@@ -1284,20 +1284,7 @@ console.log('Full dbData:', dbData);
             if (result.error) throw result.error;
             taskIdCounter++;
         }
-// Send email notification if task has an assignee
-if (taskData.assignee) {
-    const users = await loadUsersFromDatabase();
-    const assignedUser = users.find(u => u.full_name === taskData.assignee);
-    
-    if (assignedUser && assignedUser.email) {
-        await sendAssignmentEmail(
-            assignedUser.full_name,
-            assignedUser.email,
-            'Task',
-            taskData
-        );
-    }
-}
+
         return true;
     } catch (error) {
         console.error('Task save failed:', error);
@@ -1392,27 +1379,7 @@ async function deleteTaskFromDatabase(id) {
 
                 console.log('=== SAVE COMPLETED SUCCESSFULLY ===');
 				
-				// Send email notification if alert has an assignee
-if (alertData.assignedTo) {
-    const users = await loadUsersFromDatabase();
-    const assignedUser = users.find(u => u.full_name === alertData.assignedTo);
-    
-    if (assignedUser && assignedUser.email) {
-        await sendAssignmentEmail(
-            assignedUser.full_name,
-            assignedUser.email,
-            'Quality Alert',
-            {
-                id: alertData.id,
-                title: alertData.description.substring(0, 100),
-                description: alertData.description,
-                priority: alertData.priority,
-                status: alertData.status,
-                dueDate: alertData.dueDate
-            }
-        );
-    }
-}
+
 				
                 return true;
             } catch (error) {
@@ -1789,8 +1756,30 @@ if (alertData.assignedTo) {
                 createdDate: currentEditAlertId ? alerts.find(a => a.id === currentEditAlertId)?.createdDate : new Date().toISOString().split('T')[0]
             };
 
+			const isNewAlert = !currentEditAlertId;
             const success = await saveAlertToDatabase(alertData);
             
+			if (success && isNewAlert && alertData.assignedTo) {
+        const users = await loadUsersFromDatabase();
+        const assignedUser = users.find(u => u.full_name === alertData.assignedTo);
+        
+        if (assignedUser && assignedUser.email) {
+            await sendAssignmentEmail(
+                assignedUser.full_name,
+                assignedUser.email,
+                'Quality Alert',
+                {
+                    id: alertData.id,
+                    title: alertData.description.substring(0, 100),
+                    description: alertData.description,
+                    priority: alertData.priority,
+                    status: alertData.status,
+                    dueDate: alertData.dueDate
+                }
+            );
+        }
+    }
+			
             if (success) {
                 currentEditAlertId = null;
                 await loadAlertsFromDatabase();
@@ -2144,9 +2133,25 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
         notes: document.getElementById('taskNotes').value,
         createdDate: currentEditTaskId ? tasks.find(t => t.id === currentEditTaskId)?.createdDate : new Date().toISOString().split('T')[0]
     };
-
+	
+	const isNewTask = !currentEditTaskId;
     const success = await saveTaskToDatabase(taskData);
     
+	// Send email only for NEW tasks
+if (success && isNewTask && taskData.assignee) {
+    const users = await loadUsersFromDatabase();
+    const assignedUser = users.find(u => u.full_name === taskData.assignee);
+    
+    if (assignedUser && assignedUser.email) {
+        await sendAssignmentEmail(
+            assignedUser.full_name,
+            assignedUser.email,
+            'Task',
+            taskData
+        );
+    }
+}
+	
     if (success) {
         currentEditTaskId = null;
         await loadTasksFromDatabase();
