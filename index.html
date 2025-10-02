@@ -489,12 +489,12 @@
                         <button class="btn">Access Module →</button>
                     </div>
 
-                    <div class="nav-card">
+                    <div class="nav-card" onclick="showProjectManagement()">
                         <div class="icon">📊</div>
-                        <div class="status status-coming-soon">Coming Soon</div>
-                        <h3>Project Dashboard</h3>
-                        <p>Comprehensive project tracking with timelines, milestones, resource allocation, and progress monitoring tools.</p>
-                        <button class="btn btn-secondary" disabled>Module in Development</button>
+                        <div class="status status-active">Active</div>
+                        <h3>Project Management</h3>
+                        <p>Track tooling projects from creation to completion. Manage Pattern, Molds, Fixtures, and Programs with task breakdown and milestone tracking.</p>
+                        <button class="btn">Access Module →</button>
                     </div>
 
                     <div class="nav-card">
@@ -912,6 +912,271 @@
             </div>
         </div>
     </div>
+	
+	<!-- Project Management Page -->
+        <div id="projectsPage" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalProjects">0</h3>
+                    <p>Total Projects</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="planningProjects">0</h3>
+                    <p>Planning</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="activeProjects">0</h3>
+                    <p>In Progress</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="completedProjects">0</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="sidebar">
+                    <h2>Quick Actions</h2>
+                    <button class="btn" onclick="showCreateProjectForm()">Create New Project</button>
+                    <button class="btn btn-secondary" onclick="showAllProjects()">View All Projects</button>
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Status</h3>
+                    <button class="btn" onclick="filterProjectsByStatus('Planning')">Planning</button>
+                    <button class="btn" onclick="filterProjectsByStatus('In Progress')">In Progress</button>
+                    <button class="btn" onclick="filterProjectsByStatus('Completed')">Completed</button>
+                    
+                    <button class="btn btn-secondary" onclick="clearProjectsFilters()" style="margin-top: 20px; width: 100%;">Clear Filters</button>
+                </div>
+
+                <div class="main-panel">
+                    <div id="createProjectForm" class="hidden">
+                        <h2 id="projectFormTitle">Create New Project</h2>
+                        <form id="projectForm" onsubmit="handleProjectSubmit(event)">
+                            <input type="hidden" id="projectEditId">
+                            
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="projectNumber">Project Number *</label>
+                                    <input type="text" id="projectNumber" required placeholder="PRJ-2025-001">
+                                </div>
+                                <div class="form-group">
+                                    <label for="projectCustomer">Customer Name *</label>
+                                    <input type="text" id="projectCustomer" required placeholder="Customer name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="projectPartNumber">Part Number *</label>
+                                    <input type="text" id="projectPartNumber" required placeholder="Part number">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="projectPartDesc">Part Description</label>
+                                <textarea id="projectPartDesc" placeholder="Description of the part"></textarea>
+                            </div>
+
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="projectManager">Project Manager</label>
+                                    <input type="text" id="projectManager" placeholder="Manager name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="projectPriority">Priority *</label>
+                                    <select id="projectPriority" required>
+                                        <option value="High">High</option>
+                                        <option value="Medium" selected>Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="projectStatus">Status</label>
+                                    <select id="projectStatus">
+                                        <option value="Planning" selected>Planning</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="On Hold">On Hold</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="three-column-row">
+                                <div class="form-group">
+                                    <label for="projectStartDate">Start Date</label>
+                                    <input type="date" id="projectStartDate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="projectTargetDate">Target Completion</label>
+                                    <input type="date" id="projectTargetDate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="projectActualDate">Actual Completion</label>
+                                    <input type="date" id="projectActualDate">
+                                </div>
+                            </div>
+
+                            <h3 style="margin: 30px 0 20px 0; color: #667eea;">Tooling Requirements</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_pattern" onchange="toggleToolingStatus('pattern')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>Pattern</strong>
+                                    </label>
+                                    <select id="pattern_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_oe_mold" onchange="toggleToolingStatus('oe_mold')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>OE Mold</strong>
+                                    </label>
+                                    <select id="oe_mold_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_me_mold" onchange="toggleToolingStatus('me_mold')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>ME Mold</strong>
+                                    </label>
+                                    <select id="me_mold_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_trim_fixture" onchange="toggleToolingStatus('trim_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>Trim Fixture</strong>
+                                    </label>
+                                    <select id="trim_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_assembly_fixture" onchange="toggleToolingStatus('assembly_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>Assembly Fixture</strong>
+                                    </label>
+                                    <select id="assembly_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_check_fixture" onchange="toggleToolingStatus('check_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>Check Fixture</strong>
+                                    </label>
+                                    <select id="check_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_drill_fixture" onchange="toggleToolingStatus('drill_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>Drill Fixture</strong>
+                                    </label>
+                                    <select id="drill_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                                        <input type="checkbox" id="needs_trim_program" onchange="toggleToolingStatus('trim_program')" style="margin-right: 10px; width: 18px; height: 18px;">
+                                        <strong>Trim Program</strong>
+                                    </label>
+                                    <select id="trim_program_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="projectNotes">Project Notes</label>
+                                <textarea id="projectNotes" placeholder="Additional notes or requirements" rows="4"></textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+							
+							<!-- PROJECT DOCUMENTS SECTION -->
+                            <div style="border-top: 2px solid #667eea; margin-top: 30px; padding-top: 30px;">
+                                <h3 style="color: #667eea; margin-bottom: 20px;">Project Documents</h3>
+                                
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Upload Document</label>
+                                    <input type="file" id="projectDocUpload" multiple style="margin-bottom: 10px;">
+                                    <select id="projectDocType" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px;">
+                                        <option value="">Document Type</option>
+                                        <option value="Drawing">Engineering Drawing</option>
+                                        <option value="SOP">Standard Operating Procedure</option>
+                                        <option value="Inspection">Inspection Report</option>
+                                        <option value="Photo">Photo</option>
+                                        <option value="Specification">Specification</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <input type="text" id="projectDocRevision" placeholder="Revision (optional)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 150px; margin-right: 10px;">
+                                    <button type="button" onclick="uploadProjectDocuments()" class="btn" style="padding: 8px 16px;">Upload Files</button>
+                                </div>
+                                
+                                <div id="projectDocumentsList" style="margin-top: 20px;">
+                                    <!-- Documents will be listed here -->
+                                </div>
+                            </div>
+							
+                                <button type="submit" class="btn">Save Project</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelProjectForm()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="projectsList">
+                        <h2>Projects</h2>
+                        <table class="data-table" id="projectsTable">
+                            <thead>
+                                <tr>
+                                    <th>Project #</th>
+                                    <th>Customer</th>
+                                    <th>Part Number</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Target Date</th>
+                                    <th>Tooling</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectsTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 40px;">No projects found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- Load Supabase CDN -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -3526,7 +3791,962 @@ function formatDate(dateString) {
 				customInput.value = '';
 			}
 }
-		
-    </script>
+
+// ============================================
+// PROJECT MANAGEMENT SYSTEM
+// ============================================
+
+let projects = [];
+let projectIdCounter = 3001;
+let currentProjectFilter = null;
+
+// Auto-generate project number
+function generateProjectNumber() {
+    const year = new Date().getFullYear();
+    const nextNum = String(projectIdCounter).padStart(3, '0');
+    return `PRJ-${year}-${nextNum}`;
+}
+
+// Show Project Management page
+function showProjectManagement() {
+    currentPage = 'projects';
+    document.getElementById('homePage').classList.add('hidden');
+    document.getElementById('qualityAlertsPage').classList.add('hidden');
+    document.getElementById('taskManagementPage').classList.add('hidden');
+    document.getElementById('projectsPage').classList.remove('hidden');
+    document.getElementById('breadcrumb').style.display = 'block';
+    document.getElementById('currentPage').textContent = 'Project Management';
+    loadProjectsFromDatabase();
+    updateProjectStats();
+}
+
+// Load projects from database
+async function loadProjectsFromDatabase() {
+    try {
+        const result = await directApiCall('GET', 'projects?order=created_at.desc');
+        if (result.error) throw result.error;
+        
+        projects = (result.data || []).map(p => ({
+            id: p.id,
+            projectNumber: p.project_number,
+            customer: p.customer_name,
+            partNumber: p.part_number,
+            partDescription: p.part_description,
+            projectManager: p.project_manager,
+            startDate: p.start_date,
+            targetCompletion: p.target_completion,
+            actualCompletion: p.actual_completion,
+            status: p.status,
+            priority: p.priority,
+            needs_pattern: p.needs_pattern,
+            pattern_status: p.pattern_status,
+            needs_oe_mold: p.needs_oe_mold,
+            oe_mold_status: p.oe_mold_status,
+            needs_me_mold: p.needs_me_mold,
+            me_mold_status: p.me_mold_status,
+            needs_trim_fixture: p.needs_trim_fixture,
+            trim_fixture_status: p.trim_fixture_status,
+            needs_assembly_fixture: p.needs_assembly_fixture,
+            assembly_fixture_status: p.assembly_fixture_status,
+            needs_check_fixture: p.needs_check_fixture,
+            check_fixture_status: p.check_fixture_status,
+            needs_drill_fixture: p.needs_drill_fixture,
+            drill_fixture_status: p.drill_fixture_status,
+            needs_trim_program: p.needs_trim_program,
+            trim_program_status: p.trim_program_status,
+            notes: p.notes,
+            createdAt: p.created_at
+        }));
+        
+         displayProjects(projects);
+        updateProjectStats();
+        
+        // Set counter to highest existing project number + 1
+        if (projects.length > 0) {
+            const projectNumbers = projects
+                .map(p => p.projectNumber.match(/PRJ-\d{4}-(\d{3})/))
+                .filter(match => match)
+                .map(match => parseInt(match[1]));
+            if (projectNumbers.length > 0) {
+                projectIdCounter = Math.max(...projectNumbers) + 1;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading projects:', error);
+    }
+}
+
+// Display projects in table
+function displayProjects(projectsToShow) {
+    const tbody = document.getElementById('projectsTableBody');
+    if (!projectsToShow || projectsToShow.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No projects found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = projectsToShow.map(p => {
+        const tooling = [];
+        if (p.needs_pattern) tooling.push('Pattern');
+        if (p.needs_oe_mold) tooling.push('OE Mold');
+        if (p.needs_me_mold) tooling.push('ME Mold');
+        if (p.needs_trim_fixture) tooling.push('Trim Fix');
+        if (p.needs_assembly_fixture) tooling.push('Asm Fix');
+        if (p.needs_check_fixture) tooling.push('Check Fix');
+        if (p.needs_drill_fixture) tooling.push('Drill Fix');
+        if (p.needs_trim_program) tooling.push('Trim Prog');
+        
+        return `
+            <tr>
+                <td><strong>${p.projectNumber}</strong></td>
+                <td>${p.customer}</td>
+                <td>${p.partNumber}</td>
+                <td><span class="status-${p.status.toLowerCase().replace(' ', '-')}">${p.status}</span></td>
+                <td class="priority-${p.priority.toLowerCase()}">${p.priority}</td>
+                <td>${p.targetCompletion ? formatDate(p.targetCompletion) : 'Not set'}</td>
+                <td style="font-size: 11px;">${tooling.join(', ') || 'None'}</td>
+                <td>
+                    <button class="btn" onclick="editProject(${p.id})" style="padding: 6px 10px; margin: 2px;">Edit</button>
+                    <button class="btn" onclick="generatePASR(${p.id})" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 6px 10px; margin: 2px;">PASR</button>
+                    <button class="btn" onclick="deleteProject(${p.id})" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 6px 10px; margin: 2px;">Delete</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Update project stats
+function updateProjectStats() {
+    document.getElementById('totalProjects').textContent = projects.length;
+    document.getElementById('planningProjects').textContent = projects.filter(p => p.status === 'Planning').length;
+    document.getElementById('activeProjects').textContent = projects.filter(p => p.status === 'In Progress').length;
+    document.getElementById('completedProjects').textContent = projects.filter(p => p.status === 'Completed').length;
+}
+
+// Show create project form
+function showCreateProjectForm() {
+    document.getElementById('projectFormTitle').textContent = 'Create New Project';
+    document.getElementById('projectForm').reset();
+    document.getElementById('projectEditId').value = '';
+    document.getElementById('projectNumber').value = generateProjectNumber(); // Auto-generate
+    document.getElementById('createProjectForm').classList.remove('hidden');
+    document.getElementById('projectsList').classList.add('hidden');
+    
+    ['pattern', 'oe_mold', 'me_mold', 'trim_fixture', 'assembly_fixture', 'check_fixture', 'drill_fixture', 'trim_program'].forEach(t => {
+        document.getElementById(`${t}_status`).disabled = true;
+    });
+}
+
+// Show all projects
+function showAllProjects() {
+    document.getElementById('createProjectForm').classList.add('hidden');
+    document.getElementById('projectsList').classList.remove('hidden');
+    displayProjects(currentProjectFilter ? projects.filter(p => p.status === currentProjectFilter) : projects);
+}
+
+// Toggle tooling status dropdown
+function toggleToolingStatus(type) {
+    const checkbox = document.getElementById(`needs_${type}`);
+    const status = document.getElementById(`${type}_status`);
+    status.disabled = !checkbox.checked;
+    if (!checkbox.checked) status.value = 'Not Started';
+}
+
+// Handle project form submit
+async function handleProjectSubmit(e) {
+    e.preventDefault();
+    
+    const projectData = {
+        project_number: document.getElementById('projectNumber').value,
+        customer_name: document.getElementById('projectCustomer').value,
+        part_number: document.getElementById('projectPartNumber').value,
+        part_description: document.getElementById('projectPartDesc').value,
+        project_manager: document.getElementById('projectManager').value,
+        priority: document.getElementById('projectPriority').value,
+        status: document.getElementById('projectStatus').value,
+        start_date: document.getElementById('projectStartDate').value || null,
+        target_completion: document.getElementById('projectTargetDate').value || null,
+        actual_completion: document.getElementById('projectActualDate').value || null,
+        needs_pattern: document.getElementById('needs_pattern').checked,
+        pattern_status: document.getElementById('needs_pattern').checked ? document.getElementById('pattern_status').value : null,
+        needs_oe_mold: document.getElementById('needs_oe_mold').checked,
+        oe_mold_status: document.getElementById('needs_oe_mold').checked ? document.getElementById('oe_mold_status').value : null,
+        needs_me_mold: document.getElementById('needs_me_mold').checked,
+        me_mold_status: document.getElementById('needs_me_mold').checked ? document.getElementById('me_mold_status').value : null,
+        needs_trim_fixture: document.getElementById('needs_trim_fixture').checked,
+        trim_fixture_status: document.getElementById('needs_trim_fixture').checked ? document.getElementById('trim_fixture_status').value : null,
+        needs_assembly_fixture: document.getElementById('needs_assembly_fixture').checked,
+        assembly_fixture_status: document.getElementById('needs_assembly_fixture').checked ? document.getElementById('assembly_fixture_status').value : null,
+        needs_check_fixture: document.getElementById('needs_check_fixture').checked,
+        check_fixture_status: document.getElementById('needs_check_fixture').checked ? document.getElementById('check_fixture_status').value : null,
+        needs_drill_fixture: document.getElementById('needs_drill_fixture').checked,
+        drill_fixture_status: document.getElementById('needs_drill_fixture').checked ? document.getElementById('drill_fixture_status').value : null,
+        needs_trim_program: document.getElementById('needs_trim_program').checked,
+        trim_program_status: document.getElementById('needs_trim_program').checked ? document.getElementById('trim_program_status').value : null,
+        notes: document.getElementById('projectNotes').value,
+        created_by: currentUser ? currentUser.email : 'system'
+    };
+    
+    const editId = document.getElementById('projectEditId').value;
+    
+    try {
+        if (editId) {
+            const result = await directApiCall('PATCH', `projects?id=eq.${editId}`, projectData);
+            if (result.error) throw result.error;
+            alert('Project updated successfully!');
+         } else {
+            const result = await directApiCall('POST', 'projects', projectData);
+            if (result.error) throw result.error;
+            projectIdCounter++; // Increment counter
+            alert('Project created successfully!');
+        }
+        
+        await loadProjectsFromDatabase();
+        showAllProjects();
+    } catch (error) {
+        alert('Error saving project: ' + error.message);
+        console.error('Save error:', error);
+    }
+}
+
+// Edit project
+async function editProject(id) {
+    try {
+        const result = await directApiCall('GET', `projects?id=eq.${id}`);
+        if (result.error || !result.data || result.data.length === 0) throw new Error('Project not found');
+        
+        const p = result.data[0];
+        
+        document.getElementById('projectFormTitle').textContent = 'Edit Project';
+        document.getElementById('projectEditId').value = p.id;
+        document.getElementById('projectNumber').value = p.project_number;
+        document.getElementById('projectCustomer').value = p.customer_name;
+        document.getElementById('projectPartNumber').value = p.part_number;
+        document.getElementById('projectPartDesc').value = p.part_description || '';
+        document.getElementById('projectManager').value = p.project_manager || '';
+        document.getElementById('projectPriority').value = p.priority;
+        document.getElementById('projectStatus').value = p.status;
+        document.getElementById('projectStartDate').value = p.start_date || '';
+        document.getElementById('projectTargetDate').value = p.target_completion || '';
+        document.getElementById('projectActualDate').value = p.actual_completion || '';
+        document.getElementById('projectNotes').value = p.notes || '';
+        
+        ['pattern', 'oe_mold', 'me_mold', 'trim_fixture', 'assembly_fixture', 'check_fixture', 'drill_fixture', 'trim_program'].forEach(t => {
+            const cb = document.getElementById(`needs_${t}`);
+            const st = document.getElementById(`${t}_status`);
+            cb.checked = p[`needs_${t}`] || false;
+            st.disabled = !cb.checked;
+            st.value = p[`${t}_status`] || 'Not Started';
+        });
+        
+        document.getElementById('createProjectForm').classList.remove('hidden');
+        document.getElementById('projectsList').classList.add('hidden');
+    } catch (error) {
+        alert('Error loading project');
+        console.error(error);
+    }
+}
+
+// Delete project
+async function deleteProject(id) {
+    if (!confirm('Delete this project?')) return;
+    
+    try {
+        const result = await directApiCall('DELETE', `projects?id=eq.${id}`);
+        if (result.error) throw result.error;
+        
+        alert('Project deleted successfully');
+        await loadProjectsFromDatabase();
+    } catch (error) {
+        alert('Error deleting project');
+        console.error(error);
+    }
+}
+
+// Filter functions
+function filterProjectsByStatus(status) {
+    currentProjectFilter = status;
+    displayProjects(projects.filter(p => p.status === status));
+}
+
+function clearProjectsFilters() {
+    currentProjectFilter = null;
+    displayProjects(projects);
+}
+
+function cancelProjectForm() {
+    showAllProjects();
+}	
+
+// ============================================
+// DOCUMENT MANAGEMENT SYSTEM
+// ============================================
+
+// Initialize Supabase Storage (uses existing supabase client)
+const { createClient } = supabase;
+
+// Upload documents for projects
+async function uploadProjectDocuments() {
+    const fileInput = document.getElementById('projectDocUpload');
+    const docType = document.getElementById('projectDocType').value;
+    const revision = document.getElementById('projectDocRevision').value;
+    const projectId = document.getElementById('projectEditId').value;
+    
+    if (!fileInput.files.length) {
+        alert('Please select at least one file');
+        return;
+    }
+    
+    if (!projectId) {
+        alert('Please save the project first before uploading documents');
+        return;
+    }
+    
+    await uploadDocuments(fileInput.files, 'project', projectId, docType, revision);
+    
+    // Clear inputs
+    fileInput.value = '';
+    document.getElementById('projectDocType').value = '';
+    document.getElementById('projectDocRevision').value = '';
+    
+    // Reload document list
+    loadProjectDocuments(projectId);
+}
+
+// Generic upload function
+async function uploadDocuments(files, type, recordId, docType, revision) {
+    let successCount = 0;
+    
+    for (const file of files) {
+        try {
+            // Generate unique filename
+            const timestamp = Date.now();
+            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const uniqueFilename = `${type}_${recordId}_${timestamp}_${sanitizedName}`;
+            const filePath = `${type}s/${recordId}/${uniqueFilename}`;
+            
+            // Upload to Supabase Storage using REST API
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const uploadResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/documents/${filePath}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY
+                },
+                body: file
+            });
+            
+            if (!uploadResponse.ok) {
+                const errorText = await uploadResponse.text();
+                console.error('Upload failed:', errorText);
+                throw new Error(`Upload failed: ${uploadResponse.status}`);
+            }
+            
+            // Save metadata to database
+            const documentData = {
+                filename: uniqueFilename,
+                original_filename: file.name,
+                file_path: filePath,
+                file_type: file.type,
+                file_size: file.size,
+                uploaded_by: currentUser ? currentUser.email : 'unknown',
+                document_type: docType || null,
+                revision: revision || null
+            };
+            
+            // Add the appropriate ID field
+            documentData[`${type}_id`] = parseInt(recordId);
+            
+            const result = await directApiCall('POST', 'documents', documentData);
+            
+            if (result.error) {
+                console.error('Database save error:', result.error);
+                throw result.error;
+            }
+            
+            successCount++;
+            
+        } catch (error) {
+            console.error(`Error uploading ${file.name}:`, error);
+            alert(`Failed to upload ${file.name}: ${error.message}`);
+        }
+    }
+    
+    if (successCount > 0) {
+        alert(`Successfully uploaded ${successCount} of ${files.length} file(s)`);
+    }
+}
+
+// Load documents for a project
+async function loadProjectDocuments(projectId) {
+    if (!projectId) return;
+    
+    try {
+        const result = await directApiCall('GET', `documents?project_id=eq.${projectId}&order=uploaded_at.desc`);
+        if (result.error) throw result.error;
+        
+        displayDocuments(result.data || [], 'projectDocumentsList', 'project', projectId);
+    } catch (error) {
+        console.error('Error loading project documents:', error);
+    }
+}
+
+// Display documents in list
+function displayDocuments(documents, containerId, type, recordId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (documents.length === 0) {
+        container.innerHTML = '<p style="color: #999; font-style: italic;">No documents uploaded yet</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <thead>
+                <tr style="background: #667eea;">
+                    <th style="padding: 10px; text-align: left; color: white;">File Name</th>
+                    <th style="padding: 10px; text-align: left; color: white;">Type</th>
+                    <th style="padding: 10px; text-align: left; color: white;">Revision</th>
+                    <th style="padding: 10px; text-align: left; color: white;">Size</th>
+                    <th style="padding: 10px; text-align: left; color: white;">Uploaded</th>
+                    <th style="padding: 10px; text-align: left; color: white;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${documents.map(doc => `
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                        <td style="padding: 10px;">
+                            ${isImage(doc.file_type) ? '🖼️' : '📄'} ${doc.original_filename}
+                        </td>
+                        <td style="padding: 10px;">${doc.document_type || 'N/A'}</td>
+                        <td style="padding: 10px;">${doc.revision || '-'}</td>
+                        <td style="padding: 10px;">${formatFileSize(doc.file_size)}</td>
+                        <td style="padding: 10px;">${new Date(doc.uploaded_at).toLocaleDateString()}</td>
+                        <td style="padding: 10px;">
+                            <button onclick="downloadDocument('${doc.file_path}', '${doc.original_filename}')" class="btn" style="padding: 5px 10px; margin-right: 5px; font-size: 0.9em;">Download</button>
+                            <button onclick="deleteDocument(${doc.id}, '${doc.file_path}', '${type}', ${recordId})" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 5px 10px; font-size: 0.9em;">Delete</button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+// Check if file is an image
+function isImage(mimeType) {
+    return mimeType && mimeType.startsWith('image/');
+}
+
+// Format file size
+function formatFileSize(bytes) {
+    if (!bytes) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// Download document
+async function downloadDocument(filePath, originalFilename) {
+    try {
+        const downloadUrl = `${SUPABASE_URL}/storage/v1/object/documents/${filePath}`;
+        
+        const response = await fetch(downloadUrl, {
+            headers: {
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'apikey': SUPABASE_ANON_KEY
+            }
+        });
+        
+        if (!response.ok) throw new Error('Download failed');
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = originalFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+    } catch (error) {
+        console.error('Download error:', error);
+        alert('Failed to download file: ' + error.message);
+    }
+}
+
+// Delete document
+async function deleteDocument(docId, filePath, type, recordId) {
+    if (!confirm('Delete this document? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // Delete from storage
+        const deleteUrl = `${SUPABASE_URL}/storage/v1/object/documents/${filePath}`;
+        await fetch(deleteUrl, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'apikey': SUPABASE_ANON_KEY
+            }
+        });
+        
+        // Delete from database
+        const result = await directApiCall('DELETE', `documents?id=eq.${docId}`);
+        if (result.error) throw result.error;
+        
+        alert('Document deleted successfully');
+        
+        // Reload document list
+        if (type === 'project') {
+            loadProjectDocuments(recordId);
+        }
+        
+    } catch (error) {
+        console.error('Delete error:', error);
+        alert('Failed to delete document: ' + error.message);
+    }
+}
+
+// Update editProject to load documents when editing
+const originalEditProject = editProject;
+editProject = async function(id) {
+    await originalEditProject(id);
+    loadProjectDocuments(id);
+};
+
+// ============================================
+// PASR GENERATION
+// ============================================
+
+// Generate PASR Report for a project
+async function generatePASR(projectId) {
+    try {
+        const result = await directApiCall('GET', `projects?id=eq.${projectId}`);
+        if (result.error || !result.data || result.data.length === 0) {
+            alert('Project not found');
+            return;
+        }
+        
+        const project = result.data[0];
+        
+        const pasrHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PASR - ${project.part_number}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        
+        .logo {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+        }
+        
+        .info-item {
+            text-align: center;
+        }
+        
+        .info-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #1e3c72;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 25px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .section-content {
+            padding: 25px;
+            background: white;
+            min-height: 100px;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            border: 3px solid #1e3c72;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox.checked {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            border-color: #27ae60;
+        }
+        
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .checkbox-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .comments-box {
+            min-height: 120px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #495057;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .completion-footer {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #dee2e6;
+        }
+        
+        .completion-date {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3c72;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .print-controls {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .print-btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .print-btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        
+        .print-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 60, 114, 0.4);
+        }
+        
+        .print-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .print-btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        @media print {
+            body { 
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .no-print { 
+                display: none;
+            }
+            .section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="no-print print-controls">
+            <button onclick="window.print()" class="print-btn print-btn-primary">🖨️ Print PASR</button>
+            <button onclick="window.close()" class="print-btn print-btn-secondary">✕ Close</button>
+        </div>
+
+        <div class="header">
+            <div class="logo">VEE ENGINEERING INC.</div>
+            <div class="title">PART APPROVAL STATUS REPORT</div>
+        </div>
+
+        <div class="content">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Customer</div>
+                    <div class="info-value">${project.customer_name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Part Number</div>
+                    <div class="info-value">${project.part_number}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Revision Level</div>
+                    <div class="info-value">Rev ${project.notes || '1'}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Reason for PASR</div>
+                <div class="section-content">
+                    <div class="checkbox-item">
+                        <div class="checkbox checked"></div>
+                        <div class="checkbox-label">New Part</div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox"></div>
+                        <div class="checkbox-label">Part Revision</div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox"></div>
+                        <div class="checkbox-label">Other</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Tooling Complete</div>
+                <div class="section-content">
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_pattern && project.pattern_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Pattern</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_assembly_fixture && project.assembly_fixture_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Assembly Fixture</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_oe_mold && project.oe_mold_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">OE Mold</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_trim_fixture && project.trim_fixture_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Trim Fixture</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_drill_fixture && project.drill_fixture_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Drill Fixture</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_check_fixture && project.check_fixture_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Check Fixture</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_me_mold && project.me_mold_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">ME Mold</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.needs_trim_program && project.trim_program_status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Trim Program</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Part / Tool Status</div>
+                <div class="section-content">
+                    <div class="status-grid">
+                        <div class="checkbox-item">
+                            <div class="checkbox ${project.status === 'Completed' ? 'checked' : ''}"></div>
+                            <div class="checkbox-label">Approved</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-label">Conditional Approval</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-label">Process Sheets Complete</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-label">Tooling Moved to Required Department</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-label">Invoice Tooling</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Comments</div>
+                <div class="section-content">
+                    <div class="comments-box">
+                        ${project.notes || 'No additional comments'}
+                    </div>
+                </div>
+            </div>
+
+            <div class="completion-footer">
+                <div class="completion-date">
+                    Completion Date: ${project.actual_completion ? new Date(project.actual_completion).toLocaleDateString() : new Date().toLocaleDateString()}
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+        `;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(pasrHTML);
+        printWindow.document.close();
+        
+    } catch (error) {
+        console.error('Error generating PASR:', error);
+        alert('Failed to generate PASR: ' + error.message);
+    }
+}
+</script>
