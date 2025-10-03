@@ -489,7 +489,7 @@
                         <button class="btn">Access Module →</button>
                     </div>
 
-                    <div class="nav-card" onclick="showProjectManagement()">
+                    <div class="nav-card" onclick="showProjectManagementSecure()">
                         <div class="icon">📊</div>
                         <div class="status status-active">Active</div>
                         <h3>Project Management</h3>
@@ -550,12 +550,7 @@
                     <h2>Quick Actions</h2>
                     <button class="btn" onclick="showCreateAlertFormSecure()">Create New Alert</button>
                     <button class="btn btn-secondary" onclick="showAllAlerts()">View All Alerts</button>
-                    
-                    
-                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Priority</h3>
-                    <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterAlertsByPriority('High')">High Priority</button>
-                    <button class="btn" onclick="filterAlertsByPriority('Medium')">Medium Priority</button>
-                    <button class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);" onclick="filterAlertsByPriority('Low')">Low Priority</button>
+             
                     
                     <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Status</h3>
                     <button class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" onclick="filterAlertsByStatus('Open')">Open</button>
@@ -937,8 +932,8 @@
             <div class="main-content">
                 <div class="sidebar">
                     <h2>Quick Actions</h2>
-                    <button class="btn" onclick="showCreateProjectForm()">Create New Project</button>
-                    <button class="btn btn-secondary" onclick="showAllProjects()">View All Projects</button>
+					<button class="btn" onclick="showCreateProjectFormSecure()">Create New Project</button>
+					<button class="btn btn-secondary" onclick="showAllProjects()">View All Projects</button>
                     
                     <h3 style="margin-top: 30px; margin-bottom: 15px;">Filter by Status</h3>
                     <button class="btn" onclick="filterProjectsByStatus('Planning')">Planning</button>
@@ -2056,17 +2051,18 @@ async function deleteTaskFromDatabase(id) {
 
         // Search and filter functions for alerts
         function searchAlerts() {
-            const searchTerm = document.getElementById('alertsSearchBox').value.toLowerCase();
-            const filteredAlerts = alerts.filter(alert =>
-                alert.description.toLowerCase().includes(searchTerm) ||
-                (alert.assignedTo && alert.assignedTo.toLowerCase().includes(searchTerm)) ||
-                (alert.department && alert.department.toLowerCase().includes(searchTerm)) ||
-                (alert.customerSupplier && alert.customerSupplier.toLowerCase().includes(searchTerm)) ||
-                (alert.partNumber && alert.partNumber.toLowerCase().includes(searchTerm)) ||
-                alert.id.toLowerCase().includes(searchTerm)
-            );
-            displayAlerts(filteredAlerts);
-        }
+			const searchTerm = document.getElementById('alertsSearchBox').value.toLowerCase();
+			const filteredAlerts = alerts.filter(alert =>
+				alert.description.toLowerCase().includes(searchTerm) ||
+				(alert.assignedTo && alert.assignedTo.toLowerCase().includes(searchTerm)) ||
+				(alert.department && alert.department.toLowerCase().includes(searchTerm)) ||
+				(alert.customerSupplier && alert.customerSupplier.toLowerCase().includes(searchTerm)) ||
+				(alert.facility && alert.facility.toLowerCase().includes(searchTerm)) ||
+				(alert.partNumber && alert.partNumber.toLowerCase().includes(searchTerm)) ||
+				alert.id.toLowerCase().includes(searchTerm)
+			);
+			displayAlerts(filteredAlerts);
+}
 
         function filterAlertsByPriority(priority) {
             displayAlerts(alerts.filter(alert => alert.priority === priority));
@@ -3820,6 +3816,80 @@ function showProjectManagement() {
     updateProjectStats();
 }
 
+// Secure project management functions
+// Secure project management functions
+function showProjectManagementSecure() {
+    if (!requirePermission(PERMISSIONS.VIEW_TASKS, 'view projects')) {
+        return;
+    }
+    showProjectManagement();
+    
+    // If viewer role, make form read-only after it's displayed
+    if (currentUser && currentUser.role === USER_ROLES.VIEWER) {
+        setTimeout(() => {
+            makeProjectFormReadOnly();
+        }, 100);
+    }
+}
+
+function makeProjectFormReadOnly() {
+    // Disable all form inputs
+    const inputs = document.querySelectorAll('#createProjectForm input, #createProjectForm select, #createProjectForm textarea, #createProjectForm input[type="checkbox"]');
+    inputs.forEach(input => {
+        input.disabled = true;
+    });
+    
+    // Hide the save button
+    const submitBtn = document.querySelector('#projectForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.style.display = 'none';
+    }
+    
+    // Change cancel button text to "Close"
+    const cancelBtn = document.querySelector('#projectForm button[onclick="cancelProjectForm()"]');
+    if (cancelBtn) {
+        cancelBtn.textContent = 'Close';
+    }
+}
+
+function showCreateProjectFormSecure() {
+    if (!requirePermission(PERMISSIONS.CREATE_TASKS, 'create projects')) {
+        return;
+    }
+    showCreateProjectForm();
+}
+
+function editProjectSecure(id) {
+    if (!requirePermission(PERMISSIONS.VIEW_TASKS, 'view projects')) {
+        return;
+    }
+    
+    // Allow viewers to VIEW but check edit permission for actual editing
+    if (currentUser && currentUser.role !== USER_ROLES.VIEWER) {
+        if (!requirePermission(PERMISSIONS.EDIT_TASKS, 'edit projects')) {
+            return;
+        }
+    }
+    
+    editProject(id);
+    
+    // If viewer, make form read-only
+    if (currentUser && currentUser.role === USER_ROLES.VIEWER) {
+        setTimeout(() => {
+            makeProjectFormReadOnly();
+            document.getElementById('projectFormTitle').textContent = 'View Project (Read Only)';
+        }, 100);
+    }
+}
+
+function deleteProjectSecure(id) {
+    if (!requirePermission(PERMISSIONS.DELETE_TASKS, 'delete projects')) {
+        return;
+    }
+    deleteProject(id);
+}
+
+
 // Load projects from database
 async function loadProjectsFromDatabase() {
     try {
@@ -3905,9 +3975,9 @@ function displayProjects(projectsToShow) {
                 <td>${p.targetCompletion ? formatDate(p.targetCompletion) : 'Not set'}</td>
                 <td style="font-size: 11px;">${tooling.join(', ') || 'None'}</td>
                 <td>
-                    <button class="btn" onclick="editProject(${p.id})" style="padding: 6px 10px; margin: 2px;">Edit</button>
+                    <button class="btn" onclick="editProjectSecure(${p.id})" style="padding: 6px 10px; margin: 2px;">Edit</button>
                     <button class="btn" onclick="generatePASR(${p.id})" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 6px 10px; margin: 2px;">PASR</button>
-                    <button class="btn" onclick="deleteProject(${p.id})" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 6px 10px; margin: 2px;">Delete</button>
+                    <button class="btn" onclick="deleteProjectSecure(${p.id})" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 6px 10px; margin: 2px;">Delete</button>
                 </td>
             </tr>
         `;
