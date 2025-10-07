@@ -718,6 +718,15 @@
                         <h2>Quality Alerts Dashboard</h2>
                         <input type="text" class="search-box" id="alertsSearchBox" placeholder="Search alerts..." onkeyup="searchAlerts()">
                         
+						<div style="margin-bottom: 20px;">
+							<label style="font-weight: 600; margin-right: 10px;">Sort by Due Date:</label>
+							<select onchange="sortAlerts(this.value)" style="padding: 8px; border: 2px solid #ecf0f1; border-radius: 8px;">
+								<option value="">Default</option>
+								<option value="due_asc">Due Date (Earliest First)</option>
+								<option value="due_desc">Due Date (Latest First)</option>
+							</select>
+						</div>
+						
                         <table class="data-table" id="alertsTable">
                             <thead>
                                 <tr>
@@ -892,6 +901,15 @@
                         <h2>Task Management Dashboard</h2>
                         <input type="text" class="search-box" id="tasksSearchBox" placeholder="Search tasks..." onkeyup="searchTasks()">
                         
+						<div style="margin-bottom: 20px;">
+							<label style="font-weight: 600; margin-right: 10px;">Sort by Due Date:</label>
+							<select onchange="sortTasks(this.value)" style="padding: 8px; border: 2px solid #ecf0f1; border-radius: 8px;">
+								<option value="">Default</option>
+								<option value="due_asc">Due Date (Earliest First)</option>
+								<option value="due_desc">Due Date (Latest First)</option>
+							</select>
+						</div>
+						
                         <table class="data-table" id="tasksTable">
                             <thead>
                                 <tr>
@@ -1157,6 +1175,16 @@
 
                     <div id="projectsList">
                         <h2>Projects</h2>
+						
+						<div style="margin-bottom: 20px;">
+							<label style="font-weight: 600; margin-right: 10px;">Sort by Target Date:</label>
+							<select onchange="sortProjects(this.value)" style="padding: 8px; border: 2px solid #ecf0f1; border-radius: 8px;">
+								<option value="">Default</option>
+								<option value="target_asc">Target Date (Earliest First)</option>
+								<option value="target_desc">Target Date (Latest First)</option>
+							</select>
+						</div>
+						
                         <table class="data-table" id="projectsTable">
                             <thead>
 								<tr>
@@ -2529,6 +2557,70 @@ if (success && isNewTask && taskData.assignee) {
             document.getElementById('tasksSearchBox').value = '';
             displayTasks(tasks);
         }
+		
+
+// Sort alerts by due date
+function sortAlerts(sortType) {
+    let sortedAlerts = [...alerts];
+    
+    if (sortType === 'due_asc') {
+        sortedAlerts.sort((a, b) => {
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+    } else if (sortType === 'due_desc') {
+        sortedAlerts.sort((a, b) => {
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(b.dueDate) - new Date(a.dueDate);
+        });
+    }
+    
+    displayAlerts(sortedAlerts);
+}
+
+// Sort tasks by due date
+function sortTasks(sortType) {
+    let sortedTasks = [...tasks];
+    
+    if (sortType === 'due_asc') {
+        sortedTasks.sort((a, b) => {
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+    } else if (sortType === 'due_desc') {
+        sortedTasks.sort((a, b) => {
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(b.dueDate) - new Date(a.dueDate);
+        });
+    }
+    
+    displayTasks(sortedTasks);
+}
+
+// Sort projects by target date
+function sortProjects(sortType) {
+    let sortedProjects = [...projects];
+    
+    if (sortType === 'target_asc') {
+        sortedProjects.sort((a, b) => {
+            if (!a.targetCompletion) return 1;
+            if (!b.targetCompletion) return -1;
+            return new Date(a.targetCompletion) - new Date(b.targetCompletion);
+        });
+    } else if (sortType === 'target_desc') {
+        sortedProjects.sort((a, b) => {
+            if (!a.targetCompletion) return 1;
+            if (!b.targetCompletion) return -1;
+            return new Date(b.targetCompletion) - new Date(a.targetCompletion);
+        });
+    }
+    
+    displayProjects(sortedProjects);
+}
 
         function exportTasksData() {
             const dataStr = JSON.stringify(tasks, null, 2);
