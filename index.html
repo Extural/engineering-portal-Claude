@@ -1159,17 +1159,18 @@
                         <h2>Projects</h2>
                         <table class="data-table" id="projectsTable">
                             <thead>
-                                <tr>
-                                    <th>Project #</th>
-                                    <th>Customer</th>
-                                    <th>Part Number</th>
-                                    <th>Status</th>
-                                    <th>Priority</th>
-                                    <th>Target Date</th>
-                                    <th>Tooling</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
+								<tr>
+									<th>Project #</th>
+									<th>Customer</th>
+									<th>Part Number</th>
+									<th>Assigned To</th>
+									<th>Status</th>
+									<th>Priority</th>
+									<th>Target Date</th>
+									<th>Tooling</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
                             <tbody id="projectsTableBody">
                                 <tr>
                                     <td colspan="8" style="text-align: center; padding: 40px;">No projects found</td>
@@ -2728,6 +2729,19 @@ function updateUIForUser() {
     
     // Hide/show navigation based on permissions
     updateNavigationAccess();
+	
+	// Show/Hide Air Side Systems for Admin only
+	const airSideCards = document.querySelectorAll('.nav-card');
+	airSideCards.forEach(card => {
+		const h3 = card.querySelector('h3');
+		if (h3 && h3.textContent.includes('Air Side Systems')) {
+			if (currentUser && currentUser.role === 'admin') {
+				card.style.display = '';  // Show it
+			} else {
+				card.style.display = 'none';  // Hide it
+			}
+		}
+	});
     
     // Hide/show buttons based on permissions
     updateButtonAccess();
@@ -2781,14 +2795,17 @@ function updateNavigationAccess() {
 }
 
 // Air Side Systems module - Admin only
-const airSideCard = document.querySelector('.nav-card[onclick="showAirSideSystemsSecure()"]');
-if (airSideCard) {
-    if (currentUser && currentUser.role === USER_ROLES.ADMIN) {
-        airSideCard.style.display = 'block';
-    } else {
-        airSideCard.style.display = 'none';
+const airSideCards = document.querySelectorAll('.nav-card');
+airSideCards.forEach(card => {
+    const h3 = card.querySelector('h3');
+    if (h3 && h3.textContent.trim() === 'Air Side Systems') {
+        if (currentUser && currentUser.role === USER_ROLES.ADMIN) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
     }
-}
+});
 
 // Update button access
 function updateButtonAccess() {
@@ -4040,7 +4057,7 @@ async function loadProjectsFromDatabase() {
 function displayProjects(projectsToShow) {
     const tbody = document.getElementById('projectsTableBody');
     if (!projectsToShow || projectsToShow.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No projects found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;">No projects found</td></tr>';
         return;
     }
     
@@ -4060,6 +4077,7 @@ function displayProjects(projectsToShow) {
                 <td><strong>${p.projectNumber}</strong></td>
                 <td>${p.customer}</td>
                 <td>${p.partNumber}</td>
+                <td>${p.projectManager || 'Unassigned'}</td>
                 <td><span class="status-${p.status.toLowerCase().replace(' ', '-')}">${p.status}</span></td>
                 <td class="priority-${p.priority.toLowerCase()}">${p.priority}</td>
                 <td>${p.targetCompletion ? formatDate(p.targetCompletion) : 'Not set'}</td>
