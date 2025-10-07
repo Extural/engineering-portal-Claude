@@ -520,6 +520,14 @@
                         <p>Generate comprehensive reports and analytics across all engineering operations and quality metrics.</p>
                         <button class="btn btn-secondary" disabled>Module in Development</button>
                     </div>
+					
+					<div class="nav-card" onclick="showAirSideSystemsSecure()">
+                        <div class="icon">🌀</div>
+                        <div class="status status-active">Active</div>
+                        <h3>Air Side Systems</h3>
+                        <p>Analyze axial fan performance data. Calculate airflow changes based on speed, diameter, and blade modifications. Generate performance curves.</p>
+                        <button class="btn">Access Module →</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1172,6 +1180,52 @@
                 </div>
             </div>
         </div>
+		
+		<!-- Air Side Systems Page -->
+    <div id="airSidePage" class="hidden">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalFans">0</h3>
+                <p>Total Fans</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeFans">0</h3>
+                <p>Active</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="avgEfficiency">0%</h3>
+                <p>Avg Efficiency</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalAirflow">0</h3>
+                <p>Total CFM</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>Quick Actions</h2>
+                <button class="btn" onclick="showCreateFanForm()">Add New Fan</button>
+                <button class="btn btn-secondary" onclick="showAllFans()">View All Fans</button>
+                
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Tools</h3>
+                <button class="btn" onclick="showFanCalculator()">Performance Calculator</button>
+                <button class="btn btn-secondary" onclick="showCurveGenerator()">Curve Generator</button>
+            </div>
+
+            <div class="main-panel">
+                <h2>Air Side Systems - Axial Fan Management</h2>
+                <p>Manage axial fan performance data and generate performance curves.</p>
+                
+                <div id="fansList" style="margin-top: 30px;">
+                    <h3>Fan Database</h3>
+                    <p style="color: #666; margin-top: 20px;">No fans added yet. Click "Add New Fan" to get started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Supabase CDN -->
 
     <!-- Load Supabase CDN -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -1856,6 +1910,32 @@ async function deleteTaskFromDatabase(id) {
             showAllTasks();
             updateTasksStats();
         }
+		
+// Secure Air Side Systems access - Admin only
+function showAirSideSystemsSecure() {
+    if (!currentUser) {
+        alert('Please log in to access Air Side Systems');
+        return;
+    }
+    
+    if (currentUser.role !== USER_ROLES.ADMIN) {
+        alert('Access Denied: Air Side Systems is only available to Administrators');
+        return;
+    }
+    
+    showAirSideSystems();
+}
+
+function showAirSideSystems() {
+    currentPage = 'airside';
+    document.getElementById('homePage').classList.add('hidden');
+    document.getElementById('qualityAlertsPage').classList.add('hidden');
+    document.getElementById('taskManagementPage').classList.add('hidden');
+    document.getElementById('projectsPage').classList.add('hidden');
+    document.getElementById('airSidePage').classList.remove('hidden');
+    document.getElementById('breadcrumb').style.display = 'block';
+    document.getElementById('currentPage').textContent = 'Air Side Systems';
+}
 
         // Quality Alerts Functions
         function showCreateAlertForm() {
@@ -2697,6 +2777,16 @@ function updateNavigationAccess() {
         } else {
             taskCard.style.display = 'none';
         }
+    }
+}
+
+// Air Side Systems module - Admin only
+const airSideCard = document.querySelector('.nav-card[onclick="showAirSideSystemsSecure()"]');
+if (airSideCard) {
+    if (currentUser && currentUser.role === USER_ROLES.ADMIN) {
+        airSideCard.style.display = 'block';
+    } else {
+        airSideCard.style.display = 'none';
     }
 }
 
@@ -4763,4 +4853,592 @@ async function generatePASR(projectId) {
         alert('Failed to generate PASR: ' + error.message);
     }
 }
+
+// ============================================
+// AIR SIDE SYSTEMS MODULE
+// ============================================
+
+let fans = [];
+let fanIdCounter = 4001;
+
+function showCreateFanForm() {
+    document.getElementById('fansList').innerHTML = `
+        <h3 id="fanFormTitle">Add New Axial Fan</h3>
+        <form id="fanForm" onsubmit="saveFan(event)" style="max-width: 1000px;">
+            <input type="hidden" id="fanEditId" value="">
+            
+            <div class="three-column-row">
+                <div class="form-group">
+                    <label for="fanModel">Fan Model/ID *</label>
+                    <input type="text" id="fanModel" required placeholder="e.g., AX-2400-72">
+                </div>
+                <div class="form-group">
+                    <label for="fanManufacturer">Manufacturer</label>
+                    <input type="text" id="fanManufacturer" placeholder="e.g., Greenheck, Howden">
+                </div>
+                <div class="form-group">
+                    <label for="fanLocation">Location/Application</label>
+                    <input type="text" id="fanLocation" placeholder="e.g., Cooling Tower #3">
+                </div>
+            </div>
+
+            <h4 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">Design Specifications</h4>
+            
+            <div class="three-column-row">
+                <div class="form-group">
+                    <label for="fanDiameter">Diameter (inches) *</label>
+                    <input type="number" id="fanDiameter" required step="0.1" placeholder="e.g., 72">
+                </div>
+                <div class="form-group">
+                    <label for="fanRPM">Design RPM *</label>
+                    <input type="number" id="fanRPM" required step="1" placeholder="e.g., 1200">
+                </div>
+                <div class="form-group">
+                    <label for="fanBladeCount">Blade Count *</label>
+                    <input type="number" id="fanBladeCount" required step="1" min="2" placeholder="e.g., 8">
+                </div>
+            </div>
+
+            <div class="two-column-row">
+                <div class="form-group">
+                    <label for="fanPitchAngle">Blade Pitch Angle (degrees)</label>
+                    <input type="number" id="fanPitchAngle" step="0.5" placeholder="e.g., 25">
+                </div>
+                <div class="form-group">
+                    <label for="fanStatus">Status</label>
+                    <select id="fanStatus">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Testing">Testing</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+            </div>
+
+            <h4 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">Performance Curve Data Points</h4>
+            <p style="color: #666; margin-bottom: 15px;">Enter measured performance data at different operating points (minimum 10 points recommended, 20+ for accurate curves)</p>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="display: flex; gap: 10px; align-items: end; margin-bottom: 10px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">CFM *</label>
+                        <input type="number" id="newCFM" step="1" placeholder="250000" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Static Pressure (in H₂O) *</label>
+                        <input type="number" id="newSP" step="0.01" placeholder="0.75" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Horsepower *</label>
+                        <input type="number" id="newHP" step="0.1" placeholder="50" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <button type="button" onclick="addPerformancePoint()" class="btn" style="padding: 8px 16px;">Add Point</button>
+                </div>
+                
+                <div id="performancePointsList" style="margin-top: 15px;">
+                    <p style="color: #999; font-style: italic;">No performance points added yet</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fanNotes">Notes</label>
+                <textarea id="fanNotes" rows="3" placeholder="Additional information, test conditions, modifications..."></textarea>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn">Save Fan Data</button>
+                <button type="button" class="btn btn-secondary" onclick="showAllFans()">Cancel</button>
+            </div>
+        </form>
+    `;
+}
+
+let currentPerformancePoints = [];
+
+function addPerformancePoint() {
+    const cfm = parseFloat(document.getElementById('newCFM').value);
+    const sp = parseFloat(document.getElementById('newSP').value);
+    const hp = parseFloat(document.getElementById('newHP').value);
+    
+    if (!cfm || !sp || !hp) {
+        alert('Please enter CFM, Static Pressure, and Horsepower');
+        return;
+    }
+    
+    currentPerformancePoints.push({ cfm, staticPressure: sp, horsepower: hp });
+    
+    // Clear inputs
+    document.getElementById('newCFM').value = '';
+    document.getElementById('newSP').value = '';
+    document.getElementById('newHP').value = '';
+    
+    displayPerformancePoints();
+}
+
+function displayPerformancePoints() {
+    const container = document.getElementById('performancePointsList');
+    
+    if (currentPerformancePoints.length === 0) {
+        container.innerHTML = '<p style="color: #999; font-style: italic;">No performance points added yet</p>';
+        return;
+    }
+    
+    let html = `
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 5px; overflow: hidden;">
+            <thead>
+                <tr style="background: #667eea; color: white;">
+                    <th style="padding: 8px; text-align: left;">#</th>
+                    <th style="padding: 8px; text-align: right;">CFM</th>
+                    <th style="padding: 8px; text-align: right;">Static Pressure</th>
+                    <th style="padding: 8px; text-align: right;">Horsepower</th>
+                    <th style="padding: 8px; text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    currentPerformancePoints.forEach((point, index) => {
+        html += `
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px;">${index + 1}</td>
+                <td style="padding: 8px; text-align: right;">${point.cfm.toLocaleString()}</td>
+                <td style="padding: 8px; text-align: right;">${point.staticPressure.toFixed(2)} in H₂O</td>
+                <td style="padding: 8px; text-align: right;">${point.horsepower.toFixed(1)} HP</td>
+                <td style="padding: 8px; text-align: center;">
+                    <button type="button" onclick="removePerformancePoint(${index})" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer;">Remove</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+        <p style="margin-top: 10px; color: #667eea; font-weight: 600;">${currentPerformancePoints.length} points added</p>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function removePerformancePoint(index) {
+    currentPerformancePoints.splice(index, 1);
+    displayPerformancePoints();
+}
+
+function showAllFans() {
+    if (fans.length === 0) {
+        document.getElementById('fansList').innerHTML = `
+            <h3>Fan Database</h3>
+            <p style="color: #666; margin-top: 20px;">No fans added yet. Click "Add New Fan" to get started.</p>
+        `;
+        return;
+    }
+
+    let tableHTML = `
+        <h3>Fan Database (${fans.length} fans)</h3>
+        <table class="data-table" style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Manufacturer</th>
+                    <th>Diameter (in)</th>
+                    <th>RPM</th>
+                    <th>Blades</th>
+                    <th>Airflow (CFM)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    fans.forEach(fan => {
+        tableHTML += `
+            <tr>
+                <td><strong>${fan.model}</strong></td>
+                <td>${fan.manufacturer || 'N/A'}</td>
+                <td>${fan.diameter}</td>
+                <td>${fan.rpm.toLocaleString()}</td>
+                <td>${fan.bladeCount}</td>
+                <td>${fan.airflow.toLocaleString()}</td>
+                <td><span class="status-${fan.status.toLowerCase()}">${fan.status}</span></td>
+                <td>
+                    <button class="btn" onclick="editFan(${fan.id})" style="padding: 6px 10px;">Edit</button>
+                    <button class="btn" onclick="deleteFan(${fan.id})" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 6px 10px;">Delete</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('fansList').innerHTML = tableHTML;
+}
+
+function saveFan(event) {
+    event.preventDefault();
+
+    if (currentPerformancePoints.length < 5) {
+        alert('Please add at least 5 performance data points for a meaningful curve');
+        return;
+    }
+
+    const fanData = {
+        id: document.getElementById('fanEditId').value || fanIdCounter++,
+        model: document.getElementById('fanModel').value,
+        manufacturer: document.getElementById('fanManufacturer').value,
+        location: document.getElementById('fanLocation').value,
+        diameter: parseFloat(document.getElementById('fanDiameter').value),
+        rpm: parseInt(document.getElementById('fanRPM').value),
+        bladeCount: parseInt(document.getElementById('fanBladeCount').value),
+        pitchAngle: parseFloat(document.getElementById('fanPitchAngle').value) || null,
+        status: document.getElementById('fanStatus').value,
+        notes: document.getElementById('fanNotes').value,
+        performancePoints: [...currentPerformancePoints], // Store the curve data
+        createdDate: new Date().toISOString()
+    };
+
+    const existingIndex = fans.findIndex(f => f.id === fanData.id);
+    if (existingIndex > -1) {
+        fans[existingIndex] = fanData;
+    } else {
+        fans.push(fanData);
+    }
+
+    currentPerformancePoints = []; // Clear for next fan
+    alert('Fan data saved successfully with ' + fanData.performancePoints.length + ' performance points!');
+    showAllFans();
+    updateAirSideStats();
+}
+
+function editFan(id) {
+    const fan = fans.find(f => f.id === id);
+    if (!fan) return;
+
+    showCreateFanForm();
+    
+    document.querySelector('#fanFormTitle').textContent = 'Edit Fan: ' + fan.model;
+    document.getElementById('fanEditId').value = fan.id;
+    document.getElementById('fanModel').value = fan.model;
+    document.getElementById('fanManufacturer').value = fan.manufacturer || '';
+    document.getElementById('fanLocation').value = fan.location || '';
+    document.getElementById('fanDiameter').value = fan.diameter;
+    document.getElementById('fanRPM').value = fan.rpm;
+    document.getElementById('fanBladeCount').value = fan.bladeCount;
+    document.getElementById('fanPitchAngle').value = fan.pitchAngle || '';
+    document.getElementById('fanStatus').value = fan.status;
+    document.getElementById('fanNotes').value = fan.notes || '';
+    
+    // Load performance points
+    currentPerformancePoints = fan.performancePoints ? [...fan.performancePoints] : [];
+    displayPerformancePoints();
+}
+
+function deleteFan(id) {
+    if (confirm('Delete this fan data?')) {
+        fans = fans.filter(f => f.id !== id);
+        showAllFans();
+        updateAirSideStats();
+    }
+}
+
+function updateAirSideStats() {
+    document.getElementById('totalFans').textContent = fans.length;
+    document.getElementById('activeFans').textContent = fans.filter(f => f.status === 'Active').length;
+    
+    const totalAirflow = fans.reduce((sum, f) => sum + f.airflow, 0);
+    document.getElementById('totalAirflow').textContent = totalAirflow.toLocaleString();
+    
+    // Calculate average efficiency if power data exists
+    const fansWithPower = fans.filter(f => f.power && f.airflow);
+    if (fansWithPower.length > 0) {
+        const avgEff = fansWithPower.reduce((sum, f) => sum + (f.airflow / f.power), 0) / fansWithPower.length;
+        document.getElementById('avgEfficiency').textContent = Math.round(avgEff);
+    }
+}
+
+function showFanCalculator() {
+    if (fans.length === 0) {
+        alert('Please add at least one fan with performance data first');
+        return;
+    }
+    
+    document.getElementById('fansList').innerHTML = `
+        <h3>Performance Calculator</h3>
+        <p style="color: #666; margin-bottom: 20px;">Calculate performance changes using fan laws based on your baseline fan data</p>
+        
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; max-width: 900px;">
+            <div class="form-group">
+                <label for="calcBaseFan">Select Baseline Fan *</label>
+                <select id="calcBaseFan" onchange="loadBaseFanData()" style="width: 100%; padding: 12px; border: 2px solid #ccc; border-radius: 8px;">
+                    <option value="">-- Select a fan --</option>
+                    ${fans.map(f => `<option value="${f.id}">${f.model} - ${f.manufacturer || 'Unknown'} (${f.diameter}" @ ${f.rpm} RPM)</option>`).join('')}
+                </select>
+            </div>
+            
+            <div id="baselineFanInfo" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 8px; border: 2px solid #667eea;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Baseline Fan Data</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-size: 13px;">
+                    <div><strong>Diameter:</strong> <span id="baseDiameter"></span> inches</div>
+                    <div><strong>RPM:</strong> <span id="baseRPM"></span></div>
+                    <div><strong>Blades:</strong> <span id="baseBlades"></span></div>
+                    <div><strong>Data Points:</strong> <span id="basePoints"></span></div>
+                    <div><strong>Pitch Angle:</strong> <span id="basePitch"></span>°</div>
+                </div>
+            </div>
+            
+            <div id="calculationInputs" style="display: none; margin-top: 25px;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Modification Parameters</h4>
+                
+                <div class="three-column-row">
+                    <div class="form-group">
+                        <label for="newDiameter">New Diameter (inches)</label>
+                        <input type="number" id="newDiameter" step="0.1" placeholder="Leave blank for no change">
+                    </div>
+                    <div class="form-group">
+                        <label for="newRPM">New RPM</label>
+                        <input type="number" id="newRPM" step="1" placeholder="Leave blank for no change">
+                    </div>
+                    <div class="form-group">
+                        <label for="newBladeCount">New Blade Count</label>
+                        <input type="number" id="newBladeCount" step="1" min="2" placeholder="Leave blank for no change">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <strong>Fan Laws Applied:</strong>
+                    <ul style="margin: 10px 0 0 20px; font-size: 13px;">
+                        <li>CFM₂ = CFM₁ × (RPM₂/RPM₁) × (D₂/D₁)³</li>
+                        <li>SP₂ = SP₁ × (RPM₂/RPM₁)² × (D₂/D₁)²</li>
+                        <li>HP₂ = HP₁ × (RPM₂/RPM₁)³ × (D₂/D₁)⁵</li>
+                        <li>Blade count changes affect efficiency (approximated)</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 25px; text-align: center;">
+                    <button onclick="calculateNewPerformance()" class="btn" style="padding: 12px 30px; font-size: 16px;">Calculate New Performance</button>
+                    <button onclick="showFanCalculator()" class="btn btn-secondary" style="padding: 12px 30px; font-size: 16px;">Reset</button>
+                </div>
+            </div>
+            
+            <div id="calculationResults" style="display: none; margin-top: 30px;">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    `;
+}
+
+function loadBaseFanData() {
+    const fanId = parseInt(document.getElementById('calcBaseFan').value);
+    const fan = fans.find(f => f.id === fanId);
+    
+    if (!fan) {
+        document.getElementById('baselineFanInfo').style.display = 'none';
+        document.getElementById('calculationInputs').style.display = 'none';
+        return;
+    }
+    
+    // Display baseline info
+    document.getElementById('baseDiameter').textContent = fan.diameter;
+    document.getElementById('baseRPM').textContent = fan.rpm.toLocaleString();
+    document.getElementById('baseBlades').textContent = fan.bladeCount;
+    document.getElementById('basePoints').textContent = fan.performancePoints.length;
+    document.getElementById('basePitch').textContent = fan.pitchAngle || 'N/A';
+    
+    document.getElementById('baselineFanInfo').style.display = 'block';
+    document.getElementById('calculationInputs').style.display = 'block';
+    document.getElementById('calculationResults').style.display = 'none';
+}
+
+function calculateNewPerformance() {
+    const fanId = parseInt(document.getElementById('calcBaseFan').value);
+    const baseFan = fans.find(f => f.id === fanId);
+    
+    if (!baseFan) {
+        alert('Please select a baseline fan');
+        return;
+    }
+    
+    // Get modification parameters
+    const newDiam = parseFloat(document.getElementById('newDiameter').value) || baseFan.diameter;
+    const newRpm = parseFloat(document.getElementById('newRPM').value) || baseFan.rpm;
+    const newBlades = parseInt(document.getElementById('newBladeCount').value) || baseFan.bladeCount;
+    
+    // Calculate ratios
+    const rpmRatio = newRpm / baseFan.rpm;
+    const diamRatio = newDiam / baseFan.diameter;
+    const bladeRatio = newBlades / baseFan.bladeCount;
+    
+    // Apply fan laws to each performance point
+    const newPerformancePoints = baseFan.performancePoints.map(point => {
+        // CFM - no change with blade count
+        let newCFM = point.cfm * rpmRatio * Math.pow(diamRatio, 3);
+        
+        // Static Pressure - varies as square root of blade count
+        // Example: 9 blade pressure 1.134 times 7 blade
+        // Formula: SP₂ = SP₁ × √(blades₂/blades₁) × (RPM₂/RPM₁)² × (D₂/D₁)²
+        let newSP = point.staticPressure * Math.sqrt(bladeRatio) * Math.pow(rpmRatio, 2) * Math.pow(diamRatio, 2);
+        
+        // BHP - varies as straight ratio of blade count
+        // Example: 9 blade power 1.286 times 7 blade
+        // Formula: HP₂ = HP₁ × (blades₂/blades₁) × (RPM₂/RPM₁)³ × (D₂/D₁)⁵
+        let newHP = point.horsepower * bladeRatio * Math.pow(rpmRatio, 3) * Math.pow(diamRatio, 5);
+        
+        return {
+            cfm: Math.round(newCFM),
+            staticPressure: parseFloat(newSP.toFixed(3)),
+            horsepower: parseFloat(newHP.toFixed(2))
+        };
+    });
+    
+    displayCalculationResults(baseFan, newPerformancePoints, {
+        diameter: newDiam,
+        rpm: newRpm,
+        bladeCount: newBlades
+    });
+}
+
+function displayCalculationResults(baseFan, newPoints, newParams) {
+    const resultsDiv = document.getElementById('calculationResults');
+    
+    let html = `
+        <div style="background: white; padding: 25px; border-radius: 10px; border: 2px solid #27ae60;">
+            <h3 style="color: #27ae60; margin-bottom: 20px;">Calculated Performance Results</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Original</h4>
+                    <div style="font-size: 13px;">
+                        <div><strong>Diameter:</strong> ${baseFan.diameter}"</div>
+                        <div><strong>RPM:</strong> ${baseFan.rpm.toLocaleString()}</div>
+                        <div><strong>Blades:</strong> ${baseFan.bladeCount}</div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ccc;">
+                            <strong>CFM Range:</strong> ${Math.min(...baseFan.performancePoints.map(p => p.cfm)).toLocaleString()} - ${Math.max(...baseFan.performancePoints.map(p => p.cfm)).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #d4edda; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #27ae60; margin-bottom: 10px;">Modified</h4>
+                    <div style="font-size: 13px;">
+                        <div><strong>Diameter:</strong> ${newParams.diameter}" ${newParams.diameter !== baseFan.diameter ? '(CHANGED)' : ''}</div>
+                        <div><strong>RPM:</strong> ${newParams.rpm.toLocaleString()} ${newParams.rpm !== baseFan.rpm ? '(CHANGED)' : ''}</div>
+                        <div><strong>Blades:</strong> ${newParams.bladeCount} ${newParams.bladeCount !== baseFan.bladeCount ? '(CHANGED)' : ''}</div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #155724;">
+                            <strong>CFM Range:</strong> ${Math.min(...newPoints.map(p => p.cfm)).toLocaleString()} - ${Math.max(...newPoints.map(p => p.cfm)).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 style="margin-bottom: 15px;">Performance Curve Data (${newPoints.length} points)</h4>
+            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 5px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background: #667eea; color: white;">
+                        <tr>
+                            <th style="padding: 10px; text-align: left;">#</th>
+                            <th style="padding: 10px; text-align: right;">CFM</th>
+                            <th style="padding: 10px; text-align: right;">Static Pressure (in H₂O)</th>
+                            <th style="padding: 10px; text-align: right;">Horsepower</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    newPoints.forEach((point, index) => {
+        html += `
+            <tr style="border-bottom: 1px solid #eee; ${index % 2 === 0 ? 'background: #f8f9fa;' : ''}">
+                <td style="padding: 8px;">${index + 1}</td>
+                <td style="padding: 8px; text-align: right;">${point.cfm.toLocaleString()}</td>
+                <td style="padding: 8px; text-align: right;">${point.staticPressure.toFixed(3)}</td>
+                <td style="padding: 8px; text-align: right;">${point.horsepower.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button onclick="exportCalculationResults()" class="btn" style="padding: 10px 24px;">Export Results (CSV)</button>
+                <button onclick="saveAsNewFan()" class="btn" style="padding: 10px 24px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">Save as New Fan</button>
+            </div>
+        </div>
+    `;
+    
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.display = 'block';
+    
+    // Store results globally for export/save
+    window.lastCalculationResults = {
+        baseFan: baseFan,
+        newPoints: newPoints,
+        newParams: newParams
+    };
+}
+
+function exportCalculationResults() {
+    if (!window.lastCalculationResults) {
+        alert('No calculation results to export');
+        return;
+    }
+    
+    const { baseFan, newPoints, newParams } = window.lastCalculationResults;
+    
+    let csv = `Modified Fan Performance - Based on ${baseFan.model}\n`;
+    csv += `Original: ${baseFan.diameter}" @ ${baseFan.rpm} RPM, ${baseFan.bladeCount} blades\n`;
+    csv += `Modified: ${newParams.diameter}" @ ${newParams.rpm} RPM, ${newParams.bladeCount} blades\n`;
+    csv += `\nCFM,Static Pressure (in H2O),Horsepower\n`;
+    
+    newPoints.forEach(point => {
+        csv += `${point.cfm},${point.staticPressure},${point.horsepower}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `fan_calculation_${Date.now()}.csv`;
+    link.click();
+}
+
+function saveAsNewFan() {
+    if (!window.lastCalculationResults) {
+        alert('No calculation results to save');
+        return;
+    }
+    
+    const { baseFan, newPoints, newParams } = window.lastCalculationResults;
+    
+    const newModel = prompt(`Enter model name for this modified fan:`, `${baseFan.model}-MOD`);
+    if (!newModel) return;
+    
+    const newFan = {
+        id: fanIdCounter++,
+        model: newModel,
+        manufacturer: baseFan.manufacturer,
+        location: baseFan.location + ' (Modified)',
+        diameter: newParams.diameter,
+        rpm: newParams.rpm,
+        bladeCount: newParams.bladeCount,
+        pitchAngle: baseFan.pitchAngle,
+        status: 'Testing',
+        notes: `Calculated from ${baseFan.model}. Original: ${baseFan.diameter}" @ ${baseFan.rpm} RPM`,
+        performancePoints: newPoints,
+        createdDate: new Date().toISOString()
+    };
+    
+    fans.push(newFan);
+    alert(`New fan "${newModel}" saved successfully!`);
+    updateAirSideStats();
+}
+
+function showCurveGenerator() {
+    alert('Curve generator - Coming in Stage 4');
+}
+
 </script>
