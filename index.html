@@ -710,6 +710,8 @@
                             </div>
                             
                             <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">Save Alert</button>
+							<button type="button" class="btn" onclick="generateAlertTasks()" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">Generate Investigation Task</button>
+							<button type="button" class="btn btn-secondary" onclick="cancelAlertEdit()">Cancel</button>
                             <button type="button" class="btn btn-secondary" onclick="cancelAlertEdit()">Cancel</button>
                         </form>
                     </div>
@@ -975,20 +977,24 @@
                         <form id="projectForm" onsubmit="handleProjectSubmit(event)">
                             <input type="hidden" id="projectEditId">
                             
-                            <div class="three-column-row">
-                                <div class="form-group">
-                                    <label for="projectNumber">Project Number *</label>
-                                    <input type="text" id="projectNumber" required placeholder="PRJ-2025-001">
-                                </div>
-                                <div class="form-group">
-                                    <label for="projectCustomer">Customer Name *</label>
-                                    <input type="text" id="projectCustomer" required placeholder="Customer name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="projectPartNumber">Part Number *</label>
-                                    <input type="text" id="projectPartNumber" required placeholder="Part number">
-                                </div>
-                            </div>
+                            <div class="four-column-row">
+								<div class="form-group">
+									<label for="projectNumber">Project Number *</label>
+									<input type="text" id="projectNumber" required placeholder="PRJ-2025-001">
+								</div>
+								<div class="form-group">
+									<label for="projectCustomer">Customer Name *</label>
+									<input type="text" id="projectCustomer" required placeholder="Customer name">
+								</div>
+								<div class="form-group">
+									<label for="projectPartNumber">Part Number *</label>
+									<input type="text" id="projectPartNumber" required placeholder="Part number">
+								</div>
+								<div class="form-group">
+									<label for="projectRevision">Revision Level</label>
+									<input type="text" id="projectRevision" placeholder="Rev A, Rev 1.0">
+								</div>
+							</div>
 
                             <div class="form-group">
                                 <label for="projectPartDesc">Part Description</label>
@@ -1036,104 +1042,192 @@
                             </div>
 
                             <h3 style="margin: 30px 0 20px 0; color: #667eea;">Tooling Requirements</h3>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_pattern" onchange="toggleToolingStatus('pattern')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>Pattern</strong>
-                                    </label>
-                                    <select id="pattern_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_oe_mold" onchange="toggleToolingStatus('oe_mold')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>OE Mold</strong>
-                                    </label>
-                                    <select id="oe_mold_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+								<!-- Pattern -->
+								<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+									<label style="display: flex; align-items: center; margin-bottom: 10px;">
+										<input type="checkbox" id="needs_pattern" onchange="toggleToolingStatus('pattern')" style="margin-right: 10px; width: 18px; height: 18px;">
+										<strong>Pattern</strong>
+									</label>
+									<select id="pattern_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+										<option value="Not Started">Not Started</option>
+										<option value="In Progress">In Progress</option>
+										<option value="Completed">Completed</option>
+									</select>
+									<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+										<div>
+											<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+											<input type="date" id="pattern_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+										</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="pattern_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_me_mold" onchange="toggleToolingStatus('me_mold')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>ME Mold</strong>
-                                    </label>
-                                    <select id="me_mold_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
+							<!-- OE Mold -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_oe_mold" onchange="toggleToolingStatus('oe_mold')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>OE Mold</strong>
+								</label>
+								<select id="oe_mold_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="oe_mold_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="oe_mold_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_trim_fixture" onchange="toggleToolingStatus('trim_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>Trim Fixture</strong>
-                                    </label>
-                                    <select id="trim_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
+							<!-- ME Mold -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_me_mold" onchange="toggleToolingStatus('me_mold')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>ME Mold</strong>
+								</label>
+								<select id="me_mold_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="me_mold_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="me_mold_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_assembly_fixture" onchange="toggleToolingStatus('assembly_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>Assembly Fixture</strong>
-                                    </label>
-                                    <select id="assembly_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
+							<!-- Trim Fixture -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_trim_fixture" onchange="toggleToolingStatus('trim_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>Trim Fixture</strong>
+								</label>
+								<select id="trim_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="trim_fixture_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="trim_fixture_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_check_fixture" onchange="toggleToolingStatus('check_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>Check Fixture</strong>
-                                    </label>
-                                    <select id="check_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
+							<!-- Assembly Fixture -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_assembly_fixture" onchange="toggleToolingStatus('assembly_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>Assembly Fixture</strong>
+								</label>
+								<select id="assembly_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="assembly_fixture_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="assembly_fixture_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_drill_fixture" onchange="toggleToolingStatus('drill_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>Drill Fixture</strong>
-                                    </label>
-                                    <select id="drill_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
+							<!-- Check Fixture -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_check_fixture" onchange="toggleToolingStatus('check_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>Check Fixture</strong>
+								</label>
+								<select id="check_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="check_fixture_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="check_fixture_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
 
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                                        <input type="checkbox" id="needs_trim_program" onchange="toggleToolingStatus('trim_program')" style="margin-right: 10px; width: 18px; height: 18px;">
-                                        <strong>Trim Program</strong>
-                                    </label>
-                                    <select id="trim_program_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                </div>
-                            </div>
+							<!-- Drill Fixture -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_drill_fixture" onchange="toggleToolingStatus('drill_fixture')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>Drill Fixture</strong>
+								</label>
+								<select id="drill_fixture_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="drill_fixture_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="drill_fixture_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
+
+							<!-- Trim Program -->
+							<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+								<label style="display: flex; align-items: center; margin-bottom: 10px;">
+									<input type="checkbox" id="needs_trim_program" onchange="toggleToolingStatus('trim_program')" style="margin-right: 10px; width: 18px; height: 18px;">
+									<strong>Trim Program</strong>
+								</label>
+								<select id="trim_program_status" disabled style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px;">
+									<option value="Not Started">Not Started</option>
+									<option value="In Progress">In Progress</option>
+									<option value="Completed">Completed</option>
+								</select>
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Start Date</label>
+										<input type="date" id="trim_program_start_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+									<div>
+										<label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">End Date</label>
+										<input type="date" id="trim_program_end_date" disabled style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+									</div>
+								</div>
+							</div>
+						</div>
 
                             <div class="form-group">
                                 <label for="projectNotes">Project Notes</label>
@@ -1751,6 +1845,90 @@ async function deleteTaskFromDatabase(id) {
                 return false;
             }
         }
+		
+		async function deleteAlertFromDatabase(id) {
+    try {
+        const numericId = id.replace('QA-', '');
+        const result = await directApiCall('DELETE', `quality_alerts?id=eq.${parseInt(numericId)}`);
+        
+        if (result.error) throw result.error;
+        alerts = alerts.filter(a => a.id !== id);
+        return true;
+    } catch (error) {
+        console.error('Error deleting alert:', error);
+        alert('Error deleting from database. Please try again.');
+        return false;
+    }
+}
+
+async function generateAlertTasks() {
+    const alertId = document.getElementById('alertId').value;
+    
+    if (!alertId || !alertId.startsWith('QA-')) {
+        alert('Please save the alert first before generating tasks');
+        return;
+    }
+    
+    // Check if this is an existing alert
+    const existingAlert = alerts.find(a => a.id === alertId);
+    if (!existingAlert) {
+        alert('Please save the alert first before generating tasks');
+        return;
+    }
+    
+    const alertData = {
+        id: alertId,
+        description: document.getElementById('description').value,
+        assignedTo: document.getElementById('assignedTo').value,
+        department: document.getElementById('department').value,
+        priority: document.getElementById('priority').value,
+        dueDate: document.getElementById('dueDate').value,
+        partNumber: document.getElementById('partNumber').value,
+        customerSupplier: document.getElementById('customerSupplier').value
+    };
+    
+    if (!alertData.description) {
+        alert('Please enter a reason for rejection before generating tasks');
+        return;
+    }
+    
+    // Determine what type of task to create
+    const taskType = confirm(
+        'Generate task type:\n\n' +
+        'OK = Root Cause Investigation Task\n' +
+        'Cancel = Corrective Action Task'
+    );
+    
+    const taskData = {
+        id: taskIdCounter++,
+        title: taskType 
+            ? `Investigate Root Cause - Alert ${alertData.id}` 
+            : `Implement Corrective Action - Alert ${alertData.id}`,
+        category: 'Quality Control',
+        description: taskType
+            ? `Investigate root cause for quality alert ${alertData.id}\n\nIssue: ${alertData.description}\n\nCustomer: ${alertData.customerSupplier}\nPart: ${alertData.partNumber}\n\nAuto-generated from quality alert.`
+            : `Implement corrective action for quality alert ${alertData.id}\n\nIssue: ${alertData.description}\n\nCustomer: ${alertData.customerSupplier}\nPart: ${alertData.partNumber}\n\nAuto-generated from quality alert.`,
+        assigned_to: alertData.assignedTo || null,
+        task_type: alertData.department || 'Quality Control',
+        priority: alertData.priority,
+        status: 'Open',
+        due_date: alertData.dueDate || null,
+        estimated_hours: taskType ? 8 : 16,
+        progress: null,
+        notes: `Linked to Quality Alert: ${alertData.id}`,
+        created_date: new Date().toISOString().split('T')[0]
+    };
+    
+    const result = await directApiCall('POST', 'tasks', taskData);
+    
+    if (result.error) {
+        alert('Failed to create task: ' + result.error.message);
+    } else {
+        alert(`Task "${taskData.title}" created successfully!`);
+        await loadTasksFromDatabase();
+    }
+}
+		
 
         // Load sample tasks data (since we don't have tasks database table yet)
         function loadTasksSampleData() {
@@ -4100,6 +4278,7 @@ async function loadProjectsFromDatabase() {
             projectNumber: p.project_number,
             customer: p.customer_name,
             partNumber: p.part_number,
+			revisionLevel: p.revision_level,
             partDescription: p.part_description,
             projectManager: p.project_manager,
             startDate: p.start_date,
@@ -4197,12 +4376,16 @@ function showCreateProjectForm() {
     document.getElementById('projectFormTitle').textContent = 'Create New Project';
     document.getElementById('projectForm').reset();
     document.getElementById('projectEditId').value = '';
-    document.getElementById('projectNumber').value = generateProjectNumber(); // Auto-generate
+    document.getElementById('projectNumber').value = generateProjectNumber();
     document.getElementById('createProjectForm').classList.remove('hidden');
     document.getElementById('projectsList').classList.add('hidden');
     
-    ['pattern', 'oe_mold', 'me_mold', 'trim_fixture', 'assembly_fixture', 'check_fixture', 'drill_fixture', 'trim_program'].forEach(t => {
+    // Disable all tooling controls initially
+    const toolingTypes = ['pattern', 'oe_mold', 'me_mold', 'trim_fixture', 'assembly_fixture', 'check_fixture', 'drill_fixture', 'trim_program'];
+    toolingTypes.forEach(t => {
         document.getElementById(`${t}_status`).disabled = true;
+        document.getElementById(`${t}_start_date`).disabled = true;
+        document.getElementById(`${t}_end_date`).disabled = true;
     });
 }
 
@@ -4213,12 +4396,24 @@ function showAllProjects() {
     displayProjects(currentProjectFilter ? projects.filter(p => p.status === currentProjectFilter) : projects);
 }
 
-// Toggle tooling status dropdown
+// Toggle tooling status dropdown and date fields
 function toggleToolingStatus(type) {
     const checkbox = document.getElementById(`needs_${type}`);
     const status = document.getElementById(`${type}_status`);
-    status.disabled = !checkbox.checked;
-    if (!checkbox.checked) status.value = 'Not Started';
+    const startDate = document.getElementById(`${type}_start_date`);
+    const endDate = document.getElementById(`${type}_end_date`);
+    
+    const isChecked = checkbox.checked;
+    
+    status.disabled = !isChecked;
+    startDate.disabled = !isChecked;
+    endDate.disabled = !isChecked;
+    
+    if (!isChecked) {
+        status.value = 'Not Started';
+        startDate.value = '';
+        endDate.value = '';
+    }
 }
 
 // Handle project form submit
@@ -4229,6 +4424,7 @@ async function handleProjectSubmit(e) {
         project_number: document.getElementById('projectNumber').value,
         customer_name: document.getElementById('projectCustomer').value,
         part_number: document.getElementById('projectPartNumber').value,
+		revision_level: document.getElementById('projectRevision').value || null,
         part_description: document.getElementById('projectPartDesc').value,
         project_manager: document.getElementById('projectManager').value,
         priority: document.getElementById('projectPriority').value,
@@ -4236,38 +4432,84 @@ async function handleProjectSubmit(e) {
         start_date: document.getElementById('projectStartDate').value || null,
         target_completion: document.getElementById('projectTargetDate').value || null,
         actual_completion: document.getElementById('projectActualDate').value || null,
+        
+        // Pattern
         needs_pattern: document.getElementById('needs_pattern').checked,
         pattern_status: document.getElementById('needs_pattern').checked ? document.getElementById('pattern_status').value : null,
+        pattern_start_date: document.getElementById('needs_pattern').checked ? (document.getElementById('pattern_start_date').value || null) : null,
+        pattern_end_date: document.getElementById('needs_pattern').checked ? (document.getElementById('pattern_end_date').value || null) : null,
+        
+        // OE Mold
         needs_oe_mold: document.getElementById('needs_oe_mold').checked,
         oe_mold_status: document.getElementById('needs_oe_mold').checked ? document.getElementById('oe_mold_status').value : null,
+        oe_mold_start_date: document.getElementById('needs_oe_mold').checked ? (document.getElementById('oe_mold_start_date').value || null) : null,
+        oe_mold_end_date: document.getElementById('needs_oe_mold').checked ? (document.getElementById('oe_mold_end_date').value || null) : null,
+        
+        // ME Mold
         needs_me_mold: document.getElementById('needs_me_mold').checked,
         me_mold_status: document.getElementById('needs_me_mold').checked ? document.getElementById('me_mold_status').value : null,
+        me_mold_start_date: document.getElementById('needs_me_mold').checked ? (document.getElementById('me_mold_start_date').value || null) : null,
+        me_mold_end_date: document.getElementById('needs_me_mold').checked ? (document.getElementById('me_mold_end_date').value || null) : null,
+        
+        // Trim Fixture
         needs_trim_fixture: document.getElementById('needs_trim_fixture').checked,
         trim_fixture_status: document.getElementById('needs_trim_fixture').checked ? document.getElementById('trim_fixture_status').value : null,
+        trim_fixture_start_date: document.getElementById('needs_trim_fixture').checked ? (document.getElementById('trim_fixture_start_date').value || null) : null,
+        trim_fixture_end_date: document.getElementById('needs_trim_fixture').checked ? (document.getElementById('trim_fixture_end_date').value || null) : null,
+        
+        // Assembly Fixture
         needs_assembly_fixture: document.getElementById('needs_assembly_fixture').checked,
         assembly_fixture_status: document.getElementById('needs_assembly_fixture').checked ? document.getElementById('assembly_fixture_status').value : null,
+        assembly_fixture_start_date: document.getElementById('needs_assembly_fixture').checked ? (document.getElementById('assembly_fixture_start_date').value || null) : null,
+        assembly_fixture_end_date: document.getElementById('needs_assembly_fixture').checked ? (document.getElementById('assembly_fixture_end_date').value || null) : null,
+        
+        // Check Fixture
         needs_check_fixture: document.getElementById('needs_check_fixture').checked,
         check_fixture_status: document.getElementById('needs_check_fixture').checked ? document.getElementById('check_fixture_status').value : null,
+        check_fixture_start_date: document.getElementById('needs_check_fixture').checked ? (document.getElementById('check_fixture_start_date').value || null) : null,
+        check_fixture_end_date: document.getElementById('needs_check_fixture').checked ? (document.getElementById('check_fixture_end_date').value || null) : null,
+        
+        // Drill Fixture
         needs_drill_fixture: document.getElementById('needs_drill_fixture').checked,
         drill_fixture_status: document.getElementById('needs_drill_fixture').checked ? document.getElementById('drill_fixture_status').value : null,
+        drill_fixture_start_date: document.getElementById('needs_drill_fixture').checked ? (document.getElementById('drill_fixture_start_date').value || null) : null,
+        drill_fixture_end_date: document.getElementById('needs_drill_fixture').checked ? (document.getElementById('drill_fixture_end_date').value || null) : null,
+        
+        // Trim Program
         needs_trim_program: document.getElementById('needs_trim_program').checked,
         trim_program_status: document.getElementById('needs_trim_program').checked ? document.getElementById('trim_program_status').value : null,
+        trim_program_start_date: document.getElementById('needs_trim_program').checked ? (document.getElementById('trim_program_start_date').value || null) : null,
+        trim_program_end_date: document.getElementById('needs_trim_program').checked ? (document.getElementById('trim_program_end_date').value || null) : null,
+        
         notes: document.getElementById('projectNotes').value,
         created_by: currentUser ? currentUser.email : 'system'
     };
     
     const editId = document.getElementById('projectEditId').value;
+    const isNewProject = !editId;
     
     try {
+        let projectId;
+        
         if (editId) {
             const result = await directApiCall('PATCH', `projects?id=eq.${editId}`, projectData);
             if (result.error) throw result.error;
+            projectId = editId;
             alert('Project updated successfully!');
-         } else {
+        } else {
             const result = await directApiCall('POST', 'projects', projectData);
             if (result.error) throw result.error;
-            projectIdCounter++; // Increment counter
-            alert('Project created successfully!');
+            projectId = result.data[0].id;
+            projectIdCounter++;
+            
+            // Auto-generate tasks for new project
+            const generatedTasks = await autoGenerateProjectTasks(projectData, projectId);
+            
+            if (generatedTasks > 0) {
+                alert(`Project created successfully!\n${generatedTasks} tasks auto-generated for tooling items.`);
+            } else {
+                alert('Project created successfully!');
+            }
         }
         
         await loadProjectsFromDatabase();
@@ -4276,6 +4518,51 @@ async function handleProjectSubmit(e) {
         alert('Error saving project: ' + error.message);
         console.error('Save error:', error);
     }
+}
+
+async function autoGenerateProjectTasks(projectData, projectId) {
+    let tasksCreated = 0;
+    
+    const toolingItems = [
+        { needs: projectData.needs_pattern, name: 'Pattern', status: projectData.pattern_status },
+        { needs: projectData.needs_oe_mold, name: 'OE Mold', status: projectData.oe_mold_status },
+        { needs: projectData.needs_me_mold, name: 'ME Mold', status: projectData.me_mold_status },
+        { needs: projectData.needs_trim_fixture, name: 'Trim Fixture', status: projectData.trim_fixture_status },
+        { needs: projectData.needs_assembly_fixture, name: 'Assembly Fixture', status: projectData.assembly_fixture_status },
+        { needs: projectData.needs_check_fixture, name: 'Check Fixture', status: projectData.check_fixture_status },
+        { needs: projectData.needs_drill_fixture, name: 'Drill Fixture', status: projectData.drill_fixture_status },
+        { needs: projectData.needs_trim_program, name: 'Trim Program', status: projectData.trim_program_status }
+    ];
+    
+    for (const item of toolingItems) {
+        if (item.needs && item.status === 'Not Started') {
+            const taskData = {
+                id: taskIdCounter++,
+                title: `Complete ${item.name} for ${projectData.part_number}`,
+                category: 'Manufacturing',
+                description: `${item.name} required for project ${projectData.project_number}\nCustomer: ${projectData.customer_name}\nPart: ${projectData.part_number}\n\nAuto-generated from project creation.`,
+                assigned_to: projectData.project_manager || null,
+                task_type: 'Engineering',
+                priority: projectData.priority,
+                status: 'Open',
+                due_date: projectData.target_completion || null,
+                estimated_hours: null,
+                progress: null,
+                notes: `Linked to Project: ${projectData.project_number}`,
+                created_date: new Date().toISOString().split('T')[0]
+            };
+            
+            const result = await directApiCall('POST', 'tasks', taskData);
+            if (!result.error) {
+                tasksCreated++;
+            }
+        }
+    }
+    
+    // Reload tasks to show new ones
+    await loadTasksFromDatabase();
+    
+    return tasksCreated;
 }
 
 // Edit project
@@ -4291,7 +4578,8 @@ async function editProject(id) {
         document.getElementById('projectNumber').value = p.project_number;
         document.getElementById('projectCustomer').value = p.customer_name;
         document.getElementById('projectPartNumber').value = p.part_number;
-        document.getElementById('projectPartDesc').value = p.part_description || '';
+        document.getElementById('projectRevision').value = p.revision_level || '';
+		document.getElementById('projectPartDesc').value = p.part_description || '';
         document.getElementById('projectManager').value = p.project_manager || '';
         document.getElementById('projectPriority').value = p.priority;
         document.getElementById('projectStatus').value = p.status;
@@ -4300,12 +4588,23 @@ async function editProject(id) {
         document.getElementById('projectActualDate').value = p.actual_completion || '';
         document.getElementById('projectNotes').value = p.notes || '';
         
-        ['pattern', 'oe_mold', 'me_mold', 'trim_fixture', 'assembly_fixture', 'check_fixture', 'drill_fixture', 'trim_program'].forEach(t => {
+        // Populate tooling data with dates
+        const toolingTypes = ['pattern', 'oe_mold', 'me_mold', 'trim_fixture', 'assembly_fixture', 'check_fixture', 'drill_fixture', 'trim_program'];
+        
+        toolingTypes.forEach(t => {
             const cb = document.getElementById(`needs_${t}`);
             const st = document.getElementById(`${t}_status`);
+            const startDate = document.getElementById(`${t}_start_date`);
+            const endDate = document.getElementById(`${t}_end_date`);
+            
             cb.checked = p[`needs_${t}`] || false;
             st.disabled = !cb.checked;
+            startDate.disabled = !cb.checked;
+            endDate.disabled = !cb.checked;
+            
             st.value = p[`${t}_status`] || 'Not Started';
+            startDate.value = p[`${t}_start_date`] || '';
+            endDate.value = p[`${t}_end_date`] || '';
         });
         
         document.getElementById('createProjectForm').classList.remove('hidden');
@@ -4818,12 +5117,12 @@ async function generatePASR(projectId) {
             margin-bottom: 10px;
         }
     }
-</style>
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="no-print print-controls">
-            <button onclick="window.print()" class="print-btn print-btn-primary">🖨️ Print PASR</button>
+            <button onclick="printPASR()" class="print-btn print-btn-primary">🖨️ Print PASR</button>
             <button onclick="window.close()" class="print-btn print-btn-secondary">✕ Close</button>
         </div>
 
@@ -4843,9 +5142,9 @@ async function generatePASR(projectId) {
                     <div class="info-value">${project.part_number}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Revision Level</div>
-                    <div class="info-value">Rev ${project.notes || '1'}</div>
-                </div>
+					<div class="info-label">Revision Level</div>
+					<div class="info-value">${project.revision_level || 'Rev 1'}</div>
+				</div>
             </div>
 
             <div class="section">
@@ -4911,24 +5210,24 @@ async function generatePASR(projectId) {
                 <div class="section-content">
                     <div class="status-grid">
                         <div class="checkbox-item">
-                            <div class="checkbox ${project.status === 'Completed' ? 'checked' : ''}"></div>
-                            <div class="checkbox-label">Approved</div>
+                            <input type="checkbox" id="pasr_approved" style="width: 14px; height: 14px; margin-right: 8px;">
+                            <label for="pasr_approved" class="checkbox-label">Approved</label>
                         </div>
                         <div class="checkbox-item">
-                            <div class="checkbox"></div>
-                            <div class="checkbox-label">Conditional Approval</div>
+                            <input type="checkbox" id="pasr_conditional" style="width: 14px; height: 14px; margin-right: 8px;">
+                            <label for="pasr_conditional" class="checkbox-label">Conditional Approval</label>
                         </div>
                         <div class="checkbox-item">
-                            <div class="checkbox"></div>
-                            <div class="checkbox-label">Process Sheets Complete</div>
+                            <input type="checkbox" id="pasr_process_sheets" style="width: 14px; height: 14px; margin-right: 8px;">
+                            <label for="pasr_process_sheets" class="checkbox-label">Process Sheets Complete</label>
                         </div>
                         <div class="checkbox-item">
-                            <div class="checkbox"></div>
-                            <div class="checkbox-label">Tooling Moved to Required Department</div>
+                            <input type="checkbox" id="pasr_tooling_moved" style="width: 14px; height: 14px; margin-right: 8px;">
+                            <label for="pasr_tooling_moved" class="checkbox-label">Tooling Moved to Required Department</label>
                         </div>
                         <div class="checkbox-item">
-                            <div class="checkbox"></div>
-                            <div class="checkbox-label">Invoice Tooling</div>
+                            <input type="checkbox" id="pasr_invoice" style="width: 14px; height: 14px; margin-right: 8px;">
+                            <label for="pasr_invoice" class="checkbox-label">Invoice Tooling</label>
                         </div>
                     </div>
                 </div>
@@ -4937,9 +5236,7 @@ async function generatePASR(projectId) {
             <div class="section">
                 <div class="section-header">Comments</div>
                 <div class="section-content">
-                    <div class="comments-box">
-                        ${project.notes || 'No additional comments'}
-                    </div>
+                    <textarea id="pasr_comments" class="comments-box" style="border: 2px solid #ddd; min-height: 80px; width: 100%; padding: 12px; font-family: Arial; font-size: 11px; line-height: 1.5;" placeholder="Enter additional comments here...">${project.notes || ''}</textarea>
                 </div>
             </div>
 
@@ -4950,8 +5247,41 @@ async function generatePASR(projectId) {
             </div>
         </div>
     </div>
-</body>
-</html>
+
+    <script>
+    function printPASR() {
+        const checkboxes = ['pasr_approved', 'pasr_conditional', 'pasr_process_sheets', 'pasr_tooling_moved', 'pasr_invoice'];
+        
+        checkboxes.forEach(id => {
+            const checkbox = document.getElementById(id);
+            const parent = checkbox.parentElement;
+            
+            if (checkbox.checked) {
+                const checkedDiv = document.createElement('div');
+                checkedDiv.className = 'checkbox checked';
+                checkedDiv.style.cssText = 'width: 14px; height: 14px; border: 2px solid #27ae60; background: #27ae60; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px;';
+                checkedDiv.innerHTML = '<span style="color: white; font-size: 11px; font-weight: bold;">✓</span>';
+                parent.insertBefore(checkedDiv, checkbox);
+                checkbox.style.display = 'none';
+            } else {
+                const uncheckedDiv = document.createElement('div');
+                uncheckedDiv.className = 'checkbox';
+                uncheckedDiv.style.cssText = 'width: 14px; height: 14px; border: 2px solid #003366; background: white; border-radius: 3px; display: inline-flex; margin-right: 8px;';
+                parent.insertBefore(uncheckedDiv, checkbox);
+                checkbox.style.display = 'none';
+            }
+        });
+        
+        const commentsBox = document.getElementById('pasr_comments');
+        commentsBox.readOnly = true;
+        commentsBox.style.border = '1px dashed #ccc';
+        
+        window.print();
+        
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
         `;
         
         const printWindow = window.open('', '_blank');
@@ -5551,4 +5881,6 @@ function showCurveGenerator() {
     alert('Curve generator - Coming in Stage 4');
 }
 
-</script>
+	</script>
+</body>
+</html>
