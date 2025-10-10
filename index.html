@@ -973,11 +973,19 @@
 
                 <div class="main-panel">
                     <div id="createProjectForm" class="hidden">
-                        <h2 id="projectFormTitle">Create New Project</h2>
-                        <form id="projectForm" onsubmit="handleProjectSubmit(event)">
-                            <input type="hidden" id="projectEditId">
-                            
-                            <div class="four-column-row">
+						<h2 id="projectFormTitle">Create New Project</h2>
+    
+						<!-- Action Buttons at Top -->
+						<div style="display: flex; gap: 10px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #ecf0f1;">
+							<button type="submit" form="projectForm" class="btn" style="padding: 12px 30px; font-size: 16px;">💾 Save Project</button>
+							<button type="button" id="pasrButton" class="btn" onclick="generatePASRFromForm()" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 12px 30px; font-size: 16px;">📄 Generate PASR</button>
+							<button type="button" class="btn btn-secondary" onclick="cancelProjectForm()" style="padding: 12px 30px; font-size: 16px;">✕ Cancel</button>
+						</div>
+    
+						<form id="projectForm" onsubmit="handleProjectSubmit(event)">
+							<input type="hidden" id="projectEditId">
+        
+							<div class="four-column-row">
 								<div class="form-group">
 									<label for="projectNumber">Project Number *</label>
 									<input type="text" id="projectNumber" required placeholder="PRJ-2025-001">
@@ -1236,6 +1244,7 @@
 
                             <div style="display: flex; gap: 10px; margin-top: 20px;">
 							
+							
 							<!-- PROJECT DOCUMENTS SECTION -->
                             <div style="border-top: 2px solid #667eea; margin-top: 30px; padding-top: 30px;">
                                 <h3 style="color: #667eea; margin-bottom: 20px;">Project Documents</h3>
@@ -1260,10 +1269,7 @@
                                     <!-- Documents will be listed here -->
                                 </div>
                             </div>
-							
-                                <button type="submit" class="btn">Save Project</button>
-                                <button type="button" class="btn btn-secondary" onclick="cancelProjectForm()">Cancel</button>
-                            </div>
+							</div> 
                         </form>
                     </div>
 
@@ -1295,14 +1301,13 @@
 							</thead>
                             <tbody id="projectsTableBody">
                                 <tr>
-                                    <td colspan="8" style="text-align: center; padding: 40px;">No projects found</td>
+                                    <td colspan="9" style="text-align: center; padding: 40px;">No projects found</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
+        
 		
 		<!-- Air Side Systems Page -->
     <div id="airSidePage" class="hidden">
@@ -4182,31 +4187,54 @@ function generateProjectNumber() {
 
 // Show Project Management page
 function showProjectManagement() {
+    console.log('=== SHOW PROJECT MANAGEMENT ===');
     currentPage = 'projects';
+    
+    // Hide all pages
     document.getElementById('homePage').classList.add('hidden');
     document.getElementById('qualityAlertsPage').classList.add('hidden');
     document.getElementById('taskManagementPage').classList.add('hidden');
-    document.getElementById('projectsPage').classList.remove('hidden');
+    const airSidePage = document.getElementById('airSidePage');
+    if (airSidePage) airSidePage.classList.add('hidden');
+    
+    // Show projects page
+	const projectsPage = document.getElementById('projectsPage');
+	console.log('Before removing hidden:', projectsPage.className);
+	projectsPage.classList.remove('hidden');
+	console.log('After removing hidden:', projectsPage.className);
+    
+    // FORCE visibility
+    projectsPage.style.display = 'block';
+    projectsPage.style.visibility = 'visible';
+    
+    console.log('projectsPage after unhiding:', {
+        hasHiddenClass: projectsPage.classList.contains('hidden'),
+        display: window.getComputedStyle(projectsPage).display,
+        visibility: window.getComputedStyle(projectsPage).visibility
+    });
+    
+    // Update breadcrumb
     document.getElementById('breadcrumb').style.display = 'block';
     document.getElementById('currentPage').textContent = 'Project Management';
+    
+    // Load data
+    console.log('Loading projects...');
     loadProjectsFromDatabase();
     updateProjectStats();
 }
 
-// Secure project management functions
-// Secure project management functions
+// Secure project management access
 function showProjectManagementSecure() {
+    if (!currentUser) {
+        alert('Please log in to access Project Management');
+        return;
+    }
+    
     if (!requirePermission(PERMISSIONS.VIEW_TASKS, 'view projects')) {
         return;
     }
-    showProjectManagement();
     
-    // If viewer role, make form read-only after it's displayed
-    if (currentUser && currentUser.role === USER_ROLES.VIEWER) {
-        setTimeout(() => {
-            makeProjectFormReadOnly();
-        }, 100);
-    }
+    showProjectManagement();
 }
 
 function makeProjectFormReadOnly() {
@@ -4278,7 +4306,7 @@ async function loadProjectsFromDatabase() {
             projectNumber: p.project_number,
             customer: p.customer_name,
             partNumber: p.part_number,
-			revisionLevel: p.revision_level,
+            revisionLevel: p.revision_level || '',
             partDescription: p.part_description,
             projectManager: p.project_manager,
             startDate: p.start_date,
@@ -4286,27 +4314,61 @@ async function loadProjectsFromDatabase() {
             actualCompletion: p.actual_completion,
             status: p.status,
             priority: p.priority,
+            
+            // Pattern
             needs_pattern: p.needs_pattern,
             pattern_status: p.pattern_status,
+            pattern_start_date: p.pattern_start_date || null,
+            pattern_end_date: p.pattern_end_date || null,
+            
+            // OE Mold
             needs_oe_mold: p.needs_oe_mold,
             oe_mold_status: p.oe_mold_status,
+            oe_mold_start_date: p.oe_mold_start_date || null,
+            oe_mold_end_date: p.oe_mold_end_date || null,
+            
+            // ME Mold
             needs_me_mold: p.needs_me_mold,
             me_mold_status: p.me_mold_status,
+            me_mold_start_date: p.me_mold_start_date || null,
+            me_mold_end_date: p.me_mold_end_date || null,
+            
+            // Trim Fixture
             needs_trim_fixture: p.needs_trim_fixture,
             trim_fixture_status: p.trim_fixture_status,
+            trim_fixture_start_date: p.trim_fixture_start_date || null,
+            trim_fixture_end_date: p.trim_fixture_end_date || null,
+            
+            // Assembly Fixture
             needs_assembly_fixture: p.needs_assembly_fixture,
             assembly_fixture_status: p.assembly_fixture_status,
+            assembly_fixture_start_date: p.assembly_fixture_start_date || null,
+            assembly_fixture_end_date: p.assembly_fixture_end_date || null,
+            
+            // Check Fixture
             needs_check_fixture: p.needs_check_fixture,
             check_fixture_status: p.check_fixture_status,
+            check_fixture_start_date: p.check_fixture_start_date || null,
+            check_fixture_end_date: p.check_fixture_end_date || null,
+            
+            // Drill Fixture
             needs_drill_fixture: p.needs_drill_fixture,
             drill_fixture_status: p.drill_fixture_status,
+            drill_fixture_start_date: p.drill_fixture_start_date || null,
+            drill_fixture_end_date: p.drill_fixture_end_date || null,
+            
+            // Trim Program
             needs_trim_program: p.needs_trim_program,
             trim_program_status: p.trim_program_status,
+            trim_program_start_date: p.trim_program_start_date || null,
+            trim_program_end_date: p.trim_program_end_date || null,
+            
             notes: p.notes,
             createdAt: p.created_at
         }));
         
-         displayProjects(projects);
+        console.log('Mapped projects:', projects); // Debug line
+        displayProjects(projects);
         updateProjectStats();
         
         // Set counter to highest existing project number + 1
@@ -4326,42 +4388,142 @@ async function loadProjectsFromDatabase() {
 
 // Display projects in table
 function displayProjects(projectsToShow) {
+    console.log('=== DISPLAY PROJECTS DEBUG ===');
+    console.log('1. displayProjects called');
+    console.log('2. projectsToShow:', projectsToShow);
+    console.log('3. projectsToShow length:', projectsToShow ? projectsToShow.length : 'undefined');
+    
     const tbody = document.getElementById('projectsTableBody');
+    console.log('4. tbody element:', tbody);
+    
     if (!projectsToShow || projectsToShow.length === 0) {
+        console.log('5. No projects to show - displaying empty message');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;">No projects found</td></tr>';
         return;
     }
     
-    tbody.innerHTML = projectsToShow.map(p => {
-        const tooling = [];
-        if (p.needs_pattern) tooling.push('Pattern');
-        if (p.needs_oe_mold) tooling.push('OE Mold');
-        if (p.needs_me_mold) tooling.push('ME Mold');
-        if (p.needs_trim_fixture) tooling.push('Trim Fix');
-        if (p.needs_assembly_fixture) tooling.push('Asm Fix');
-        if (p.needs_check_fixture) tooling.push('Check Fix');
-        if (p.needs_drill_fixture) tooling.push('Drill Fix');
-        if (p.needs_trim_program) tooling.push('Trim Prog');
+    console.log('6. Starting to build table HTML for', projectsToShow.length, 'projects');
+    
+    try {
+        const rowsHTML = projectsToShow.map((p, index) => {
+            console.log(`7. Processing project ${index + 1}:`, p);
+            
+            const tooling = [];
+            if (p.needs_pattern) tooling.push('Pattern');
+            if (p.needs_oe_mold) tooling.push('OE Mold');
+            if (p.needs_me_mold) tooling.push('ME Mold');
+            if (p.needs_trim_fixture) tooling.push('Trim Fix');
+            if (p.needs_assembly_fixture) tooling.push('Asm Fix');
+            if (p.needs_check_fixture) tooling.push('Check Fix');
+            if (p.needs_drill_fixture) tooling.push('Drill Fix');
+            if (p.needs_trim_program) tooling.push('Trim Prog');
+            
+            console.log(`8. Project ${index + 1} tooling:`, tooling);
+            
+            return `
+                <tr>
+                    <td><strong>${p.projectNumber}</strong></td>
+                    <td>${p.customer}</td>
+                    <td>${p.partNumber}${p.revisionLevel ? ' / ' + p.revisionLevel : ''}</td>
+                    <td>${p.projectManager || 'Unassigned'}</td>
+                    <td><span class="status-${p.status.toLowerCase().replace(' ', '-')}">${p.status}</span></td>
+                    <td class="priority-${p.priority.toLowerCase()}">${p.priority}</td>
+                    <td>${p.targetCompletion ? formatDate(p.targetCompletion) : 'Not set'}</td>
+                    <td style="font-size: 11px;">${tooling.join(', ') || 'None'}</td>
+                    <td>
+                        <button class="btn" onclick="editProjectSecure(${p.id})" style="padding: 6px 10px; margin: 2px;">Edit</button>
+                        <button class="btn" onclick="deleteProjectSecure(${p.id})" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 6px 10px; margin: 2px;">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
         
-        return `
-            <tr>
-                <td><strong>${p.projectNumber}</strong></td>
-                <td>${p.customer}</td>
-                <td>${p.partNumber}</td>
-                <td>${p.projectManager || 'Unassigned'}</td>
-                <td><span class="status-${p.status.toLowerCase().replace(' ', '-')}">${p.status}</span></td>
-                <td class="priority-${p.priority.toLowerCase()}">${p.priority}</td>
-                <td>${p.targetCompletion ? formatDate(p.targetCompletion) : 'Not set'}</td>
-                <td style="font-size: 11px;">${tooling.join(', ') || 'None'}</td>
-                <td>
-                    <button class="btn" onclick="editProjectSecure(${p.id})" style="padding: 6px 10px; margin: 2px;">Edit</button>
-                    <button class="btn" onclick="generatePASR(${p.id})" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 6px 10px; margin: 2px;">PASR</button>
-                    <button class="btn" onclick="deleteProjectSecure(${p.id})" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 6px 10px; margin: 2px;">Delete</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
+        console.log('9. HTML generated, length:', rowsHTML.length);
+        console.log('10. First 200 chars of HTML:', rowsHTML.substring(0, 200));
+        
+        tbody.innerHTML = rowsHTML;
+		console.log('11. innerHTML set successfully');
+
+		// FORCE visibility
+		const table = document.getElementById('projectsTable');
+		const projList = document.getElementById('projectsList');  // ← Changed variable name
+		const mainPanel = document.querySelector('#projectsPage .main-panel');
+
+		console.log('12. Forcing visibility...');
+		console.log('    table element:', table);
+		console.log('    projList element:', projList);
+		console.log('    mainPanel element:', mainPanel);
+
+		if (table) {
+			table.style.display = 'table';
+			table.style.visibility = 'visible';
+			console.log('    table forced visible');
+		}
+		if (projList) {
+			projList.style.display = 'block';
+			projList.style.visibility = 'visible';
+			console.log('    projList forced visible');
+		}
+		if (mainPanel) {
+			mainPanel.style.display = 'block';
+			mainPanel.style.visibility = 'visible';
+			console.log('    mainPanel forced visible');
+		}
+
+		// Check computed styles
+		if (table) {
+			const computed = window.getComputedStyle(table);
+			console.log('13. Table computed styles:', {
+				display: computed.display,
+				visibility: computed.visibility,
+				opacity: computed.opacity,
+				position: computed.position
+			});
+		}
+
+		console.log('=== END DEBUG ===');
+
+		// Check page visibility
+		console.log('=== PAGE VISIBILITY CHECK ===');
+		const projectsPage = document.getElementById('projectsPage');
+		const projectsList = document.getElementById('projectsList');
+		const createForm = document.getElementById('createProjectForm');
+		console.log('projectsPage exists:', projectsPage ? 'YES' : 'NO');
+		console.log('projectsPage hidden:', projectsPage?.classList.contains('hidden'));
+		console.log('projectsList exists:', projectsList ? 'YES' : 'NO');
+		console.log('projectsList hidden:', projectsList?.classList.contains('hidden'));
+		console.log('createProjectForm hidden:', createForm?.classList.contains('hidden'));
+		console.log('tbody parent visibility:', tbody.offsetParent !== null ? 'VISIBLE' : 'HIDDEN');
+	
+	// ADD THIS ENTIRE BLOCK HERE ↓
+	console.log('=== DOM TREE WALK ===');
+	let element = tbody;
+	let level = 0;
+	while (element && level < 12) {
+		const computed = window.getComputedStyle(element);
+		const rect = element.getBoundingClientRect();
+		console.log(`${level}. ${element.tagName}#${element.id || 'none'}.${element.className || 'none'}`, {
+			display: computed.display,
+			visibility: computed.visibility,
+			opacity: computed.opacity,
+			height: computed.height,
+			offsetParent: element.offsetParent ? 'EXISTS' : 'NULL',
+			boundingRect: `${rect.width}x${rect.height}`,
+			isVisible: rect.width > 0 && rect.height > 0
+		});
+		element = element.parentElement;
+		level++;
+	}
+	console.log('=== END DOM TREE WALK ===');
+	
+	
+    } catch (error) {
+        console.error('ERROR in displayProjects:', error);
+        console.error('Error stack:', error.stack);
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error displaying projects - check console</td></tr>';
+    }
 }
+    
 
 // Update project stats
 function updateProjectStats() {
@@ -4371,7 +4533,6 @@ function updateProjectStats() {
     document.getElementById('completedProjects').textContent = projects.filter(p => p.status === 'Completed').length;
 }
 
-// Show create project form
 function showCreateProjectForm() {
     document.getElementById('projectFormTitle').textContent = 'Create New Project';
     document.getElementById('projectForm').reset();
@@ -4387,12 +4548,22 @@ function showCreateProjectForm() {
         document.getElementById(`${t}_start_date`).disabled = true;
         document.getElementById(`${t}_end_date`).disabled = true;
     });
+    
+    // Disable PASR button for new projects
+    const pasrButton = document.getElementById('pasrButton');
+    if (pasrButton) {
+        pasrButton.disabled = true;
+        pasrButton.style.opacity = '0.5';
+        pasrButton.style.cursor = 'not-allowed';
+    }
 }
 
 // Show all projects
 function showAllProjects() {
+    console.log('showAllProjects called');
     document.getElementById('createProjectForm').classList.add('hidden');
     document.getElementById('projectsList').classList.remove('hidden');
+    console.log('projectsList should now be visible');
     displayProjects(currentProjectFilter ? projects.filter(p => p.status === currentProjectFilter) : projects);
 }
 
@@ -4609,6 +4780,14 @@ async function editProject(id) {
         
         document.getElementById('createProjectForm').classList.remove('hidden');
         document.getElementById('projectsList').classList.add('hidden');
+		
+		// Enable PASR button for existing projects
+		const pasrButton = document.getElementById('pasrButton');
+		if (pasrButton) {
+			pasrButton.disabled = false;
+			pasrButton.style.opacity = '1';
+			pasrButton.style.cursor = 'pointer';
+		}
     } catch (error) {
         alert('Error loading project');
         console.error(error);
@@ -5122,7 +5301,7 @@ async function generatePASR(projectId) {
 <body>
     <div class="container">
         <div class="no-print print-controls">
-            <button onclick="printPASR()" class="print-btn print-btn-primary">🖨️ Print PASR</button>
+            <button onclick="window.print()" class="print-btn print-btn-primary">🖨️ Print PASR</button>
             <button onclick="window.close()" class="print-btn print-btn-secondary">✕ Close</button>
         </div>
 
@@ -5250,10 +5429,13 @@ async function generatePASR(projectId) {
 
     <script>
     function printPASR() {
+        console.log('printPASR called');
         const checkboxes = ['pasr_approved', 'pasr_conditional', 'pasr_process_sheets', 'pasr_tooling_moved', 'pasr_invoice'];
         
         checkboxes.forEach(id => {
             const checkbox = document.getElementById(id);
+            if (!checkbox) return;
+            
             const parent = checkbox.parentElement;
             
             if (checkbox.checked) {
@@ -5273,8 +5455,10 @@ async function generatePASR(projectId) {
         });
         
         const commentsBox = document.getElementById('pasr_comments');
-        commentsBox.readOnly = true;
-        commentsBox.style.border = '1px dashed #ccc';
+        if (commentsBox) {
+            commentsBox.readOnly = true;
+            commentsBox.style.border = '1px dashed #ccc';
+        }
         
         window.print();
         
@@ -5282,6 +5466,9 @@ async function generatePASR(projectId) {
             location.reload();
         }, 1000);
     }
+  
+</body>
+</html>
         `;
         
         const printWindow = window.open('', '_blank');
@@ -5413,6 +5600,29 @@ function addPerformancePoint() {
     document.getElementById('newHP').value = '';
     
     displayPerformancePoints();
+}
+
+// Generate PASR from the current form (for editing/creating)
+function generatePASRFromForm() {
+    const projectId = document.getElementById('projectEditId').value;
+    
+    console.log('generatePASRFromForm called, projectId:', projectId);
+    
+    if (!projectId) {
+        alert('Please save the project first before generating a PASR.\n\nClick "Save Project" then you can generate the PASR.');
+        return;
+    }
+    
+    // Convert to integer and call the existing function
+    const numericId = parseInt(projectId);
+    console.log('Calling generatePASR with ID:', numericId);
+    
+    if (isNaN(numericId)) {
+        alert('Invalid project ID');
+        return;
+    }
+    
+    generatePASR(numericId);
 }
 
 function displayPerformancePoints() {
@@ -5880,6 +6090,17 @@ function saveAsNewFan() {
 function showCurveGenerator() {
     alert('Curve generator - Coming in Stage 4');
 }
+
+// DEBUG: Check if projects table exists on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        console.log('=== PAGE STRUCTURE CHECK ===');
+        console.log('projectsPage exists:', document.getElementById('projectsPage') ? 'YES' : 'NO');
+        console.log('projectsTable exists:', document.getElementById('projectsTable') ? 'YES' : 'NO');
+        console.log('projectsTableBody exists:', document.getElementById('projectsTableBody') ? 'YES' : 'NO');
+        console.log('projectsPage is hidden:', document.getElementById('projectsPage')?.classList.contains('hidden'));
+    }, 2000);
+});
 
 	</script>
 </body>
